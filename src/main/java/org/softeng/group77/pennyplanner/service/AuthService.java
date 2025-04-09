@@ -10,5 +10,5 @@ public interface AuthService {
 
     User login(String username, String password) throws AuthenticationException;
 
-    User register(String username, String password, String email);
+    User register(String username, String password, String email, String phone);
 }
