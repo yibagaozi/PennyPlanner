@@ -61,8 +61,7 @@ public class AuthServiceImpl implements AuthService {
             currentUser = userOpt.get();
             log.info("User {} attempting to login", usernameTrim);
 
-            if (!passwordEncoder.matches(passwordHash, currentUser.getPasswordHash())) {
-                throw new AuthenticationException("Invalid username or password.");
+            if (!passwordEncoder.matches(password, currentUser.getPasswordHash())) {
             }
 
             currentUser.setLastLoginAt(LocalDateTime.now());
