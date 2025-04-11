@@ -2,6 +2,7 @@ package org.softeng.group77.pennyplanner.repository;
 
 import org.softeng.group77.pennyplanner.model.User;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository {
@@ -10,5 +11,12 @@ public interface UserRepository {
 
     Optional<User> findByEmail(String email);
 
-    void save(User newUser);
+    Optional<User> findById(String id);
+
+    List<User> findAll();
+
+    User save(User newUser);
+
+    boolean deleteById(String id);
+
 }
