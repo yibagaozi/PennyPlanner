@@ -24,18 +24,18 @@ public class User {
 
     public User(String username, String passwordHash, String email, String phone) {
         this.id = UUID.randomUUID().toString();
-        setUsername(username);
+        this.username = new SimpleStringProperty(username);
+        this.email = new SimpleStringProperty(email);
+        this.phone = new SimpleStringProperty(phone);
         this.passwordHash = passwordHash;
-        setEmail(email);
-        setPhone(phone);
         this.createdAt = LocalDateTime.now();
     }
 
     public User(String id, StringProperty username, StringProperty email, StringProperty phone, LocalDateTime createdAt) {
         this.id = id;
-        this.username = username;
-        this.email = email;
-        this.phone = phone;
+        this.username = username != null ? username : new SimpleStringProperty();
+        this.email = email != null ? email : new SimpleStringProperty();
+        this.phone = phone != null ? phone : new SimpleStringProperty();
         this.passwordHash = null;
         this.createdAt = createdAt;
         this.lastLoginAt = LocalDateTime.now();
