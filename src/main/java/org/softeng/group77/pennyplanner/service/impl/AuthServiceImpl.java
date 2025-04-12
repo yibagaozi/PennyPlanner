@@ -172,7 +172,7 @@ public class AuthServiceImpl implements AuthService {
             return updatedInfo;
         } catch (Exception e) {
             log.error("Error while changing password: ", e);
-            throw new RuntimeException(e);
+            throw new AuthenticationException("An error occurred while changing password. Please try again later.");
         }
     }
 
