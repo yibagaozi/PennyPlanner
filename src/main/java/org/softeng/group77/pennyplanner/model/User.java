@@ -1,5 +1,6 @@
 package org.softeng.group77.pennyplanner.model;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import lombok.Getter;
 import lombok.Setter;
