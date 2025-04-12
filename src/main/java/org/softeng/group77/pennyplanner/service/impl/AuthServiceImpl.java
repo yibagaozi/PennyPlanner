@@ -202,7 +202,7 @@ public class AuthServiceImpl implements AuthService {
 
         LocalDateTime now = LocalDateTime.now();
         Duration elapsed = Duration.between(cacheTimestamp, now);
-        return elapsed.compareTo(cacheExpiration) > 0;
+        return elapsed.compareTo(cacheExpiration) < 0;
     }
 
 }
