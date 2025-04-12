@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.naming.AuthenticationException;
+import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -83,7 +84,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public UserInfo register(String username, String password, String email, String phone) {
+    public UserInfo register(String username, String password, String email, String phone) throws IOException {
 
         log.info("Registering user with username: {} and email: {}", username, email);
 

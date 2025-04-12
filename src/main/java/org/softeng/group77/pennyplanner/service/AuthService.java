@@ -5,13 +5,14 @@ import org.softeng.group77.pennyplanner.model.User;
 import org.springframework.stereotype.Component;
 
 import javax.naming.AuthenticationException;
+import java.io.IOException;
 
 @Component
 public interface AuthService {
 
     UserInfo login(String username, String password) throws AuthenticationException;
 
-    UserInfo register(String username, String password, String email, String phone);
+    UserInfo register(String username, String password, String email, String phone) throws IOException;
 
     UserInfo getCurrentUser();
 

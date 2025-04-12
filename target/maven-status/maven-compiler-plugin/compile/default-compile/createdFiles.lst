@@ -1,0 +1,5 @@
+org/softeng/group77/pennyplanner/util/JsonUpdater.class
+org/softeng/group77/pennyplanner/repository/impl/JsonUserRepositoryImpl$1.class
+org/softeng/group77/pennyplanner/config/DataStorageConfig.class
+org/softeng/group77/pennyplanner/repository/base/JsonDataManager.class
+org/softeng/group77/pennyplanner/util/JsonFileUtil.class

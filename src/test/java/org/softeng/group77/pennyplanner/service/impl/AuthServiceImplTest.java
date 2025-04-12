@@ -16,6 +16,7 @@ import org.softeng.group77.pennyplanner.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.naming.AuthenticationException;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -53,7 +54,7 @@ public class AuthServiceImplTest {
 
     @Test
     @DisplayName("Valid username login")
-    void login_withValidUsername_shouldReturnUserInfo() throws AuthenticationException {
+    void login_withValidUsername_shouldReturnUserInfo() throws AuthenticationException, IOException {
         when(userRepository.findByUsername(testUsername)).thenReturn(Optional.of(testUser));
         when(passwordEncoder.matches(testPassword, testPasswordHash)).thenReturn(true);
 
@@ -67,7 +68,7 @@ public class AuthServiceImplTest {
 
     @Test
     @DisplayName("Valid email login")
-    void login_withValidEmail_shouldReturnUserInfo() throws AuthenticationException {
+    void login_withValidEmail_shouldReturnUserInfo() throws AuthenticationException, IOException {
         when(userRepository.findByEmail(testEmail)).thenReturn(Optional.of(testUser));
         when(passwordEncoder.matches(testPassword, testPasswordHash)).thenReturn(true);
 
@@ -90,7 +91,7 @@ public class AuthServiceImplTest {
 
     @Test
     @DisplayName("Invalid username login")
-    void login_withInvalidUsername_shouldThrowException() {
+    void login_withInvalidUsername_shouldThrowException() throws IOException {
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
 
@@ -100,7 +101,7 @@ public class AuthServiceImplTest {
 
     @Test
     @DisplayName("Wrong password login")
-    void login_withInvalidPassword_shouldThrowException() {
+    void login_withInvalidPassword_shouldThrowException() throws IOException {
         when(userRepository.findByUsername(testUsername)).thenReturn(Optional.of(testUser));
         when(passwordEncoder.matches(anyString(), eq(testPasswordHash))).thenReturn(false);
 
@@ -110,7 +111,7 @@ public class AuthServiceImplTest {
 
     @Test
     @DisplayName("Valid user info for register")
-    void register_withValidDetails_shouldCreateUser() {
+    void register_withValidDetails_shouldCreateUser() throws IOException {
         when(userRepository.findByUsername(testUsername)).thenReturn(Optional.empty());
         when(userRepository.findByEmail(testEmail)).thenReturn(Optional.empty());
         when(passwordEncoder.encode(testPassword)).thenReturn(testPasswordHash);
@@ -135,7 +136,7 @@ public class AuthServiceImplTest {
 
     @Test
     @DisplayName("Username exists for register")
-    void register_withExistingUsername_shouldThrowException() {
+    void register_withExistingUsername_shouldThrowException() throws IOException {
         when(userRepository.findByUsername(testUsername)).thenReturn(Optional.of(testUser));
 
         assertThrows(RegistrationException.class, () -> authService.register(testUsername, testPassword, testEmail, testPhone),
@@ -144,7 +145,7 @@ public class AuthServiceImplTest {
 
     @Test
     @DisplayName("Email exists for register")
-    void register_withExistingEmail_shouldThrowException() {
+    void register_withExistingEmail_shouldThrowException() throws IOException {
         when(userRepository.findByUsername(testUsername)).thenReturn(Optional.empty());
         when(userRepository.findByEmail(testEmail)).thenReturn(Optional.of(testUser));
 
@@ -153,7 +154,7 @@ public class AuthServiceImplTest {
 
     @Test
     @DisplayName("Invalid email for register")
-    void register_withInvalidEmail_shouldThrowException() {
+    void register_withInvalidEmail_shouldThrowException() throws IOException {
         when(userRepository.findByUsername(testUsername)).thenReturn(Optional.empty());
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
 
@@ -163,7 +164,7 @@ public class AuthServiceImplTest {
 
     @Test
     @DisplayName("Invalid phone for register")
-    void register_withInvalidPhone_shouldThrowException() {
+    void register_withInvalidPhone_shouldThrowException() throws IOException {
         when(userRepository.findByUsername(testUsername)).thenReturn(Optional.empty());
         when(userRepository.findByEmail(testEmail)).thenReturn(Optional.empty());
       
@@ -173,7 +174,7 @@ public class AuthServiceImplTest {
 
     @Test
     @DisplayName("Clean cache after logged out")
-    void logout_shouldClearUserCache() throws AuthenticationException {
+    void logout_shouldClearUserCache() throws AuthenticationException, IOException {
         when(userRepository.findByUsername(testUsername)).thenReturn(Optional.of(testUser));
         when(passwordEncoder.matches(testPassword, testPasswordHash)).thenReturn(true);
         authService.login(testUsername, testPassword);
@@ -185,7 +186,7 @@ public class AuthServiceImplTest {
 
     @Test
     @DisplayName("Wrong old password")
-    void changePassword_withInvalidOldPassword_shouldThrowException() throws AuthenticationException {
+    void changePassword_withInvalidOldPassword_shouldThrowException() throws AuthenticationException, IOException {
         when(userRepository.findByUsername(testUsername)).thenReturn(Optional.of(testUser));
         when(passwordEncoder.matches(testPassword, testPasswordHash)).thenReturn(true);
         authService.login(testUsername, testPassword);
