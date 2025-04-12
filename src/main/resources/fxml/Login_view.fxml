@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox fx:id="root" alignment="CENTER" spacing="20" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.softeng.group77.pennyplanner.LoginController">
+    <padding>
+        <Insets top="40.0" right="50.0" bottom="40.0" left="50.0"/>
+    </padding>
+
+    <!-- 应用标题 -->
+    <Text text="PennyPlanner">
+        <font>
+            <Font name="Arial" size="28"/>
+        </font>
+    </Text>
+
+    <!-- 登录标题 -->
+    <Text text="Login" style="-fx-font-family: Arial; -fx-font-size: 20px; -fx-font-weight: bold;"/>
+
+    <!-- 提示文本 -->
+    <Label text="Enter your account and password to continue" style="-fx-text-fill: #666666;"/>
+
+    <!-- 输入框区域 -->
+    <VBox alignment="CENTER" spacing="15">
+        <padding>
+            <Insets top="20.0" bottom="20.0"/>
+        </padding>
+
+        <!-- 邮箱/电话输入框 -->
+        <TextField fx:id="emailField" promptText="email&amp;phone" prefWidth="250.0">
+            <style>
+                <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
+                -fx-border-color: #cccccc;
+                -fx-border-radius: 5;
+            </style>
+        </TextField>
+
+        <!-- 密码输入框 -->
+        <PasswordField fx:id="passwordField" promptText="password" prefWidth="250.0">
+            <style>
+                <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
+                -fx-border-color: #cccccc;
+                -fx-border-radius: 5;
+            </style>
+        </PasswordField>
+
+        <!-- 继续按钮 -->
+        <Button fx:id="continueButton" text="Login" prefWidth="250.0" style="-fx-background-color: #000000; -fx-text-fill: white; -fx-font-weight: bold;" onAction="#turntoHome" >
+            <padding>
+                <Insets top="10.0" right="30.0" bottom="10.0" left="30.0"/>
+            </padding>
+        </Button>
+    </VBox>
+
+    <!-- 创建账户提示 -->
+    <Label text="Do not have an account?" style="-fx-text-fill: #666666;"/>
+
+    <!-- 创建账户链接 -->
+    <Hyperlink fx:id="createAccountLink" text="Create an account" style="-fx-text-fill: #000000; -fx-border-color: transparent;"/>
+
+    <!-- 条款提示 -->
+    <Label text="By clicking continue, you agree to our Terms of&#10;Service and Privacy Policy" style="-fx-text-fill: #999999; -fx-font-size: 12;" alignment="CENTER"/>
+</VBox>
