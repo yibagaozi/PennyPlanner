@@ -1,5 +1,6 @@
 package org.softeng.group77.pennyplanner.service;
 
+import org.softeng.group77.pennyplanner.dto.UserInfo;
 import org.softeng.group77.pennyplanner.model.User;
 import org.springframework.stereotype.Component;
 
@@ -8,7 +9,18 @@ import javax.naming.AuthenticationException;
 @Component
 public interface AuthService {
 
-    User login(String username, String password) throws AuthenticationException;
+    UserInfo login(String username, String password) throws AuthenticationException;
 
-    User register(String username, String password, String email, String phone);
+    UserInfo register(String username, String password, String email, String phone);
+
+    UserInfo getCurrentUser();
+
+    UserInfo updateUserInfo(String userId, UserInfo updatedInfo);
+
+    UserInfo changePassword(String userId, String oldPassword, String newPassword) throws AuthenticationException;
+
+    void logout();
+
+    boolean isLoggedIn();
+
 }
