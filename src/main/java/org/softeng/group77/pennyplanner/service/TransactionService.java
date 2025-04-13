@@ -4,6 +4,8 @@ import org.softeng.group77.pennyplanner.dto.TransactionDetail;
 import org.softeng.group77.pennyplanner.model.Transaction;
 import org.springframework.stereotype.Component;
 
+import javax.naming.AuthenticationException;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -18,12 +20,12 @@ public interface TransactionService {
 
     boolean deleteTransaction(String transactionId);
 
-    List<TransactionDetail> getUserTransactions(String userId);
+    List<TransactionDetail> getUserTransactions();
 
-    List<TransactionDetail> searchUserTransactions(String userId, String keyword);
+    List<TransactionDetail> searchUserTransactions(String keyword);
 
-    List<TransactionDetail> filterTransactionByDate(String userId, LocalDate startDate, LocalDate endDate);
+    List<TransactionDetail> filterTransactionByDate(LocalDate startDate, LocalDate endDate);
 
-    List<TransactionDetail> filterTransactionByCategory(String userId, String category);
+    List<TransactionDetail> filterTransactionByCategory(String category);
 
 }
