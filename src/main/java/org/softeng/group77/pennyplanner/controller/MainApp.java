@@ -54,4 +54,18 @@ public class MainApp extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
     }
+
+
+public static void showHome() throws IOException {
+    FXMLLoader loader = new FXMLLoader(
+            MainApp.class.getResource("/com/group77/demo1/home_view.fxml")
+    );
+    Parent root = loader.load();
+
+    Scene scene = new Scene(root,800,500);
+    scene.getStylesheets().add(MainApp.class.getResource("style-home.css").toExternalForm());
+    primaryStage.setTitle("PennyPlanner");
+    primaryStage.setScene(scene);
+    primaryStage.show();
+    }
 }
