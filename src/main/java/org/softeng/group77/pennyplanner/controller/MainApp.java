@@ -5,12 +5,15 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.io.IOException;
 
 
 public class MainApp extends Application {
     private static Stage primaryStage;
+    private static ApplicationContext applicationContext; // Spring 上下文
 
     public static void main(String[] args) {
         launch(args);
@@ -19,19 +22,18 @@ public class MainApp extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         MainApp.primaryStage = primaryStage;
-        //showSignup();
+        applicationContext = new AnnotationConfigApplicationContext("org.softeng.group77.pennyplanner");
         showLogin();
-        //showHome();
-        //showReport();
-        //showhistory();
-        //showmanagement();
-        //showuser();
     }
 
     public static void showSignup() throws IOException {
         FXMLLoader loader = new FXMLLoader(
                 MainApp.class.getResource("/org/softeng/group77/pennyplanner/Signup_view.fxml")
         );
+
+        // 让 Spring 管理 FXML 控制器
+        loader.setControllerFactory(applicationContext::getBean);
+
         Parent root = loader.load();
 
         Scene scene = new Scene(root, 400, 600);
