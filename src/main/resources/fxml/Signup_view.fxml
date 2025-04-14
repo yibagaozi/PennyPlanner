@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+
+<?import java.net.URL?>
+<VBox alignment="CENTER" spacing="20"
+      xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.softeng.group77.pennyplanner.controller.SignupController"
+      stylesheets="@/css/login.css">
+
+
+
+    <Label text="PennyPlanner" styleClass="title" />
+    <Label text="Create an account" styleClass="subtitle" />
+    <Label text="Enter your email to sign up for this app" styleClass="hint-text" />
+
+    <VBox spacing="10" styleClass="input-container">
+        <TextField fx:id="emailField" promptText="email@domain.com" styleClass="text-field" />
+        <PasswordField fx:id="passwordField" promptText="password" styleClass="text-field" />
+    </VBox>
+
+    <Button fx:id="signUpButton" text="Sign up with email" styleClass="primary-button" onAction="#handleSignUp" />
+
+    <HBox alignment="CENTER" spacing="5">
+        <Label text="or continue with" styleClass="hint-text" />
+    </HBox>
+    <Button fx:id="LoginButton" text="Registered. Switch to login" styleClass="primary-button" onAction="#turntoLogin"></Button>
+
+
+    <Label text="By clicking continue, you agree to our Terms of Service and Privacy Policy"
+           styleClass="footer-text" wrapText="true" />
+</VBox>

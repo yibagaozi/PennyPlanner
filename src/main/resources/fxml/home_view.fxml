@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane styleClass="border-pane-no-gap" stylesheets="@style-home.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.group77.demo1.HomeController">
+<BorderPane styleClass="border-pane-no-gap" stylesheets="@/css/style-home.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.softeng.group77.pennyplanner.controller.HomeController">
     <left>
         <VBox styleClass="nav-bar" BorderPane.alignment="TOP_LEFT">
             <Label styleClass="nav-title" text="PennyPlanner" />
