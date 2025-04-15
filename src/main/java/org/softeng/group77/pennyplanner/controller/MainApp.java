@@ -1,19 +1,36 @@
 package org.softeng.group77.pennyplanner.controller;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.springframework.context.ApplicationContext;
+import org.softeng.group77.pennyplanner.PennyPlannerApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+
 
 import java.io.IOException;
+import java.net.URL;
 
 
 public class MainApp extends Application {
     private static Stage primaryStage;
-    private static ApplicationContext applicationContext; // Spring 上下文
+    private static ConfigurableApplicationContext applicationContext;
+
+    @Override
+    public void init() {
+        applicationContext = new SpringApplicationBuilder(PennyPlannerApplication.class)
+                .run();
+    }
+
+    @Override
+    public void stop() {
+        applicationContext.close();
+        Platform.exit();
+    }
 
     public static void main(String[] args) {
         launch(args);
@@ -27,9 +44,11 @@ public class MainApp extends Application {
     }
 
     public static void showSignup() throws IOException {
-        FXMLLoader loader = new FXMLLoader(
-                MainApp.class.getResource("/org/softeng/group77/pennyplanner/Signup_view.fxml")
-        );
+        URL fxmlUrl = MainApp.class.getResource("/fxml/Signup_view.fxml");
+        if (fxmlUrl == null) {
+            throw new IOException("无法找到FXML文件: Signup_view.fxml");
+        }
+        FXMLLoader loader = new FXMLLoader(fxmlUrl);
 
         // 让 Spring 管理 FXML 控制器
         loader.setControllerFactory(applicationContext::getBean);
@@ -37,7 +56,7 @@ public class MainApp extends Application {
         Parent root = loader.load();
 
         Scene scene = new Scene(root, 400, 600);
-        scene.getStylesheets().add(MainApp.class.getResource("login.css").toExternalForm());
+        scene.getStylesheets().add(MainApp.class.getResource("/css/login.css").toExternalForm());
         primaryStage.setTitle("PennyPlanner");
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -45,13 +64,15 @@ public class MainApp extends Application {
 
 
     public static void showLogin() throws IOException {
-        FXMLLoader loader = new FXMLLoader(
-                MainApp.class.getResource("/org/softeng/group77/pennyplanner/Login_view.fxml")
-        );
+        URL fxmlUrl = MainApp.class.getResource("/fxml/Login_view.fxml");
+        if (fxmlUrl == null) {
+            throw new IOException("无法找到FXML文件: Login_view.fxml");
+        }
+        FXMLLoader loader = new FXMLLoader(fxmlUrl);
         Parent root = loader.load();
 
         Scene scene = new Scene(root, 400, 600);
-        scene.getStylesheets().add(MainApp.class.getResource("login.css").toExternalForm());
+        scene.getStylesheets().add(MainApp.class.getResource("/css/login.css").toExternalForm());
         primaryStage.setTitle("PennyPlanner");
         primaryStage.setScene(scene);
         primaryStage.show();
