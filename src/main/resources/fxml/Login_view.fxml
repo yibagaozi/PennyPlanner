@@ -56,6 +56,8 @@
         </Button>
     </VBox>
 
+    <Label fx:id="errorLabel" text="" />
+
     <!-- 创建账户提示 -->
     <Label text="Do not have an account?" style="-fx-text-fill: #666666;"/>
 

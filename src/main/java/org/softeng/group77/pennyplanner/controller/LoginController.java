@@ -42,7 +42,7 @@ public class LoginController {
             try {
                 turntoHome();
             } catch (Exception e) {
-                showError("登录失败: " + e.getMessage());
+                Platform.runLater(() -> errorLabel.setText("登录失败: " + e.getMessage()));
             }
         });
     }
@@ -52,7 +52,7 @@ public class LoginController {
         String password = passwordField.getText();
 
         if (email.isEmpty() || password.isEmpty()) {
-            showError("Username and password must not be empty.");
+            Platform.runLater(() -> errorLabel.setText("Username and password must not be empty."));
             return;
         }
 
@@ -72,13 +72,13 @@ public class LoginController {
                         try {
                             MainApp.showHome(); // 登录成功，跳转主页
                         } catch (IOException e) {
-                            showError("无法跳转到主页: " + e.getMessage());
+                            Platform.runLater(() -> errorLabel.setText("无法跳转到主页: " + e.getMessage()));
                         }
                     });
                 } catch (AuthenticationException e) {
-                    showError(e.getMessage()); // 显示登录错误
+                    Platform.runLater(() -> errorLabel.setText(e.getMessage())); // 显示登录错误
                 } catch (Exception e) {
-                    showError("登录失败: " + e.getMessage());
+                    Platform.runLater(() -> errorLabel.setText("登录失败: " + e.getMessage()));
                 }
                 return null;
             }

@@ -27,4 +27,5 @@ public class TestDataGenerateUtil {
         System.out.println("Test user data generated: " + user.getUsername() + ", " + user.getEmail() + ", " + user.getPhone());
     }
 
+
 }
