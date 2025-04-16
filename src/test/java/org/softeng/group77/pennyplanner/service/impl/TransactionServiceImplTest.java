@@ -189,4 +189,30 @@ public class TransactionServiceImplTest {
         assertEquals(0, afterDelete.size());
     }
 
+
+    private TransactionDetail createTestTransactionDetail(String id) {
+        TransactionDetail detail = new TransactionDetail();
+        detail.setId(id);
+        detail.setUserId(TEST_USER_ID);
+        detail.setAmount(new BigDecimal("100.00"));
+        detail.setDescription("Test Transaction");
+        detail.setCategory("Food");
+        detail.setTransactionDateTime(LocalDateTime.now());
+        return detail;
+    }
+
+    private Transaction createTestTransaction() {
+        Transaction transaction = new Transaction(TEST_USER_ID);
+        transaction.setAmount(new BigDecimal("100.00"));
+        transaction.setDescription("Test Transaction");
+        transaction.setCategory("Food");
+        transaction.setTransactionDateTime(LocalDateTime.now());
+        return transaction;
+    }
+
+    private Transaction createAndSaveTestTransaction() throws IOException {
+        Transaction transaction = createTestTransaction();
+        return transactionRepository.save(transaction);
+    }
+
 }
