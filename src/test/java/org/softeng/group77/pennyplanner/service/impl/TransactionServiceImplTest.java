@@ -189,6 +189,97 @@ public class TransactionServiceImplTest {
         assertEquals(0, afterDelete.size());
     }
 
+    @Test
+    void getUserTransactions_Success() throws Exception {
+
+        createAndSaveTestTransaction();
+        createAndSaveTestTransaction();
+
+        Transaction otherUserTx = new Transaction(OTHER_USER_ID);
+        otherUserTx.setAmount(new BigDecimal("50.00"));
+        otherUserTx.setDescription("Other User Transaction");
+        otherUserTx.setCategory("Other");
+        otherUserTx.setTransactionDateTime(LocalDateTime.now());
+        transactionRepository.save(otherUserTx);
+
+        List<TransactionDetail> results = transactionService.getUserTransactions();
+
+        assertNotNull(results);
+        assertEquals(2, results.size());
+
+        for (TransactionDetail detail : results) {
+            assertEquals(TEST_USER_ID, detail.getUserId());
+        }
+    }
+
+    @Test
+    void searchUserTransactions_Success() throws Exception {
+
+        Transaction tx1 = createTestTransaction();
+        tx1.setDescription("Grocery shopping");
+        transactionRepository.save(tx1);
+
+        Transaction tx2 = createTestTransaction();
+        tx2.setDescription("Restaurant dinner");
+        transactionRepository.save(tx2);
+
+        Transaction tx3 = createTestTransaction();
+        tx3.setDescription("Shopping for clothes");
+        transactionRepository.save(tx3);
+
+        List<TransactionDetail> results = transactionService.searchUserTransactions("shopping");
+
+        assertNotNull(results);
+        assertEquals(2, results.size());
+        assertTrue(results.stream().anyMatch(t -> t.getDescription().equals("Grocery shopping")));
+        assertTrue(results.stream().anyMatch(t -> t.getDescription().equals("Shopping for clothes")));
+    }
+
+    @Test
+    void filterTransactionByDate_Success() throws Exception {
+
+        Transaction tx1 = createTestTransaction();
+        tx1.setTransactionDateTime(LocalDateTime.of(2025, 4, 10, 10, 0));
+        transactionRepository.save(tx1);
+
+        Transaction tx2 = createTestTransaction();
+        tx2.setTransactionDateTime(LocalDateTime.of(2025, 4, 12, 15, 30));
+        transactionRepository.save(tx2);
+
+        Transaction tx3 = createTestTransaction();
+        tx3.setTransactionDateTime(LocalDateTime.of(2025, 4, 15, 9, 45));
+        transactionRepository.save(tx3);
+
+        LocalDate startDate = LocalDate.of(2025, 4, 11);
+        LocalDate endDate = LocalDate.of(2025, 4, 14);
+        List<TransactionDetail> results = transactionService.filterTransactionByDate(startDate, endDate);
+
+        assertNotNull(results);
+        assertEquals(1, results.size());
+        assertEquals(LocalDateTime.of(2025, 4, 12, 15, 30), results.get(0).getTransactionDateTime());
+    }
+
+    @Test
+    void filterTransactionByCategory_Success() throws Exception {
+
+        Transaction tx1 = createTestTransaction();
+        tx1.setCategory("Food");
+        transactionRepository.save(tx1);
+
+        Transaction tx2 = createTestTransaction();
+        tx2.setCategory("Shopping");
+        transactionRepository.save(tx2);
+
+        Transaction tx3 = createTestTransaction();
+        tx3.setCategory("Food");
+        transactionRepository.save(tx3);
+
+        List<TransactionDetail> results = transactionService.filterTransactionByCategory("Food");
+
+        assertNotNull(results);
+        assertEquals(2, results.size());
+        assertTrue(results.stream().allMatch(t -> t.getCategory().equals("Food")));
+    }
 
     private TransactionDetail createTestTransactionDetail(String id) {
         TransactionDetail detail = new TransactionDetail();
