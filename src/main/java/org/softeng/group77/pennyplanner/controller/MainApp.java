@@ -14,6 +14,8 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 
 
 public class MainApp extends Application {
@@ -29,6 +31,7 @@ public class MainApp extends Application {
     @Override
     public void stop() {
         applicationContext.close();
+        clearFilesInDirectory("data");
         Platform.exit();
     }
 
@@ -51,7 +54,7 @@ public class MainApp extends Application {
         FXMLLoader loader = new FXMLLoader(fxmlUrl);
 
         // 让 Spring 管理 FXML 控制器
-        loader.setControllerFactory(applicationContext::getBean);
+        //loader.setControllerFactory(applicationContext::getBean);
 
         Parent root = loader.load();
 
@@ -79,16 +82,39 @@ public class MainApp extends Application {
     }
 
 
-public static void showHome() throws IOException {
-    FXMLLoader loader = new FXMLLoader(
-            MainApp.class.getResource("/com/group77/demo1/home_view.fxml")
-    );
-    Parent root = loader.load();
+    public static void showHome() throws IOException {
+        FXMLLoader loader = new FXMLLoader(
+                MainApp.class.getResource("/fxml/home_view.fxml")
+        );
+        Parent root = loader.load();
 
-    Scene scene = new Scene(root,800,500);
-    scene.getStylesheets().add(MainApp.class.getResource("style-home.css").toExternalForm());
-    primaryStage.setTitle("PennyPlanner");
-    primaryStage.setScene(scene);
-    primaryStage.show();
+        Scene scene = new Scene(root,800,500);
+        scene.getStylesheets().add(MainApp.class.getResource("style-home.css").toExternalForm());
+        primaryStage.setTitle("PennyPlanner");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    private void clearFilesInDirectory(String directoryPath) {
+        Path dirPath = Paths.get(directoryPath);
+
+        try {
+            Files.walkFileTree(dirPath, new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    Files.delete(file);
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                    Files.delete(dir);
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+            System.out.println("Data folder cleared successfully.");
+        } catch (IOException e) {
+            System.err.println("Error clearing data folder: " + e.getMessage());
+        }
     }
 }
