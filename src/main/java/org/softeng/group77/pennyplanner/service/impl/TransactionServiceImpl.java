@@ -41,12 +41,9 @@ public class TransactionServiceImpl implements TransactionService {
             validateTransactionDetail(transactionDetail);
             log.info("Creating transaction: {}", transactionDetail);
 
-            UserInfo currentUser = authService.getCurrentUser();
-            if (currentUser == null) {
-                throw new AuthenticationException("User must be logged in to create transactions");
-            }
+            String userId = authService.getCurrentUser().getId();
 
-            Transaction transaction = new Transaction(currentUser.getId());
+            Transaction transaction = new Transaction(userId);
             updateTransactionFromDetail(transaction, transactionDetail);
 
             Transaction savedTransaction = transactionRepository.save(transaction);

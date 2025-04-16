@@ -37,6 +37,11 @@ public class Transaction {
     @Setter
     private LocalDateTime updatedAt;
 
+    public Transaction() {
+        this.id = UUID.randomUUID().toString();
+        this.createdAt = LocalDateTime.now();
+    }
+
     public Transaction(String description, String category, BigDecimal amount, LocalDateTime transactionDateTime, String userId) {
         this.id = UUID.randomUUID().toString();
         this.description = description;
