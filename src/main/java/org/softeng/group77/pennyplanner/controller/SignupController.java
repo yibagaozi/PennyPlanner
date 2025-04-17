@@ -19,6 +19,7 @@ public class SignupController {
     private TextField emailField;
     @FXML private PasswordField passwordField;
     @FXML private Button signUpButton;
+    @FXML private TextField usernameField;
     @FXML private TextField phoneField;
     @FXML private Label errorLabel; // 用于显示错误信息
 
@@ -34,7 +35,7 @@ public class SignupController {
 
     @FXML
     private void handleSignUp() {
-        String username = emailField.getText(); // 假设用户名为邮箱
+        String username = usernameField.getText(); // 假设用户名为邮箱
         String password = passwordField.getText();
         String email = emailField.getText();
         String phone = phoneField.getText();

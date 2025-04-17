@@ -49,7 +49,7 @@ public class HomeController {
     }@FXML
     private void turntoManagement() throws IOException {
         System.out.println("转到home页面");
-        //MainApp.showmanagement();
+        MainApp.showmanagement();
     }@FXML
     private void turntoUser() throws IOException {
         System.out.println("转到home页面");

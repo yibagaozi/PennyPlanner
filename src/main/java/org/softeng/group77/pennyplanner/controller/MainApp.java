@@ -54,7 +54,7 @@ public class MainApp extends Application {
         FXMLLoader loader = new FXMLLoader(fxmlUrl);
 
         // 让 Spring 管理 FXML 控制器
-        //loader.setControllerFactory(applicationContext::getBean);
+        loader.setControllerFactory(applicationContext::getBean);
 
         Parent root = loader.load();
 
@@ -90,6 +90,19 @@ public class MainApp extends Application {
 
         Scene scene = new Scene(root,800,500);
         scene.getStylesheets().add(MainApp.class.getResource("/css/style-home.css").toExternalForm());
+        primaryStage.setTitle("PennyPlanner");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    public static void showmanagement() throws IOException {
+        FXMLLoader loader = new FXMLLoader(
+                MainApp.class.getResource("/fxml/Management_view.fxml")
+        );
+        Parent root = loader.load();
+
+        Scene scene = new Scene(root,800,500);
+        scene.getStylesheets().add(MainApp.class.getResource("/css/style-Management.css").toExternalForm());
         primaryStage.setTitle("PennyPlanner");
         primaryStage.setScene(scene);
         primaryStage.show();
