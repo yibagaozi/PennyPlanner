@@ -89,7 +89,7 @@ public class MainApp extends Application {
         Parent root = loader.load();
 
         Scene scene = new Scene(root,800,500);
-        scene.getStylesheets().add(MainApp.class.getResource("style-home.css").toExternalForm());
+        scene.getStylesheets().add(MainApp.class.getResource("/css/style-home.css").toExternalForm());
         primaryStage.setTitle("PennyPlanner");
         primaryStage.setScene(scene);
         primaryStage.show();
