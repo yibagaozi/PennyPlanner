@@ -19,10 +19,10 @@
     <Label text="Enter your email to sign up for this app" styleClass="hint-text" />
 
     <VBox spacing="10" styleClass="input-container">
-        <TextField fx:id="usernameField" promptText="Name" styleClass="text-field" />
-        <TextField fx:id="emailField" promptText="email@domain.com" styleClass="text-field" />
-        <TextField fx:id="phoneField" promptText="1513536" styleClass="text-field" />
-        <PasswordField fx:id="passwordField" promptText="password" styleClass="text-field" />
+        <TextField fx:id="usernameField" promptText="UserName" styleClass="text-field" />
+        <TextField fx:id="emailField" promptText="Email" styleClass="text-field" />
+        <TextField fx:id="phoneField" promptText="Phone Number" styleClass="text-field" />
+        <PasswordField fx:id="passwordField" promptText="Password" styleClass="text-field" />
     </VBox>
 
     <Button fx:id="signUpButton" text="Sign up with email" styleClass="primary-button" onAction="#handleSignUp" />

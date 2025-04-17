@@ -43,6 +43,7 @@ public class MainApp extends Application {
     public void start(Stage primaryStage) throws Exception {
         MainApp.primaryStage = primaryStage;
         applicationContext = new AnnotationConfigApplicationContext("org.softeng.group77.pennyplanner");
+        clearFilesInDirectory("data");
         showLogin();
     }
 
@@ -72,6 +73,7 @@ public class MainApp extends Application {
             throw new IOException("无法找到FXML文件: Login_view.fxml");
         }
         FXMLLoader loader = new FXMLLoader(fxmlUrl);
+        loader.setControllerFactory(applicationContext::getBean);
         Parent root = loader.load();
 
         Scene scene = new Scene(root, 400, 600);
