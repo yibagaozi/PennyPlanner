@@ -1,0 +1,48 @@
+.root {
+    -fx-background-color: white;
+    -fx-padding: 40px;
+}
+
+.title {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+}
+
+.subtitle {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.hint-text {
+    -fx-font-size: 14px;
+    -fx-text-fill: #666666;
+}
+
+.input-container {
+    -fx-padding: 10px 0;
+}
+
+.text-field {
+    -fx-pref-height: 40px;
+    -fx-pref-width: 300px;
+    -fx-font-size: 14px;
+    -fx-background-radius: 5px;
+    -fx-border-radius: 5px;
+    -fx-border-color: #cccccc;
+    -fx-border-width: 1px;
+}
+
+.primary-button {
+    -fx-pref-height: 40px;
+    -fx-pref-width: 300px;
+    -fx-font-size: 14px;
+    -fx-background-color: #000000;
+    -fx-text-fill: white;
+    -fx-background-radius: 5px;
+}
+
+.footer-text {
+    -fx-font-size: 12px;
+    -fx-text-fill: #999999;
+    -fx-max-width: 300px;
+}

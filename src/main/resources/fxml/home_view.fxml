@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane styleClass="border-pane-no-gap" stylesheets="@/css/style-home.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.softeng.group77.pennyplanner.controller.HomeController">
+    <left>
+        <VBox styleClass="nav-bar" BorderPane.alignment="TOP_LEFT">
+            <Label styleClass="nav-title" text="PennyPlanner" />
+            <Button onAction="#turntoHome" styleClass="nav-button" text="Home" />
+            <Button onAction="#turntoReport" styleClass="nav-button" text="Report &amp; Forecast" />
+            <Button styleClass="nav-button" text="Settings" />
+            <Button onAction="#turntoHistory" styleClass="nav-button" text="History" />
+            <Button onAction="#turntoManagement" styleClass="nav-button" text="Management" />
+            <Button onAction="#turntoUser" styleClass="nav-button" text="User Profile" />
+        </VBox>
+    </left>
+    <right>
+        <SplitPane orientation="VERTICAL" styleClass="right-split">
+            <SplitPane dividerPositions="0.15" layoutX="179.0" layoutY="1.0" orientation="VERTICAL" prefHeight="398.0" prefWidth="418.0">
+                <items>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+                        <children>
+                            <Button layoutX="450.0" layoutY="7.0" mnemonicParsing="false" onAction="#turntoLogin" text="Log out" />
+                            <Label layoutX="14.0" layoutY="11.0" text="Home" />
+                        </children>
+                    </AnchorPane>
+
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="353.0" prefWidth="505.0">
+                        <children>
+                            <Label fx:id="usernameLabel" layoutX="12.0" prefHeight="37.0" prefWidth="103.0" text="Hello username" />
+                            <Label layoutX="12.0" layoutY="30.0" prefHeight="15.0" prefWidth="178.0" text="Good times are like running in the match">
+                                <font>
+                                    <Font size="8.0" />
+                                </font>
+                            </Label>
+
+                            <!-- 卡片容器HBox -->
+                            <HBox layoutX="6.0" layoutY="56.0" prefHeight="100.0" prefWidth="481.0" spacing="20.0">
+                                <!-- 卡片1: 总余额 -->
+                                <VBox prefWidth="150.0" styleClass="card">
+                                    <children>
+                                        <Label styleClass="card-title" text="Total Balance" />
+                                        <Label styleClass="card-amount" text="12,345" />
+                                        <HBox spacing="5">
+                                            <Label styleClass="positive-change" text="↑" />
+                                            <Label styleClass="positive-change" text="2.5%" />
+                                        </HBox>
+                                    </children>
+                                </VBox>
+
+                                <!-- 卡片2: 收入 -->
+                                <VBox prefWidth="150.0" styleClass="card">
+                                    <children>
+                                        <Label styleClass="card-title" text="Income" />
+                                        <Label styleClass="card-amount" text="5,678" />
+                                        <HBox spacing="5">
+                                            <Label styleClass="positive-change" text="↑" />
+                                            <Label styleClass="positive-change" text="1.8%" />
+                                        </HBox>
+                                    </children>
+                                </VBox>
+
+                                <!-- 卡片3: 支出 -->
+                                <VBox prefWidth="150.0" styleClass="card">
+                                    <children>
+                                        <Label styleClass="card-title" text="Expense" />
+                                        <Label styleClass="card-amount" text="3,333" />
+                                        <HBox spacing="5">
+                                            <Label styleClass="negative-change" text="↓" />
+                                            <Label styleClass="negative-change" text="0.8%" />
+                                        </HBox>
+                                    </children>
+                                </VBox>
+                            </HBox>
+                     <LineChart fx:id="expenseTrendChart" layoutX="14.0" layoutY="183.0" prefHeight="146.0" prefWidth="222.0">
+                       <xAxis>
+                         <CategoryAxis side="BOTTOM" />
+                       </xAxis>
+                       <yAxis>
+                         <NumberAxis side="LEFT" />
+                       </yAxis>
+                     </LineChart>
+                     <PieChart fx:id="expenseDistributionChart" layoutX="281.0" layoutY="179.0" prefHeight="146.0" prefWidth="222.0" />
+                     <Label layoutX="255.0" layoutY="19.0" prefHeight="22.0" prefWidth="52.0" text="Budget" />
+                     <TextField layoutX="312.0" layoutY="19.0" prefHeight="22.0" prefWidth="106.0" />
+                     <Button layoutX="448.0" layoutY="19.0" mnemonicParsing="false" text="Save" />
+
+                        </children>
+                    </AnchorPane>
+                </items>
+            </SplitPane>
+        </SplitPane>
+
+
+    </right>
+</BorderPane>
+
+
+
+
