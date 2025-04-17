@@ -34,12 +34,8 @@ public class JsonUserRepositoryImpl extends JsonDataManager<User> implements Use
     }
 
     @Override
-    public List<User> findAll() {
-        try {
-            return loadAll();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public List<User> findAll() throws IOException {
+        return loadAll();
     }
 
     @Override
@@ -49,12 +45,8 @@ public class JsonUserRepositoryImpl extends JsonDataManager<User> implements Use
     }
 
     @Override
-    public boolean deleteById(String id) {
-        try {
+    public boolean deleteById(String id) throws IOException {
             return delete(user -> user.getId().equals(id));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
 }

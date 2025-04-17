@@ -14,10 +14,10 @@ public interface UserRepository {
 
     Optional<User> findById(String id) throws IOException;
 
-    List<User> findAll();
+    List<User> findAll() throws IOException;
 
     User save(User newUser) throws IOException;
 
-    boolean deleteById(String id);
+    boolean deleteById(String id) throws IOException;
 
 }

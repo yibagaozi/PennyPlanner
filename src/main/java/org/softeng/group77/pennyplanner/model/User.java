@@ -54,4 +54,14 @@ public class User {
         this.lastLoginAt = LocalDateTime.now();
     }
 
+    public User(String id, String passwordHash, String username, String email, String phone) {
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.phone = phone;
+        this.passwordHash = passwordHash;
+        this.createdAt = LocalDateTime.now();
+        this.lastLoginAt = LocalDateTime.now();
+    }
+
 }
