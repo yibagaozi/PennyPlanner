@@ -53,7 +53,7 @@ public class HomeController {
     }@FXML
     private void turntoUser() throws IOException {
         System.out.println("转到home页面");
-        //MainApp.showuser();
+        MainApp.showuser();
     }
     @FXML
     private void turntoLogin() throws IOException {

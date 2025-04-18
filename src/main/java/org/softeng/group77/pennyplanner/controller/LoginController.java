@@ -60,11 +60,6 @@ public class LoginController {
         continueButton.setDisable(true);
         errorLabel.setText("登录中...");
 
-        // 这里可以添加验证逻辑
-        //System.out.println("尝试登录 - 邮箱/电话: " + email + ", 密码: " + password);
-        //System.out.println("跳转Home页面");
-        //MainApp.showHome();
-
         // 使用 Task 进行异步登录（避免阻塞 UI）
         Task<Void> loginTask = new Task<>() {
             @Override

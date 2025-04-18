@@ -123,6 +123,19 @@ public class MainApp extends Application {
         primaryStage.show();
     }
 
+    public static void showuser() throws IOException {
+        FXMLLoader loader = new FXMLLoader(
+                MainApp.class.getResource("/fxml/User_view.fxml")
+        );
+        Parent root = loader.load();
+
+        Scene scene = new Scene(root,800,500);
+        scene.getStylesheets().add(MainApp.class.getResource("/css/style-User.css").toExternalForm());
+        primaryStage.setTitle("PennyPlanner");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
     private void clearFilesInDirectory(String directoryPath) {
         Path dirPath = Paths.get(directoryPath);
 
