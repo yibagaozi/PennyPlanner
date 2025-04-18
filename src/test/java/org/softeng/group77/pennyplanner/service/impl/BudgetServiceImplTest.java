@@ -66,6 +66,7 @@ public class BudgetServiceImplTest {
         }, "Saving budget with invalid date should throw IllegalArgumentException");
     }
 
+
     @Test
     void testGetBudgetByDate() {
         // 保存一个预算
@@ -104,15 +105,20 @@ public class BudgetServiceImplTest {
             budgetService.saveBudget(5000, null); // 传递 null 会抛出异常
         }, "Date cannot be null");
     }
+
     @Test
     void testSaveBudgetWithFutureDate() {
         LocalDate futureDate = LocalDate.now().plusDays(1);
-        assertThrows(IllegalArgumentException.class, () -> {
-            budgetService.saveBudget(5000, futureDate); // 传递未来日期会抛出异常
-        }, "Invalid date");
+        budgetService.saveBudget(5000, futureDate); // 现在允许设置未来日期
+
+        // 获取当前预算
+        Budget currentBudget = budgetService.getCurrentBudget();
+
+        // 验证未来日期的预算是否被正确保存
+        assertNotNull(currentBudget, "Saved future budget should not be null");
+        assertEquals(5000, currentBudget.getAmount(), "Budget amount should be 5000 for future date");
+        assertEquals(futureDate, currentBudget.getDate(), "Budget date should match the future date");
     }
-
-
 
     @Test
     void testSaveBudgetWithZeroAmount() {
@@ -125,5 +131,30 @@ public class BudgetServiceImplTest {
         // 验证金额为 0
         assertNotNull(currentBudget, "Saved budget should not be null");
         assertEquals(0, currentBudget.getAmount(), "Budget amount should be 0");
+    }
+
+    @Test
+    void testGetCurrentBudgetForSameMonth() {
+        // 保存多个预算，确保有不同日期的预算
+        budgetService.saveBudget(1000, LocalDate.of(2025, 5, 5));  // 5月5号的预算
+        budgetService.saveBudget(1500, LocalDate.of(2025, 5, 10)); // 5月10号的预算
+        budgetService.saveBudget(2000, LocalDate.of(2025, 5, 15)); // 5月15号的预算
+
+        // 假设今天是 2025年4月19日，当前月没有预算
+        // 获取当月最新的预算（在此例中应打印出 "No budget found for the current month (APRIL)"）
+        Budget currentBudget = budgetService.getCurrentBudget();
+
+        // 验证打印出提示信息，表示当前月没有预算
+        // 输出信息应该是： "No budget found for the current month (APRIL)"
+        assertNull(currentBudget, "No budget should be returned for the current month (April)");
+    }
+
+
+    @Test
+    void testSaveBudgetForPastDate() {
+        // 尝试保存一个过去的日期，应该抛出 IllegalArgumentException
+        assertThrows(IllegalArgumentException.class, () -> {
+            budgetService.saveBudget(2000, LocalDate.of(2025, 4, 18)); // 设置过去的日期
+        }, "Should not allow saving budget for past dates");
     }
 }

@@ -19,31 +19,21 @@ public class BudgetServiceImpl implements BudgetService {
             throw new IllegalArgumentException("Amount cannot be negative");
         }
 
-        // 确保日期不为 null 且不是未来日期
-        if (date == null || date.isAfter(LocalDate.now())) {
-            throw new IllegalArgumentException("Invalid date");
+        // 不允许保存过去日期的预算
+        if (date == null || date.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("Cannot set budget for past dates");
+        }
+
+        // 限制最大日期为2030-12-31
+        LocalDate maxValidDate = LocalDate.of(2030, 12, 31);
+        if (date.isAfter(maxValidDate)) {
+            throw new IllegalArgumentException("Invalid date: exceeds maximum valid date");
         }
 
         Budget budget = new Budget(amount, date);
-        budgetMap.put(date, budget);
+        budgetMap.put(date, budget); // 每次修改时，都会覆盖同一日期的预算
 
-        System.out.println("Saved budget: " + budget.getAmount() + " on " + budget.getDate());
-    }
-
-
-    @Override
-    public Budget getCurrentBudget() {
-        LocalDate currentDate = LocalDate.now(); // 获取当前日期
-        Budget currentBudget = budgetMap.get(currentDate); // 获取当前日期的预算，若无返回 null
-
-        // 打印获取的预算信息
-        if (currentBudget != null) {
-            System.out.println("Fetched current budget: " + currentBudget.getAmount() + " on " + currentBudget.getDate());
-        } else {
-            System.out.println("No budget found for current date.");
-        }
-
-        return currentBudget; // 返回当前日期的预算
+        System.out.println("Saved budget: " + budget.getAmount() + " for " + budget.getDate());
     }
 
     @Override
@@ -53,15 +43,34 @@ public class BudgetServiceImpl implements BudgetService {
             throw new IllegalArgumentException("Date cannot be null");
         }
 
-        Budget budget = budgetMap.get(date); // 获取指定日期的预算
+        return budgetMap.get(date); // 返回指定日期的预算
+    }
 
-        // 打印获取的预算信息
-        if (budget != null) {
-            System.out.println("Fetched budget for " + date + ": " + budget.getAmount());
-        } else {
-            System.out.println("No budget found for date " + date);
+    @Override
+    public Budget getCurrentBudget() {
+        LocalDate currentDate = LocalDate.now();
+        System.out.println("Current Date: " + currentDate);  // 打印当前日期
+
+        Budget latestBudget = null;
+
+        // 遍历所有预算，筛选当前月份的预算
+        for (Map.Entry<LocalDate, Budget> entry : budgetMap.entrySet()) {
+            System.out.println("Checking budget for date: " + entry.getKey()); // 打印每个预算的日期
+
+            // 如果预算日期属于当前月份
+            if (entry.getKey().getMonth() == currentDate.getMonth()) {
+                if (latestBudget == null || entry.getValue().getDate().isAfter(latestBudget.getDate())) {
+                    latestBudget = entry.getValue(); // 保留最新的预算
+                }
+            }
         }
 
-        return budget; // 返回指定日期的预算
+        // 如果没有找到最新的预算
+        if (latestBudget == null) {
+            System.out.println("No budget found for the current month (" + currentDate.getMonth() + ")");
+        }
+
+        return latestBudget; // 返回当前月份最新的预算，如果没有则返回 null
     }
+
 }
