@@ -125,24 +125,19 @@ public class HistoryController {
     // 以下导航方法保持不变
     @FXML
     private void turntoHome() throws IOException {
-        System.out.println("转到home页面");
         MainApp.showHome();
     }
     @FXML
     private void turntoReport() throws IOException {
-        System.out.println("转到home页面");
-        //MainApp.showReport();
+        MainApp.showReport();
     }@FXML
     private void turntoHistory() throws IOException {
-        System.out.println("转到home页面");
         MainApp.showhistory();
     }@FXML
     private void turntoManagement() throws IOException {
-        System.out.println("转到home页面");
         MainApp.showmanagement();
     }@FXML
     private void turntoUser() throws IOException {
-        System.out.println("转到home页面");
         MainApp.showuser();
     }
     @FXML

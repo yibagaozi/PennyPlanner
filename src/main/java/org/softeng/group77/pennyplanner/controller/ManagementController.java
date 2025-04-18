@@ -70,19 +70,19 @@ public class ManagementController {
     }
     @FXML
     private void turntoReport() throws IOException {
-        System.out.println("转到home页面");
-        //MainApp.showReport();
+        //System.out.println("转到home页面");
+        MainApp.showReport();
     }@FXML
     private void turntoHistory() throws IOException {
-        System.out.println("转到home页面");
+        //System.out.println("转到home页面");
         MainApp.showhistory();
     }@FXML
     private void turntoManagement() throws IOException {
-        System.out.println("转到home页面");
+        //System.out.println("转到home页面");
         MainApp.showmanagement();
     }@FXML
     private void turntoUser() throws IOException {
-        System.out.println("转到home页面");
+        //System.out.println("转到home页面");
         MainApp.showuser();
     }
     @FXML
