@@ -75,7 +75,7 @@ public class ManagementController {
     }@FXML
     private void turntoHistory() throws IOException {
         System.out.println("转到home页面");
-        //MainApp.showhistory();
+        MainApp.showhistory();
     }@FXML
     private void turntoManagement() throws IOException {
         System.out.println("转到home页面");

@@ -97,6 +97,19 @@ public class MainApp extends Application {
         primaryStage.show();
     }
 
+    public static void showhistory() throws IOException {
+        FXMLLoader loader = new FXMLLoader(
+                MainApp.class.getResource("/fxml/History_view.fxml")
+        );
+        Parent root = loader.load();
+
+        Scene scene = new Scene(root,800,500);
+        scene.getStylesheets().add(MainApp.class.getResource("/css/style-History.css").toExternalForm());
+        primaryStage.setTitle("PennyPlanner");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
     public static void showmanagement() throws IOException {
         FXMLLoader loader = new FXMLLoader(
                 MainApp.class.getResource("/fxml/Management_view.fxml")
