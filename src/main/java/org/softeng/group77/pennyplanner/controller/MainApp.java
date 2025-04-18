@@ -43,7 +43,7 @@ public class MainApp extends Application {
     public void start(Stage primaryStage) throws Exception {
         MainApp.primaryStage = primaryStage;
         applicationContext = new AnnotationConfigApplicationContext("org.softeng.group77.pennyplanner");
-        clearFilesInDirectory("data");
+        //clearFilesInDirectory("data");
         showLogin();
     }
 
