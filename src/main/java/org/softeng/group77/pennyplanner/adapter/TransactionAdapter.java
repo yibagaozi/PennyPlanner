@@ -11,7 +11,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -74,18 +76,30 @@ public class TransactionAdapter {
      */
     public ObservableList<tableModel> getUserTransactions() {
         try {
-            List<TransactionDetail> details = transactionService.getUserTransactions();
-            List<tableModel> models = new ArrayList<>();
+            List<TransactionDetail> details = transactionService.getUserTransactions()
+                    .stream()
+                    .sorted(Comparator.comparing(TransactionDetail::getTransactionDateTime).reversed()) // 按日期降序
+                    .collect(Collectors.toList());
+            ObservableList<tableModel> models = FXCollections.observableArrayList();
+            //List<tableModel> models = new ArrayList<>();
 //            List<tableModel> models = details.stream()
 //                    .map(this::toTableModel)
 //                    .collect(Collectors.toList());
-            int index = 1;
-            for (TransactionDetail detail : details) {
+//            int index = 1;
+//            for (TransactionDetail detail : details) {
+//                tableModel model = toTableModel(detail);
+//                model.setDisplayId(String.valueOf(index++)); // 设置显示ID为序号
+//                models.add(model);
+//            }
+            // 生成动态序号
+            AtomicInteger index = new AtomicInteger(1);
+            details.forEach(detail -> {
                 tableModel model = toTableModel(detail);
-                model.setDisplayId(String.valueOf(index++)); // 设置显示ID为序号
+                model.setDisplayId(String.valueOf(index.getAndIncrement())); // 设置递增序号
                 models.add(model);
-            }
-            return FXCollections.observableArrayList(models);
+            });
+
+            return models;
         } catch (Exception e) {
             e.printStackTrace();
             return FXCollections.observableArrayList(new ArrayList<>());

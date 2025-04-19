@@ -39,7 +39,10 @@
                     </AnchorPane>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="353.0" prefWidth="505.0">
                         <children>
-                            <Label fx:id="date" layoutX="12.0" prefHeight="37.0" prefWidth="103.0" text="Hello username" />
+                            <Label fx:id="date" layoutX="12.0" prefHeight="37.0" prefWidth="103.0" style="-fx-font-weight: bold;" text="April 2025">
+                        <font>
+                           <Font size="15.0" />
+                        </font></Label>
                             <!-- 卡片容器HBox -->
                             <HBox layoutX="6.0" layoutY="56.0" prefHeight="100.0" prefWidth="481.0" spacing="20.0">
                                 <!-- 卡片1: 总余额 -->
@@ -84,7 +87,7 @@
                      <Button layoutX="477.0" layoutY="166.0" mnemonicParsing="false" onAction="#refreshData" prefHeight="23.0" prefWidth="80.0" text="Refresh" />
                      <TableView fx:id="transactionTable" layoutX="11.0" layoutY="196.0" prefHeight="145.0" prefWidth="572.0">
                        <columns>
-                           <TableColumn fx:id="transactionidColumn" prefWidth="50" text="id" />
+                           <TableColumn fx:id="transactionidColumn" prefWidth="50" text="No." />
                            <TableColumn fx:id="dateColumn" prefWidth="120" text="Date" />
                            <TableColumn fx:id="descriptionColumn" prefWidth="200" text="Description" />
                            <TableColumn fx:id="amountColumn" prefWidth="100" text="Amount" />

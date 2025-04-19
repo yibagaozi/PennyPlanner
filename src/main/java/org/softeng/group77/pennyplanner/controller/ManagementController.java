@@ -80,8 +80,8 @@ public class ManagementController {
                         methodComboBox.getValue()
                 );
 
-                // 添加到共享数据
-                //SharedDataModel.getTransactionData().add(newTransaction);
+                //添加到共享数据
+                SharedDataModel.getTransactionData().add(newTransaction);
                 // 添加到共享数据并持久化
                 boolean success = SharedDataModel.addTransaction(newTransaction);
 

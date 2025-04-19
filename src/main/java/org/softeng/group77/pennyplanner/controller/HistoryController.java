@@ -29,13 +29,13 @@ public class HistoryController {
     @FXML
     private void initialize() {
         // 首先刷新数据，确保显示最新的交易记录
-        SharedDataModel.refreshTransactionData();
+        //SharedDataModel.refreshTransactionData();
 
         // 创建FilteredList包装SharedDataModel的数据
-        filteredData = new FilteredList<>(SharedDataModel.getTransactionData());
+        //filteredData = new FilteredList<>(SharedDataModel.getTransactionData());
 
         // 初始化日期标题（固定显示 March 2025）
-        date.setText("March 2025");
+        //date.setText("April 2025");
 
         Year.setItems(FXCollections.observableArrayList(
                 null, // 空选项
@@ -63,6 +63,9 @@ public class HistoryController {
         amountColumn.setCellValueFactory(cellData -> cellData.getValue().amountProperty().asObject());
         categoryColumn.setCellValueFactory(cellData -> cellData.getValue().categoryProperty());
         methodColumn.setCellValueFactory(cellData -> cellData.getValue().methodProperty());
+        // 设置默认按日期降序
+        dateColumn.setSortType(TableColumn.SortType.DESCENDING);
+        transactionTable.getSortOrder().add(dateColumn);
 
         // 设置动态过滤列表为表格数据源
         transactionTable.setItems(filteredData);
@@ -91,6 +94,30 @@ public class HistoryController {
         Year.valueProperty().addListener((obs, oldVal, newVal) -> updateFilter());
         Month.valueProperty().addListener((obs, oldVal, newVal) -> updateFilter());
         category.valueProperty().addListener((obs, oldVal, newVal) -> updateFilter());
+
+        // Initial filter application might be needed if default filters are set
+        updateFilter();
+
+//        //时间排序
+//        dateColumn.setSortType(TableColumn.SortType.DESCENDING); // 默认按日期降序
+//        transactionTable.getSortOrder().add(dateColumn); // 设置默认排序列
+//        transactionTable.sort(); // 应用排序
+//
+//        // 确保表格可排序
+//        transactionTable.setSortPolicy(table -> {
+//            FXCollections.sort(transactionTable.getItems(), (o1, o2) -> {
+//                // 如果用户点击了列头，使用默认排序
+//                if (!transactionTable.getSortOrder().isEmpty()) {
+//                    return table.getComparator().compare(o1, o2);
+//                }
+//                // 否则保持原始顺序（按displayId）
+//                return Integer.compare(
+//                        Integer.parseInt(o1.getDisplayId()),
+//                        Integer.parseInt(o2.getDisplayId())
+//                );
+//            });
+//            return true;
+//        });
     }
 
     // 统一筛选逻辑（核心修复）
@@ -133,8 +160,8 @@ public class HistoryController {
     public void refreshData() {
         SharedDataModel.refreshTransactionData();
         // 重新初始化过滤数据
-        filteredData = new FilteredList<>(SharedDataModel.getTransactionData());
-        transactionTable.setItems(filteredData);
+        //filteredData = new FilteredList<>(SharedDataModel.getTransactionData());
+        //transactionTable.setItems(filteredData);
     }
 
     // 以下导航方法保持不变

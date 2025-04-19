@@ -18,8 +18,8 @@ public class tableModel {
     // 构造函数
     public tableModel(String id, String date, String description, double amount,
                       String category, String method) {
-        this.id = new SimpleStringProperty(id);
-        this.displayId = new SimpleStringProperty("id"); // 默认为空，后续设置
+        this.id = new SimpleStringProperty(id); // 保留原始UUID
+        this.displayId = new SimpleStringProperty(""); // 初始为空，由适配器设置序号
         this.date = new SimpleStringProperty(date);
         this.description = new SimpleStringProperty(description);
         this.amount = new SimpleDoubleProperty(amount);
