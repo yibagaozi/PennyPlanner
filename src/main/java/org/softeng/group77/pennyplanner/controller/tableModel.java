@@ -13,11 +13,13 @@ public class tableModel {
     private final DoubleProperty amount;     // 对应Amount列
     private final StringProperty category;   // 对应Category列
     private final StringProperty method;     // 对应Method列
+    private final SimpleStringProperty displayId;
 
     // 构造函数
     public tableModel(String id, String date, String description, double amount,
                       String category, String method) {
         this.id = new SimpleStringProperty(id);
+        this.displayId = new SimpleStringProperty("id"); // 默认为空，后续设置
         this.date = new SimpleStringProperty(date);
         this.description = new SimpleStringProperty(description);
         this.amount = new SimpleDoubleProperty(amount);
@@ -31,6 +33,7 @@ public class tableModel {
     public double getAmount() { return amount.get(); }
     public String getCategory() { return category.get(); }
     public String getMethod() { return method.get(); }
+    public String getDisplayId() { return displayId.get(); }
 
     // Setter方法
     public void setDate(String value) { date.set(value); }
@@ -38,6 +41,7 @@ public class tableModel {
     public void setAmount(double value) { amount.set(value); }
     public void setCategory(String value) { category.set(value); }
     public void setMethod(String value) { method.set(value); }
+    public void setDisplayId(String value) { displayId.set(value); }
 
     // Property getter方法(用于TableView绑定)
     public StringProperty dateProperty() { return date; }
@@ -45,6 +49,7 @@ public class tableModel {
     public DoubleProperty amountProperty() { return amount; }
     public StringProperty categoryProperty() { return category; }
     public StringProperty methodProperty() { return method; }
+    public StringProperty displayIdProperty() { return displayId; }
 
     public String getId() {
         return id.get();

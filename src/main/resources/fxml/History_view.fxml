@@ -81,6 +81,7 @@
                      <ComboBox fx:id="Year" layoutX="14.0" layoutY="166.0" onAction="#initialize" prefHeight="23.0" prefWidth="105.0" />
                      <ComboBox fx:id="Month" layoutX="135.0" layoutY="166.0" prefHeight="23.0" prefWidth="98.0" />
                      <Button layoutX="377.0" layoutY="166.0" mnemonicParsing="false" onAction="#turntoManagement" prefHeight="23.0" prefWidth="80.0" text="Add items" />
+                     <Button layoutX="477.0" layoutY="166.0" mnemonicParsing="false" onAction="#refreshData" prefHeight="23.0" prefWidth="80.0" text="Refresh" />
                      <TableView fx:id="transactionTable" layoutX="11.0" layoutY="196.0" prefHeight="145.0" prefWidth="572.0">
                        <columns>
                            <TableColumn fx:id="transactionidColumn" prefWidth="50" text="id" />

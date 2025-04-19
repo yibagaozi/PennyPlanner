@@ -7,9 +7,14 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.softeng.group77.pennyplanner.PennyPlannerApplication;
+import org.softeng.group77.pennyplanner.adapter.TransactionAdapter;
+import org.softeng.group77.pennyplanner.service.AuthService;
+import org.softeng.group77.pennyplanner.service.TransactionService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.stereotype.Controller;
 
 
 import java.io.IOException;
@@ -17,10 +22,12 @@ import java.net.URL;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 
-
+@Controller
 public class MainApp extends Application {
     private static Stage primaryStage;
     private static ConfigurableApplicationContext applicationContext;
+    private static TransactionAdapter transactionAdapter;
+    private static AuthService authService;
 
     @Override
     public void init() {
@@ -98,6 +105,9 @@ public class MainApp extends Application {
     }
 
     public static void showhistory() throws IOException {
+        // 刷新交易数据 —— ensure 强制刷新
+        SharedDataModel.refreshTransactionData();
+
         FXMLLoader loader = new FXMLLoader(
                 MainApp.class.getResource("/fxml/History_view.fxml")
         );
@@ -170,5 +180,16 @@ public class MainApp extends Application {
         } catch (IOException e) {
             System.err.println("Error clearing data folder: " + e.getMessage());
         }
+    }
+
+    @Autowired
+    public void setServices(TransactionService transactionService, AuthService authService) {
+        this.transactionAdapter = new TransactionAdapter(transactionService);
+        this.authService = authService;
+
+        // 设置适配器到共享模型
+        SharedDataModel.setTransactionAdapter(transactionAdapter);
+        HomeController.setTransactionAdapter(transactionAdapter);
+        HomeController.setAuthService(authService);
     }
 }

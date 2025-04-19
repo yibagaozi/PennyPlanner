@@ -9,9 +9,14 @@ import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import java.io.File;
+import java.math.BigDecimal;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.UUID;
 
 public class ManagementController {
     // 字段绑定
@@ -22,18 +27,19 @@ public class ManagementController {
     @FXML private ComboBox<String> methodComboBox;
     // 类型选择状态
     private boolean isExpense = true;
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         // 在initialize方法中初始化分类和支付方式
         public void initialize() {
             // 初始化分类选项
             categoryComboBox.setItems(FXCollections.observableArrayList(
-                    "Food", "Salary", "Living Bill", "Entertainment",
+                    null, "Food", "Salary", "Living Bill", "Entertainment",
                     "Transportation", "Education", "Clothes", "Others"
             ));
 
             // 初始化支付方式
             methodComboBox.setItems(FXCollections.observableArrayList(
-                    "信用卡", "银行转账", "自动扣款", "现金", "电子支付"
+                    null, "Credit Card", "Bank Transfer", "Auto-Payment", "Cash", "E-Payment"
             ));
 
             // 设置默认选择
@@ -45,6 +51,7 @@ public class ManagementController {
         @FXML
         private void handleSave() {
             try {
+                dateField.setPromptText("YYYY-MM-DD");
                 // 数据校验
                 if (dateField.getText().isEmpty() ||
                         !dateField.getText().matches("\\d{4}-\\d{2}-\\d{2}")) {
@@ -59,11 +66,13 @@ public class ManagementController {
                 }
 
                 // 创建新交易记录
-                String newId = String.valueOf(SharedDataModel.getTransactionData().size() + 1);
+                //String newId = String.valueOf(SharedDataModel.getTransactionData().size() + 1);
+                String newId = UUID.randomUUID().toString(); // 使用UUID生成唯一ID
                 double finalAmount = isExpense ? -Math.abs(amount) : Math.abs(amount);
 
                 tableModel newTransaction = new tableModel(
-                        newId,
+                        //newId,
+                        java.util.UUID.randomUUID().toString(), // 使用UUID作为后端ID
                         dateField.getText(),
                         descriptionField.getText(),
                         finalAmount,
@@ -72,7 +81,17 @@ public class ManagementController {
                 );
 
                 // 添加到共享数据
-                SharedDataModel.getTransactionData().add(newTransaction);
+                //SharedDataModel.getTransactionData().add(newTransaction);
+                // 添加到共享数据并持久化
+                boolean success = SharedDataModel.addTransaction(newTransaction);
+
+                if (success) {
+                    showAlert("交易记录已成功保存");
+                    // 清空输入框
+                    clearForm();
+                } else {
+                    showAlert("保存失败，请稍后再试");
+                }
 
                 // 清空输入框
                 clearForm();
@@ -82,6 +101,11 @@ public class ManagementController {
             }
         }
 
+        @FXML
+        private void handleCancel() {
+            // 清空输入框
+            clearForm();
+        }
 
         // 新增类型选择处理方法
         @FXML
@@ -93,6 +117,7 @@ public class ManagementController {
         private void handleIncome() {
             isExpense = false;
         }
+
 
         private void clearForm() {
             dateField.clear();

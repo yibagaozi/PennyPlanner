@@ -22,11 +22,18 @@ public class HistoryController {
     @FXML private TableColumn<tableModel, String> methodColumn;
 
     // 数据存储结构：原始数据 + 动态过滤列表
-    private final ObservableList<tableModel> transactionData = FXCollections.observableArrayList();
-    private final FilteredList<tableModel> filteredData = new FilteredList<>(transactionData);
+    //private final ObservableList<tableModel> transactionData = FXCollections.observableArrayList();
+    private final ObservableList<tableModel> transactionData = SharedDataModel.getTransactionData();
+    private FilteredList<tableModel> filteredData = new FilteredList<>(transactionData);
 
     @FXML
     private void initialize() {
+        // 首先刷新数据，确保显示最新的交易记录
+        SharedDataModel.refreshTransactionData();
+
+        // 创建FilteredList包装SharedDataModel的数据
+        filteredData = new FilteredList<>(SharedDataModel.getTransactionData());
+
         // 初始化日期标题（固定显示 March 2025）
         date.setText("March 2025");
 
@@ -50,7 +57,7 @@ public class HistoryController {
         category.setItems(categories);
 
         // 绑定表格列与模型属性
-        transactionidColumn.setCellValueFactory(cellData -> cellData.getValue().idProperty());
+        transactionidColumn.setCellValueFactory(cellData -> cellData.getValue().displayIdProperty());
         dateColumn.setCellValueFactory(cellData -> cellData.getValue().dateProperty());
         descriptionColumn.setCellValueFactory(cellData -> cellData.getValue().descriptionProperty());
         amountColumn.setCellValueFactory(cellData -> cellData.getValue().amountProperty().asObject());
@@ -62,7 +69,7 @@ public class HistoryController {
 
         // 加载示例数据（仅加载一次）
         if (transactionData.isEmpty()) {
-            addSampleData();
+            //addSampleData();
         }
 
         // 配置金额列显示格式
@@ -116,10 +123,18 @@ public class HistoryController {
     }
 
     // 示例数据初始化（与截图完全一致）
-    private void addSampleData() {
-        transactionData.add(new tableModel("1", "2023-06-15", "超市购物", -125.50, "Food", "信用卡"));
-        transactionData.add(new tableModel("2", "2023-06-16", "工资收入", 5000.00, "Salary", "银行转账"));
-        transactionData.add(new tableModel("3", "2023-06-17", "水电费", -230.75, "Living Bill", "自动扣款"));
+//    private void addSampleData() {
+//        transactionData.add(new tableModel("1", "2023-06-15", "超市购物", -125.50, "Food", "信用卡"));
+//        transactionData.add(new tableModel("2", "2023-06-16", "工资收入", 5000.00, "Salary", "银行转账"));
+//        transactionData.add(new tableModel("3", "2023-06-17", "水电费", -230.75, "Living Bill", "自动扣款"));
+//    }
+
+    @FXML
+    public void refreshData() {
+        SharedDataModel.refreshTransactionData();
+        // 重新初始化过滤数据
+        filteredData = new FilteredList<>(SharedDataModel.getTransactionData());
+        transactionTable.setItems(filteredData);
     }
 
     // 以下导航方法保持不变

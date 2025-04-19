@@ -68,6 +68,8 @@ public class LoginController {
                     authService.login(email, password); // 调用 AuthService 登录
                     Platform.runLater(() -> {
                         try {
+                            // 登录成功后刷新事务数据
+                            SharedDataModel.refreshTransactionData();
                             MainApp.showHome(); // 登录成功，跳转主页
                         } catch (IOException e) {
                             Platform.runLater(() -> errorLabel.setText("无法跳转到主页: " + e.getMessage()));
