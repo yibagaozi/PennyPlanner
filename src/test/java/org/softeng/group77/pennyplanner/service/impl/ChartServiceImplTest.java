@@ -159,15 +159,15 @@ public class ChartServiceImplTest {
         // 验证结果
         assertNotNull(lineChartData, "折线图数据不应为null");
         assertEquals("月度支出测试", lineChartData.getTitle(), "标题应匹配");
-        assertEquals("月份", lineChartData.getXAxisLabel(), "X轴标签应为'月份'");
-        assertEquals("支出金额", lineChartData.getYAxisLabel(), "Y轴标签应为'支出金额'");
+        assertEquals("Month", lineChartData.getXAxisLabel(), "X轴标签应为'月份'");
+        assertEquals("Amount", lineChartData.getYAxisLabel(), "Y轴标签应为'支出金额'");
 
         // 验证数据系列
         Map<String, List<ChartDataPoint>> series = lineChartData.getSeries();
         assertNotNull(series, "数据系列不应为null");
-        assertTrue(series.containsKey("月度支出"), "应包含'月度支出'系列");
+        assertTrue(series.containsKey("Monthly Expense"), "应包含'月度支出'系列");
 
-        List<ChartDataPoint> monthlyPoints = series.get("月度支出");
+        List<ChartDataPoint> monthlyPoints = series.get("Monthly Expense");
         assertNotNull(monthlyPoints, "月度支出数据点不应为null");
         assertEquals(12, monthlyPoints.size(), "应有12个月的数据点");
 
@@ -201,7 +201,7 @@ public class ChartServiceImplTest {
 
         // 验证数据系列
         Map<String, List<ChartDataPoint>> series = lineChartData.getSeries();
-        List<ChartDataPoint> monthlyPoints = series.get("月度支出");
+        List<ChartDataPoint> monthlyPoints = series.get("Monthly Expense");
 
         // 2024应只有12月有数据，2025应有1-3月有数据，2026应无数据
         if (year == 2024) {
@@ -234,8 +234,8 @@ public class ChartServiceImplTest {
         // 验证结果
         assertNotNull(barChartData, "柱状图数据不应为null");
         assertEquals("分类比较测试", barChartData.getTitle(), "标题应匹配");
-        assertEquals("支出类别", barChartData.getXAxisLabel(), "X轴标签应为'支出类别'");
-        assertEquals("金额", barChartData.getYAxisLabel(), "Y轴标签应为'金额'");
+        assertEquals("Category", barChartData.getXAxisLabel(), "X轴标签应为'支出类别'");
+        assertEquals("Amount", barChartData.getYAxisLabel(), "Y轴标签应为'金额'");
 
         // 验证分类数据
         assertEquals(categories, barChartData.getCategories(), "分类列表应匹配");
@@ -243,9 +243,9 @@ public class ChartServiceImplTest {
         // 验证系列数据
         Map<String, List<Double>> seriesData = barChartData.getSeries();
         assertNotNull(seriesData, "系列数据不应为null");
-        assertTrue(seriesData.containsKey("支出金额"), "应包含'支出金额'系列");
+        assertTrue(seriesData.containsKey("Amount"), "应包含'支出金额'系列");
 
-        List<Double> values = seriesData.get("支出金额");
+        List<Double> values = seriesData.get("Amount");
         assertNotNull(values, "值列表不应为null");
         assertEquals(4, values.size(), "应有4个分类的值");
 
@@ -294,10 +294,10 @@ public class ChartServiceImplTest {
         // 验证数据系列
         Map<String, List<ChartDataPoint>> series = chartData.getSeries();
         assertNotNull(series, "数据系列不应为null");
-        assertTrue(series.containsKey("支出趋势"), "应包含'支出趋势'系列");
+        assertTrue(series.containsKey("Expense Trend"), "应包含'支出趋势'系列");
 
         // 验证至少有一个数据点
-        List<ChartDataPoint> dataPoints = series.get("支出趋势");
+        List<ChartDataPoint> dataPoints = series.get("Expense Trend");
         assertFalse(dataPoints.isEmpty(), "数据点列表不应为空");
 
         // 根据不同周期验证数据点数量和格式
@@ -346,7 +346,7 @@ public class ChartServiceImplTest {
 
         // 验证结果
         assertNotNull(chartData, "图表数据不应为null");
-        assertEquals("2025年各类别月度支出", chartData.getTitle(), "标题应正确");
+        assertEquals("2025yearly expense trend by category", chartData.getTitle(), "标题应正确");
 
         // 验证数据系列
         Map<String, List<ChartDataPoint>> series = chartData.getSeries();
