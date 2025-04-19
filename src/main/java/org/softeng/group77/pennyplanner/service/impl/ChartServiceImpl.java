@@ -6,6 +6,7 @@ import org.softeng.group77.pennyplanner.service.ChartService;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
