@@ -9,17 +9,18 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
 <BorderPane styleClass="border-pane-no-gap" stylesheets="@/css/style-Report.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.softeng.group77.pennyplanner.controller.ReportController">
     <left>
         <VBox styleClass="nav-bar" BorderPane.alignment="TOP_LEFT">
             <Label styleClass="nav-title" text="PennyPlanner" />
-            <Button styleClass="nav-button" text="Home" onAction="#turntoHome"/>
-            <Button styleClass="nav-button" text="Report &amp; Forecast" onAction="#turntoReport"/>
+            <Button onAction="#turntoHome" styleClass="nav-button" text="Home" />
+            <Button onAction="#turntoReport" styleClass="nav-button" text="Report &amp; Forecast" />
             <Button styleClass="nav-button" text="Settings" />
-            <Button styleClass="nav-button" text="History" onAction="#turntoHistory"/>
-            <Button styleClass="nav-button" text="Management" onAction="#turntoManagement"/>
-            <Button styleClass="nav-button" text="User Profile" onAction="#turntoUser"/>
+            <Button onAction="#turntoHistory" styleClass="nav-button" text="History" />
+            <Button onAction="#turntoManagement" styleClass="nav-button" text="Management" />
+            <Button onAction="#turntoUser" styleClass="nav-button" text="User Profile" />
         </VBox>
     </left>
     <right>
@@ -28,8 +29,11 @@
                 <items>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                         <children>
-                            <Button layoutX="450.0" layoutY="7.0" mnemonicParsing="false" text="Log out" onAction="#turntoLogin"/>
-                            <Label layoutX="14.0" layoutY="11.0" text="Report" />
+                            <Button layoutX="450.0" layoutY="7.0" mnemonicParsing="false" onAction="#turntoLogin" text="Log out" />
+                            <Label layoutX="14.0" layoutY="11.0" style="-fx-font-weight: bold;" text="Report">
+                        <font>
+                           <Font size="17.0" />
+                        </font></Label>
                         </children>
                     </AnchorPane>
 
@@ -75,7 +79,7 @@
                                 </VBox>
                             </HBox>
                             <PieChart fx:id="expenseDistributionChart" layoutX="281.0" layoutY="179.0" prefHeight="146.0" prefWidth="222.0" />
-                     <Button layoutX="28.0" layoutY="21.0" mnemonicParsing="false" text="Use AI forecast and report function" onAction="#useAI"/>
+                     <Button layoutX="28.0" layoutY="21.0" mnemonicParsing="false" onAction="#useAI" text="Use AI forecast and report function" />
                      <TextArea fx:id="myTextArea" layoutX="21.0" layoutY="184.0" prefHeight="140.0" prefWidth="452.0" />
 
                         </children>
