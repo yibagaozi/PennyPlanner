@@ -45,7 +45,7 @@ public class HistoryController {
         for (int year = 2000; year <= 2025; year++) {
             Year.getItems().add(year);
         }
-        // 初始化月份选择框 (1-12月)
+        
         for (int month = 1; month <= 12; month++) {
             Month.getItems().add(month + "月");
         }
