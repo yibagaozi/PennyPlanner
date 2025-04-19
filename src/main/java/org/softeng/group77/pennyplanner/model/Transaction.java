@@ -1,5 +1,6 @@
 package org.softeng.group77.pennyplanner.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -58,6 +59,11 @@ public class Transaction {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
         this.userId = userId;
+    }
+
+    @JsonIgnore
+    public double getAmountAsDouble() {
+        return amount != null ? amount.doubleValue() : 0.0;
     }
 
 }

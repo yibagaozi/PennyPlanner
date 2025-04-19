@@ -2,9 +2,11 @@ package org.softeng.group77.pennyplanner.util;
 
 import org.softeng.group77.pennyplanner.dto.TransactionDetail;
 import org.softeng.group77.pennyplanner.model.Transaction;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public class TransactionMapper {
 
     public TransactionDetail toTransactionDetail(Transaction transaction) {
