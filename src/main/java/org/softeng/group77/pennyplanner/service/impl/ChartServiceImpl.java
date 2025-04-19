@@ -13,6 +13,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class ChartServiceImpl implements ChartService {
 
     private static final List<String> CHART_COLORS = Arrays.asList(
@@ -241,6 +242,50 @@ public class ChartServiceImpl implements ChartService {
             .animated(true)
             .period(TimeSeriesData.ChartPeriod.MONTHLY)
             .build();
+    }
+
+    private void groupByDateFormat(List<Transaction> transactions, DateTimeFormatter formatter, List<ChartDataPoint> dataPoints) {
+        Map<String, Double> dateTotals = transactions.stream()
+            .collect(Collectors.groupingBy(
+                tx -> formatter.format(tx.getTransactionDateTime()),
+                Collectors.summingDouble(Transaction::getAmountAsDouble)
+            ));
+
+        List<String> sortedDates = new ArrayList<>(dateTotals.keySet());
+        Collections.sort(sortedDates);
+
+        for (String date : sortedDates) {
+            dataPoints.add(ChartDataPoint.builder()
+                .label(date)
+                .value(Math.abs(dateTotals.get(date)))
+                .seriesName("Expense Trend")
+                .color("#4285F4")
+                .build());
+        }
+    }
+
+    private void groupByWeek(List<Transaction> transactions, List<ChartDataPoint> dataPoints) {
+        Map<String, Double> weekTotals = new HashMap<>();
+
+        for (Transaction tx : transactions) {
+            LocalDate date = tx.getTransactionDateTime().toLocalDate();
+            int weekOfYear = date.get(java.time.temporal.WeekFields.of(Locale.getDefault()).weekOfYear());
+            String key = date.getYear() + "-W" + weekOfYear;
+
+            weekTotals.put(key, weekTotals.getOrDefault(key, 0.0) + tx.getAmountAsDouble());
+        }
+
+        List<String> sortedWeeks = new ArrayList<>(weekTotals.keySet());
+        Collections.sort(sortedWeeks);
+
+        for (String week : sortedWeeks) {
+            dataPoints.add(ChartDataPoint.builder()
+                .label(week)
+                .value(Math.abs(weekTotals.get(week)))
+                .seriesName("Expense Trend")
+                .color("#4285F4")
+                .build());
+        }
     }
 
 }
