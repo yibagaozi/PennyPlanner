@@ -1,0 +1,292 @@
+package org.softeng.group77.pennyplanner.service.impl;
+
+import org.softeng.group77.pennyplanner.model.*;
+import org.softeng.group77.pennyplanner.service.ChartService;
+
+import java.time.LocalDate;
+import java.util.List;
+import org.springframework.stereotype.Service;
+import lombok.extern.slf4j.Slf4j;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
+
+@Service
+@Slf4j
+public class ChartServiceImpl implements ChartService {
+
+    private static final List<String> CHART_COLORS = Arrays.asList(
+        "#4285F4", "#EA4335", "#FBBC05", "#34A853", "#FF6D01",
+        "#46BDC6", "#7BAAF7", "#F6AEA9", "#FDE293", "#AEDCB7"
+    );
+
+    @Override
+    public PieChartData generateCategoryDistributionPieChart(List<Transaction> transactions, String title) {
+        Map<String, Double> categoryTotals = transactions.stream()
+            .filter(tx -> tx.getCategory() != null && !tx.getCategory().isEmpty())
+            .collect(Collectors.groupingBy(
+                Transaction::getCategory,
+                Collectors.summingDouble(Transaction::getAmountAsDouble)
+            ));
+
+        List<ChartDataPoint> dataPoints = new ArrayList<>();
+        int colorIndex = 0;
+
+        for (Map.Entry<String, Double> entry : categoryTotals.entrySet()) {
+
+            String color = CHART_COLORS.get(colorIndex % CHART_COLORS.size());
+            colorIndex++;
+
+            dataPoints.add(ChartDataPoint.builder()
+                .label(entry.getKey())
+                .value(Math.abs(entry.getValue()))
+                .color(color)
+                .build());
+        }
+
+        dataPoints.sort((a, b) -> Double.compare(b.getValue(), a.getValue()));
+
+        return PieChartData.builder()
+            .title(title != null ? title : "Expense Distribution by Category")
+            .dataPoints(dataPoints)
+            .showLegend(true)
+            .showLabels(true)
+            .animated(true)
+            .build();
+    }
+
+    @Override
+    public TimeSeriesData generateMonthlyExpenseLineChart(List<Transaction> transactions, int year, String title) {
+        DateTimeFormatter monthFormatter = DateTimeFormatter.ofPattern("MM月");
+
+        Map<String, List<Transaction>> monthlyTransactions = transactions.stream()
+            .filter(tx -> tx.getTransactionDateTime().getYear() == year)
+            .collect(Collectors.groupingBy(tx ->
+                monthFormatter.format(tx.getTransactionDateTime())
+            ));
+
+        List<ChartDataPoint> monthlyDataPoints = new ArrayList<>();
+        for (int month = 1; month <= 12; month++) {
+            String monthLabel = String.format("%02d月", month);
+
+            double totalAmount = monthlyTransactions.getOrDefault(monthLabel, Collections.emptyList())
+                .stream()
+                .mapToDouble(Transaction::getAmountAsDouble)
+                .sum();
+
+            monthlyDataPoints.add(ChartDataPoint.builder()
+                .label(monthLabel)
+                .value(Math.abs(totalAmount))
+                .seriesName("Monthly Expense")
+                .color("#4285F4")
+                .build());
+        }
+
+        Map<String, List<ChartDataPoint>> series = new HashMap<>();
+        series.put("Monthly Expense", monthlyDataPoints);
+
+        return TimeSeriesData.builder()
+            .title(title != null ? title : year + "Monthly Expense Trend")
+            .xAxisLabel("Month")
+            .yAxisLabel("Amount")
+            .series(series)
+            .showLegend(true)
+            .animated(true)
+            .period(TimeSeriesData.ChartPeriod.MONTHLY)
+            .build();
+    }
+
+    @Override
+    public CategoryChartData generateCategoryComparisonBarChart(List<Transaction> transactions, List<String> categories, String title) {
+        if (categories == null || categories.isEmpty()) {
+            categories = transactions.stream()
+                .map(Transaction::getCategory)
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+        }
+
+        Map<String, Double> categoryTotals = transactions.stream()
+            .filter(tx -> tx.getCategory() != null)
+            .collect(Collectors.groupingBy(
+                Transaction::getCategory,
+                Collectors.summingDouble(Transaction::getAmountAsDouble)
+            ));
+
+        Map<String, List<Double>> seriesData = new HashMap<>();
+        List<Double> values = new ArrayList<>();
+
+        for (String category : categories) {
+            double amount = Math.abs(categoryTotals.getOrDefault(category, 0.0));
+            values.add(amount);
+        }
+
+        seriesData.put("Amount", values);
+
+        Map<String, String> seriesColors = new HashMap<>();
+        seriesColors.put("Amount", "#4285F4");
+
+        return CategoryChartData.builder()
+            .title(title != null ? title : "Category Comparison")
+            .xAxisLabel("Category")
+            .yAxisLabel("Amount")
+            .categories(categories)
+            .series(seriesData)
+            .seriesColors(seriesColors)
+            .showLegend(true)
+            .animated(true)
+            .build();
+    }
+
+    @Override
+    public TimeSeriesData generateDateRangeExpenseChart(List<Transaction> transactions, LocalDate startDate, LocalDate endDate, TimeSeriesData.ChartPeriod period) {
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.plusDays(1).atStartOfDay();
+
+        List<Transaction> filteredTransactions = transactions.stream()
+            .filter(tx -> !tx.getTransactionDateTime().isBefore(startDateTime) &&
+                         tx.getTransactionDateTime().isBefore(endDateTime))
+            .collect(Collectors.toList());
+
+        DateTimeFormatter formatter;
+        Map<String, List<ChartDataPoint>> seriesMap = new HashMap<>();
+        List<ChartDataPoint> dataPoints = new ArrayList<>();
+
+        switch (period) {
+            case DAILY:
+                formatter = DateTimeFormatter.ofPattern("MM-dd");
+                groupByDateFormat(filteredTransactions, formatter, dataPoints);
+                break;
+            case WEEKLY:
+                groupByWeek(filteredTransactions, dataPoints);
+                break;
+            case MONTHLY:
+                formatter = DateTimeFormatter.ofPattern("yyyy-MM");
+                groupByDateFormat(filteredTransactions, formatter, dataPoints);
+                break;
+            case YEARLY:
+                formatter = DateTimeFormatter.ofPattern("yyyy");
+                groupByDateFormat(filteredTransactions, formatter, dataPoints);
+                break;
+            default:
+                formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                groupByDateFormat(filteredTransactions, formatter, dataPoints);
+        }
+
+        seriesMap.put("Expense Trend", dataPoints);
+
+        return TimeSeriesData.builder()
+            .title(startDate + " to " + endDate + " Expense Trend")
+            .xAxisLabel("Date")
+            .yAxisLabel("Amount")
+            .series(seriesMap)
+            .showLegend(true)
+            .animated(true)
+            .period(period)
+            .build();
+    }
+
+    @Override
+    public TimeSeriesData generateMultiCategoryTimeSeriesChart(List<Transaction> transactions, int year, List<String> categories) {
+        if (categories == null || categories.isEmpty()) {
+            categories = transactions.stream()
+                .map(Transaction::getCategory)
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+        }
+
+        DateTimeFormatter monthFormatter = DateTimeFormatter.ofPattern("MM月");
+
+        List<Transaction> yearTransactions = transactions.stream()
+            .filter(tx -> tx.getTransactionDateTime().getYear() == year)
+            .collect(Collectors.toList());
+
+        Map<String, List<ChartDataPoint>> seriesMap = new HashMap<>();
+
+        int colorIndex = 0;
+        for (String category : categories) {
+            String color = CHART_COLORS.get(colorIndex % CHART_COLORS.size());
+            colorIndex++;
+
+            List<ChartDataPoint> categoryPoints = new ArrayList<>();
+
+            for (int month = 1; month <= 12; month++) {
+                final int currentMonth = month;
+                String monthLabel = String.format("%02d month", month);
+
+                double monthCategoryTotal = yearTransactions.stream()
+                    .filter(tx -> tx.getTransactionDateTime().getMonthValue() == currentMonth &&
+                                category.equals(tx.getCategory()))
+                    .mapToDouble(Transaction::getAmountAsDouble)
+                    .sum();
+
+                categoryPoints.add(ChartDataPoint.builder()
+                    .label(monthLabel)
+                    .value(Math.abs(monthCategoryTotal))
+                    .seriesName(category)
+                    .color(color)
+                    .build());
+            }
+
+            seriesMap.put(category, categoryPoints);
+        }
+
+        return TimeSeriesData.builder()
+            .title(year + "yearly expense trend by category")
+            .xAxisLabel("Month")
+            .yAxisLabel("Amount")
+            .series(seriesMap)
+            .showLegend(true)
+            .animated(true)
+            .period(TimeSeriesData.ChartPeriod.MONTHLY)
+            .build();
+    }
+
+    private void groupByDateFormat(List<Transaction> transactions, DateTimeFormatter formatter, List<ChartDataPoint> dataPoints) {
+        Map<String, Double> dateTotals = transactions.stream()
+            .collect(Collectors.groupingBy(
+                tx -> formatter.format(tx.getTransactionDateTime()),
+                Collectors.summingDouble(Transaction::getAmountAsDouble)
+            ));
+
+        List<String> sortedDates = new ArrayList<>(dateTotals.keySet());
+        Collections.sort(sortedDates);
+
+        for (String date : sortedDates) {
+            dataPoints.add(ChartDataPoint.builder()
+                .label(date)
+                .value(Math.abs(dateTotals.get(date)))
+                .seriesName("Expense Trend")
+                .color("#4285F4")
+                .build());
+        }
+    }
+
+    private void groupByWeek(List<Transaction> transactions, List<ChartDataPoint> dataPoints) {
+        Map<String, Double> weekTotals = new HashMap<>();
+
+        for (Transaction tx : transactions) {
+            LocalDate date = tx.getTransactionDateTime().toLocalDate();
+            int weekOfYear = date.get(java.time.temporal.WeekFields.of(Locale.getDefault()).weekOfYear());
+            String key = date.getYear() + "-W" + weekOfYear;
+
+            weekTotals.put(key, weekTotals.getOrDefault(key, 0.0) + tx.getAmountAsDouble());
+        }
+
+        List<String> sortedWeeks = new ArrayList<>(weekTotals.keySet());
+        Collections.sort(sortedWeeks);
+
+        for (String week : sortedWeeks) {
+            dataPoints.add(ChartDataPoint.builder()
+                .label(week)
+                .value(Math.abs(weekTotals.get(week)))
+                .seriesName("Expense Trend")
+                .color("#4285F4")
+                .build());
+        }
+    }
+
+}
