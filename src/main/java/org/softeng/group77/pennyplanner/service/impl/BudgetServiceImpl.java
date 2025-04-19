@@ -57,8 +57,8 @@ public class BudgetServiceImpl implements BudgetService {
         for (Map.Entry<LocalDate, Budget> entry : budgetMap.entrySet()) {
             System.out.println("Checking budget for date: " + entry.getKey()); // 打印每个预算的日期
 
-            // 如果预算日期属于当前月份
-            if (entry.getKey().getMonth() == currentDate.getMonth()) {
+            // 如果预算日期属于当前月份和年份
+            if (entry.getKey().getMonth() == currentDate.getMonth() && entry.getKey().getYear() == currentDate.getYear()) {
                 if (latestBudget == null || entry.getValue().getDate().isAfter(latestBudget.getDate())) {
                     latestBudget = entry.getValue(); // 保留最新的预算
                 }
