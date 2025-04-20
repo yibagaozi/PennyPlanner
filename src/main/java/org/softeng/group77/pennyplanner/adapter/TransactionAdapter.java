@@ -81,16 +81,7 @@ public class TransactionAdapter {
                     .sorted(Comparator.comparing(TransactionDetail::getTransactionDateTime).reversed()) // 按日期降序
                     .collect(Collectors.toList());
             ObservableList<tableModel> models = FXCollections.observableArrayList();
-            //List<tableModel> models = new ArrayList<>();
-//            List<tableModel> models = details.stream()
-//                    .map(this::toTableModel)
-//                    .collect(Collectors.toList());
-//            int index = 1;
-//            for (TransactionDetail detail : details) {
-//                tableModel model = toTableModel(detail);
-//                model.setDisplayId(String.valueOf(index++)); // 设置显示ID为序号
-//                models.add(model);
-//            }
+
             // 生成动态序号
             AtomicInteger index = new AtomicInteger(1);
             details.forEach(detail -> {
