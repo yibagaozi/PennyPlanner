@@ -13,6 +13,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.layout.StackPane?>
 
 <BorderPane styleClass="border-pane-no-gap" stylesheets="@/css/style-home.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.softeng.group77.pennyplanner.controller.HomeController">
     <left>
@@ -87,15 +88,15 @@
                                     </children>
                                 </VBox>
                             </HBox>
-                     <LineChart fx:id="expenseTrendChart" layoutX="14.0" layoutY="183.0" prefHeight="146.0" prefWidth="222.0">
-                       <xAxis>
-                         <CategoryAxis side="BOTTOM" />
-                       </xAxis>
-                       <yAxis>
-                         <NumberAxis side="LEFT" />
-                       </yAxis>
-                     </LineChart>
-                     <PieChart fx:id="expenseDistributionChart" layoutX="281.0" layoutY="179.0" prefHeight="146.0" prefWidth="222.0" />
+                     <StackPane fx:id="expenseTrendChartContainer" layoutX="14.0" layoutY="183.0" prefHeight="146.0" prefWidth="222.0" />
+<!--                       <xAxis>-->
+<!--                         <CategoryAxis side="BOTTOM" />-->
+<!--                       </xAxis>-->
+<!--                       <yAxis>-->
+<!--                         <NumberAxis side="LEFT" />-->
+<!--                       </yAxis>-->
+<!--                     </StackPane>-->
+                     <StackPane fx:id="expenseDistributionChartContainer" layoutX="281.0" layoutY="179.0" prefHeight="146.0" prefWidth="222.0" />
                      <Label layoutX="255.0" layoutY="19.0" prefHeight="22.0" prefWidth="52.0" text="Budget" />
                      <TextField layoutX="312.0" layoutY="19.0" prefHeight="22.0" prefWidth="106.0" />
                      <Button layoutX="448.0" layoutY="19.0" mnemonicParsing="false" text="Save" />

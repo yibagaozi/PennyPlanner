@@ -31,6 +31,7 @@ public class MainApp extends Application {
 
     @Override
     public void init() {
+
         applicationContext = new SpringApplicationBuilder(PennyPlannerApplication.class)
                 .run();
     }
@@ -53,6 +54,7 @@ public class MainApp extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         MainApp.primaryStage = primaryStage;
+
         applicationContext = new AnnotationConfigApplicationContext("org.softeng.group77.pennyplanner");
         //clearFilesInDirectory("data");
         showLogin();
@@ -100,6 +102,7 @@ public class MainApp extends Application {
         FXMLLoader loader = new FXMLLoader(
                 MainApp.class.getResource("/fxml/home_view.fxml")
         );
+        loader.setControllerFactory(applicationContext::getBean);
         Parent root = loader.load();
 
         Scene scene = new Scene(root,800,500);
