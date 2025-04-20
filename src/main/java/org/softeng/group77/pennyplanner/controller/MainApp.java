@@ -31,6 +31,7 @@ public class MainApp extends Application {
 
     @Override
     public void init() {
+
         applicationContext = new SpringApplicationBuilder(PennyPlannerApplication.class)
                 .run();
     }
@@ -38,7 +39,11 @@ public class MainApp extends Application {
     @Override
     public void stop() {
         applicationContext.close();
-        clearFilesInDirectory("data");
+        //clearFilesInDirectory("data");
+
+        SharedDataModel.clearUIData(); // 只清除UI上的数据，不清除存储的数据
+        authService.logout();
+
         Platform.exit();
     }
 
@@ -49,6 +54,7 @@ public class MainApp extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         MainApp.primaryStage = primaryStage;
+
         applicationContext = new AnnotationConfigApplicationContext("org.softeng.group77.pennyplanner");
         //clearFilesInDirectory("data");
         showLogin();
@@ -88,6 +94,7 @@ public class MainApp extends Application {
         primaryStage.setTitle("PennyPlanner");
         primaryStage.setScene(scene);
         primaryStage.show();
+        SharedDataModel.refreshTransactionData();
     }
 
 
@@ -95,6 +102,7 @@ public class MainApp extends Application {
         FXMLLoader loader = new FXMLLoader(
                 MainApp.class.getResource("/fxml/home_view.fxml")
         );
+        loader.setControllerFactory(applicationContext::getBean);
         Parent root = loader.load();
 
         Scene scene = new Scene(root,800,500);

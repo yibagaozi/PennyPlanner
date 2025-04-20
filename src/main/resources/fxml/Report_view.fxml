@@ -25,7 +25,7 @@
     </left>
     <right>
         <SplitPane orientation="VERTICAL" styleClass="right-split">
-            <SplitPane dividerPositions="0.1" layoutX="179.0" layoutY="1.0" orientation="VERTICAL" prefHeight="398.0" prefWidth="418.0">
+            <SplitPane fx:id="splitPane" dividerPositions="0.1" layoutX="179.0" layoutY="1.0" orientation="VERTICAL" prefHeight="398.0" prefWidth="418.0">
                 <items>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                         <children>
@@ -41,7 +41,7 @@
                         <children>
 
                             <!-- 卡片容器HBox -->
-                            <HBox layoutX="6.0" layoutY="56.0" prefHeight="100.0" prefWidth="481.0" spacing="20.0">
+                            <HBox layoutX="56.0" layoutY="56.0" prefHeight="100.0" prefWidth="481.0" spacing="20.0">
                                 <!-- 卡片1: 总余额 -->
                                 <VBox prefWidth="150.0" styleClass="card">
                                     <children>
@@ -79,8 +79,8 @@
                                 </VBox>
                             </HBox>
                             <PieChart fx:id="expenseDistributionChart" layoutX="281.0" layoutY="179.0" prefHeight="146.0" prefWidth="222.0" />
-                     <Button layoutX="28.0" layoutY="21.0" mnemonicParsing="false" onAction="#useAI" text="Use AI forecast and report function" />
-                     <TextArea fx:id="myTextArea" layoutX="21.0" layoutY="184.0" prefHeight="140.0" prefWidth="452.0" />
+                     <Button layoutX="21.0" layoutY="21.0" mnemonicParsing="false" onAction="#useAI" text="Use AI forecast and report function" />
+                     <TextArea fx:id="myTextArea" layoutX="76.0" layoutY="204.0" prefHeight="140.0" prefWidth="452.0" />
 
                         </children>
                     </AnchorPane>
