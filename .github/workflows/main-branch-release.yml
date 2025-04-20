@@ -3,11 +3,14 @@ name: Main Branch Release
 on:
   push:
     branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
   workflow_dispatch:
 
 permissions:
   contents: write
   packages: write
+  checks: write
 
 jobs:
   build-and-release:
