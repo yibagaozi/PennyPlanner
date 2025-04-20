@@ -26,7 +26,7 @@
     </left>
     <right>
         <SplitPane orientation="VERTICAL" styleClass="right-split">
-            <SplitPane dividerPositions="0.1" layoutX="179.0" layoutY="1.0" orientation="VERTICAL" prefHeight="500.0" prefWidth="418.0">
+            <SplitPane fx:id="splitPane" dividerPositions="0.1" layoutX="179.0" layoutY="1.0" orientation="VERTICAL" prefHeight="500.0" prefWidth="418.0">
                 <items>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                         <children>
@@ -44,7 +44,7 @@
                            <Font size="15.0" />
                         </font></Label>
                             <!-- 卡片容器HBox -->
-                            <HBox layoutX="6.0" layoutY="56.0" prefHeight="100.0" prefWidth="481.0" spacing="20.0">
+                            <HBox layoutX="56.0" layoutY="56.0" prefHeight="100.0" prefWidth="481.0" spacing="20.0">
                                 <!-- 卡片1: 总余额 -->
                                 <VBox prefWidth="150.0" styleClass="card">
                                     <children>

@@ -30,6 +30,9 @@ public class HistoryController {
     private FilteredList<tableModel> filteredData = new FilteredList<>(transactionData);
 
     @FXML
+    private SplitPane splitPane;
+
+    @FXML
     private void initialize() {
         // 首先刷新数据，确保显示最新的交易记录
         //SharedDataModel.refreshTransactionData();
@@ -119,6 +122,12 @@ public class HistoryController {
 //        // 不再需要从模型中获取displayId
 //        transactionidColumn.setCellValueFactory(cellData ->
 //                new SimpleStringProperty(String.valueOf(filteredData.indexOf(cellData.getValue()) + 1)));
+
+
+        // 禁用分割线的拖动
+        splitPane.getDividers().forEach(divider -> divider.positionProperty().addListener((observable, oldValue, newValue) -> {
+            divider.setPosition(0.1); // 固定分割线位置为 10%
+        }));
     }
 
     // 统一筛选逻辑（核心修复）

@@ -7,6 +7,7 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
+import javafx.scene.control.SplitPane;
 import org.softeng.group77.pennyplanner.adapter.TransactionAdapter;
 import org.softeng.group77.pennyplanner.service.AuthService;
 import org.softeng.group77.pennyplanner.model.*;
@@ -30,6 +31,9 @@ import java.util.stream.Collectors;
 public class HomeController {
     @FXML
     private Label usernameLabel; // 必须与fx:id完全一致
+
+    @FXML
+    private SplitPane splitPane;
 
 //    @FXML
 //    private LineChart<String, Number> expenseTrendChart; // 支出趋势折线图
@@ -97,6 +101,13 @@ public class HomeController {
 
         // 3. 初始化支出分布饼图
         setupExpenseDistributionChart();
+
+
+        // 禁用分割线的拖动
+        splitPane.getDividers().forEach(divider -> divider.positionProperty().addListener((observable, oldValue, newValue) -> {
+            divider.setPosition(0.1); // 固定分割线位置为 10%
+        }));
+
 
     }
     @FXML

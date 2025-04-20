@@ -2,10 +2,7 @@ package org.softeng.group77.pennyplanner.controller;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import java.io.File;
@@ -25,6 +22,7 @@ public class ManagementController {
     @FXML private TextField amountField;
     @FXML private ComboBox<String> categoryComboBox;
     @FXML private ComboBox<String> methodComboBox;
+    @FXML private SplitPane splitPane;
     // 类型选择状态
     private boolean isExpense = true;
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -45,6 +43,11 @@ public class ManagementController {
             // 设置默认选择
             categoryComboBox.getSelectionModel().selectFirst();
             methodComboBox.getSelectionModel().selectFirst();
+
+            // 禁用分割线的拖动
+            splitPane.getDividers().forEach(divider -> divider.positionProperty().addListener((observable, oldValue, newValue) -> {
+                divider.setPosition(0.1); // 固定分割线位置为 10%
+            }));
         }
 
         // "Save"按钮处理方法
