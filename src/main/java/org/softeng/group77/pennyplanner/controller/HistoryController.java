@@ -1,10 +1,13 @@
 package org.softeng.group77.pennyplanner.controller;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+
 import java.io.IOException;
 import java.util.function.Predicate;
 
@@ -25,6 +28,9 @@ public class HistoryController {
     //private final ObservableList<tableModel> transactionData = FXCollections.observableArrayList();
     private final ObservableList<tableModel> transactionData = SharedDataModel.getTransactionData();
     private FilteredList<tableModel> filteredData = new FilteredList<>(transactionData);
+
+    @FXML
+    private SplitPane splitPane;
 
     @FXML
     private void initialize() {
@@ -98,26 +104,30 @@ public class HistoryController {
         // Initial filter application might be needed if default filters are set
         updateFilter();
 
-//        //时间排序
-//        dateColumn.setSortType(TableColumn.SortType.DESCENDING); // 默认按日期降序
-//        transactionTable.getSortOrder().add(dateColumn); // 设置默认排序列
-//        transactionTable.sort(); // 应用排序
-//
-//        // 确保表格可排序
-//        transactionTable.setSortPolicy(table -> {
-//            FXCollections.sort(transactionTable.getItems(), (o1, o2) -> {
-//                // 如果用户点击了列头，使用默认排序
-//                if (!transactionTable.getSortOrder().isEmpty()) {
-//                    return table.getComparator().compare(o1, o2);
-//                }
-//                // 否则保持原始顺序（按displayId）
-//                return Integer.compare(
-//                        Integer.parseInt(o1.getDisplayId()),
-//                        Integer.parseInt(o2.getDisplayId())
-//                );
-//            });
-//            return true;
-//        });
+        // 为编号列设置一个特殊的cellFactory，动态生成序号
+        transactionidColumn.setCellFactory(column -> new TableCell<tableModel, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setText(null);
+                } else {
+                    // 使用当前行索引+1作为编号
+                    setText(String.valueOf(getIndex() + 1));
+                }
+            }
+        });
+        // 不再需要使用model中的displayId作为值
+        transactionidColumn.setCellValueFactory(new PropertyValueFactory<>("id")); // 任意属性，实际不会使用
+//        // 不再需要从模型中获取displayId
+//        transactionidColumn.setCellValueFactory(cellData ->
+//                new SimpleStringProperty(String.valueOf(filteredData.indexOf(cellData.getValue()) + 1)));
+
+
+        // 禁用分割线的拖动
+        splitPane.getDividers().forEach(divider -> divider.positionProperty().addListener((observable, oldValue, newValue) -> {
+            divider.setPosition(0.1); // 固定分割线位置为 10%
+        }));
     }
 
     // 统一筛选逻辑（核心修复）

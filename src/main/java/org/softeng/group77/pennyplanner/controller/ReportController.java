@@ -1,6 +1,7 @@
 package org.softeng.group77.pennyplanner.controller;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextArea;
 
 import java.io.IOException;
@@ -8,12 +9,20 @@ import java.io.IOException;
 public class ReportController {
     @FXML
     private TextArea myTextArea; // 必须与FXML中的fx:id一致
+
+    @FXML
+    private SplitPane splitPane;
+
     @FXML
     private void initialize() {
         // 设置初始文本
         String text="AI-generated forecast or report";
         myTextArea.setText(text);
 
+        // 禁用分割线的拖动
+        splitPane.getDividers().forEach(divider -> divider.positionProperty().addListener((observable, oldValue, newValue) -> {
+            divider.setPosition(0.1); // 固定分割线位置为 10%
+        }));
 
     }
     @FXML

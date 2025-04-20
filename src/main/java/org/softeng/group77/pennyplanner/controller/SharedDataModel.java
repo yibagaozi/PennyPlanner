@@ -21,6 +21,8 @@ public class SharedDataModel {
 
     public static void setAuthService(AuthService service) {
         authService = service;
+//        currentUserId = null;  // 重置当前用户ID
+//        dataInitialized = false;  // 标记数据需要重新初始化
     }
 
     //Get Transaction Data
@@ -56,17 +58,25 @@ public class SharedDataModel {
     // Refresh Data
     public static void refreshTransactionData() {
         if (transactionAdapter != null && currentUserId != null) {
-            transactionData.clear();
-            //transactionData.addAll(transactionAdapter.getUserTransactions());
-            ObservableList<tableModel> userTransactions = transactionAdapter.getUserTransactions();
-//            // 添加数据并重新设置序号
-//            int index = 1;
-//            for (tableModel transaction : userTransactions) {
-//                // 使用序号代替ID
-//                transaction.setDisplayId(String.valueOf(index++));
-                transactionData.addAll(userTransactions);
+            try {
+                String userId = authService.getCurrentUser().getId();
+                if (userId != null) {
+                    transactionData.clear();
+                    ObservableList<tableModel> userTransactions = transactionAdapter.getUserTransactions();
+                    transactionData.addAll(userTransactions);
+                    // 添加到UI数据集合
+                    transactionData.addAll(userTransactions);
+                    dataInitialized = true;
+                } else {
+                    System.out.println("用户未登录，无法刷新交易数据");
+                    transactionData.clear();
+                }
+            }catch (Exception e) {
+                System.out.println("刷新交易数据失败: " + e.getMessage());
+                e.printStackTrace();
+                transactionData.clear();
             }
-            dataInitialized = true;
+        }
 
     }
 
@@ -111,5 +121,11 @@ public class SharedDataModel {
             }
         }
         return success;
+    }
+
+    // 清除UI数据 ，而不是后端数据
+    public static void clearUIData() {
+        transactionData.clear(); // 只清除UI数据集合
+        dataInitialized = false; // 标记需要重新初始化
     }
 }

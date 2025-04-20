@@ -49,7 +49,7 @@ public class ChartServiceImpl implements ChartService {
         dataPoints.sort((a, b) -> Double.compare(b.getValue(), a.getValue()));
 
         return PieChartData.builder()
-            .title(title != null ? title : "Expense Distribution by Category")
+            .title(title != null ? title : "Expense Distribution")
             .dataPoints(dataPoints)
             .showLegend(true)
             .showLabels(true)
