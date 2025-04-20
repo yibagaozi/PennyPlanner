@@ -1,0 +1,38 @@
+name: Develop Branch Tests
+
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  checks: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up JDK 21
+      uses: actions/setup-java@v3
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        cache: maven
+
+    - name: Run tests
+      run: mvn test
+
+    - name: Report test results
+      if: always()
+      uses: dorny/test-reporter@v1
+      with:
+        name: Test Results
+        path: target/surefire-reports/*.xml
+        reporter: java-junit
