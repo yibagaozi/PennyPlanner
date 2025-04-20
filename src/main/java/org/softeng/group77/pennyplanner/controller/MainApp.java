@@ -38,7 +38,11 @@ public class MainApp extends Application {
     @Override
     public void stop() {
         applicationContext.close();
-        clearFilesInDirectory("data");
+        //clearFilesInDirectory("data");
+
+        SharedDataModel.clearUIData(); // 只清除UI上的数据，不清除存储的数据
+        authService.logout();
+
         Platform.exit();
     }
 
@@ -88,6 +92,7 @@ public class MainApp extends Application {
         primaryStage.setTitle("PennyPlanner");
         primaryStage.setScene(scene);
         primaryStage.show();
+        SharedDataModel.refreshTransactionData();
     }
 
 
