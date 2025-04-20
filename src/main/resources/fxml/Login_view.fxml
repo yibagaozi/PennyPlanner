@@ -31,7 +31,7 @@
         </padding>
 
         <!-- 邮箱/电话输入框 -->
-        <TextField fx:id="emailField" promptText="email&amp;phone" prefWidth="250.0">
+        <TextField fx:id="emailField" promptText="Username &amp; Email &amp; Phone " prefWidth="250.0">
             <style>
                 <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
                 -fx-border-color: #cccccc;

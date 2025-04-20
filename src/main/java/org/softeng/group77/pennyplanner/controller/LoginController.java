@@ -56,11 +56,9 @@ public class LoginController {
             return;
         }
 
-        // 这里可以添加验证逻辑
-        System.out.println("尝试登录 - 邮箱/电话: " + email + ", 密码: " + password);
-        System.out.println("跳转Home页面");
-        MainApp.showHome();
-        // 验证成功后导航到主界面
+        // 禁用登录按钮，显示加载状态
+        continueButton.setDisable(true);
+        errorLabel.setText("登录中...");
 
         // 使用 Task 进行异步登录（避免阻塞 UI）
         Task<Void> loginTask = new Task<>() {
@@ -70,6 +68,8 @@ public class LoginController {
                     authService.login(email, password); // 调用 AuthService 登录
                     Platform.runLater(() -> {
                         try {
+                            // 登录成功后刷新事务数据
+                            SharedDataModel.refreshTransactionData();
                             MainApp.showHome(); // 登录成功，跳转主页
                         } catch (IOException e) {
                             Platform.runLater(() -> errorLabel.setText("无法跳转到主页: " + e.getMessage()));
@@ -79,6 +79,10 @@ public class LoginController {
                     Platform.runLater(() -> errorLabel.setText(e.getMessage())); // 显示登录错误
                 } catch (Exception e) {
                     Platform.runLater(() -> errorLabel.setText("登录失败: " + e.getMessage()));
+                    System.out.println(e.getMessage());
+                }finally {
+                    // 无论成功失败，重新启用登录按钮
+                    Platform.runLater(() -> continueButton.setDisable(false));
                 }
                 return null;
             }

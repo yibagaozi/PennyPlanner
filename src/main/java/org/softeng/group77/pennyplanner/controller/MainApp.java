@@ -7,9 +7,14 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.softeng.group77.pennyplanner.PennyPlannerApplication;
+import org.softeng.group77.pennyplanner.adapter.TransactionAdapter;
+import org.softeng.group77.pennyplanner.service.AuthService;
+import org.softeng.group77.pennyplanner.service.TransactionService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.stereotype.Controller;
 
 
 import java.io.IOException;
@@ -17,10 +22,12 @@ import java.net.URL;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 
-
+@Controller
 public class MainApp extends Application {
     private static Stage primaryStage;
     private static ConfigurableApplicationContext applicationContext;
+    private static TransactionAdapter transactionAdapter;
+    private static AuthService authService;
 
     @Override
     public void init() {
@@ -43,6 +50,7 @@ public class MainApp extends Application {
     public void start(Stage primaryStage) throws Exception {
         MainApp.primaryStage = primaryStage;
         applicationContext = new AnnotationConfigApplicationContext("org.softeng.group77.pennyplanner");
+        //clearFilesInDirectory("data");
         showLogin();
     }
 
@@ -72,6 +80,7 @@ public class MainApp extends Application {
             throw new IOException("无法找到FXML文件: Login_view.fxml");
         }
         FXMLLoader loader = new FXMLLoader(fxmlUrl);
+        loader.setControllerFactory(applicationContext::getBean);
         Parent root = loader.load();
 
         Scene scene = new Scene(root, 400, 600);
@@ -95,6 +104,22 @@ public class MainApp extends Application {
         primaryStage.show();
     }
 
+    public static void showhistory() throws IOException {
+        // 刷新交易数据 —— ensure 强制刷新
+        SharedDataModel.refreshTransactionData();
+
+        FXMLLoader loader = new FXMLLoader(
+                MainApp.class.getResource("/fxml/History_view.fxml")
+        );
+        Parent root = loader.load();
+
+        Scene scene = new Scene(root,800,500);
+        scene.getStylesheets().add(MainApp.class.getResource("/css/style-History.css").toExternalForm());
+        primaryStage.setTitle("PennyPlanner");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
     public static void showmanagement() throws IOException {
         FXMLLoader loader = new FXMLLoader(
                 MainApp.class.getResource("/fxml/Management_view.fxml")
@@ -108,6 +133,32 @@ public class MainApp extends Application {
         primaryStage.show();
     }
 
+    public static void showuser() throws IOException {
+        FXMLLoader loader = new FXMLLoader(
+                MainApp.class.getResource("/fxml/User_view.fxml")
+        );
+        Parent root = loader.load();
+
+        Scene scene = new Scene(root,800,500);
+        scene.getStylesheets().add(MainApp.class.getResource("/css/style-User.css").toExternalForm());
+        primaryStage.setTitle("PennyPlanner");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+
+    public static void showReport() throws IOException {
+        FXMLLoader loader = new FXMLLoader(
+                MainApp.class.getResource("/fxml/Report_view.fxml")
+        );
+        Parent root = loader.load();
+
+        Scene scene = new Scene(root,800,500);
+        scene.getStylesheets().add(MainApp.class.getResource("/css/style-Report.css").toExternalForm());
+        primaryStage.setTitle("PennyPlanner");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
     private void clearFilesInDirectory(String directoryPath) {
         Path dirPath = Paths.get(directoryPath);
 
@@ -129,5 +180,16 @@ public class MainApp extends Application {
         } catch (IOException e) {
             System.err.println("Error clearing data folder: " + e.getMessage());
         }
+    }
+
+    @Autowired
+    public void setServices(TransactionService transactionService, AuthService authService) {
+        this.transactionAdapter = new TransactionAdapter(transactionService);
+        this.authService = authService;
+
+        // 设置适配器到共享模型
+        SharedDataModel.setTransactionAdapter(transactionAdapter);
+        HomeController.setTransactionAdapter(transactionAdapter);
+        HomeController.setAuthService(authService);
     }
 }
