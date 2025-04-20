@@ -16,13 +16,13 @@ public class DataInitializationRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        try {
-            clearFilesInDirectory("data");
-            testDataGenerateUtil.generateTestUserData();
-            System.out.println("Test user data has been generated successfully.");
-        } catch (IOException e) {
-            System.err.println("Error generating test user data: " + e.getMessage());
-        }
+        // try {
+        //     clearFilesInDirectory("data");
+        //     testDataGenerateUtil.generateTestUserData();
+        //     System.out.println("Test user data has been generated successfully.");
+        // } catch (IOException e) {
+        //     System.err.println("Error generating test user data: " + e.getMessage());
+        // }
     }
 
     private void clearFilesInDirectory(String directoryPath) {
