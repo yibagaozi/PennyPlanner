@@ -115,6 +115,122 @@ public class ChartViewServiceImpl implements ChartViewService {
         return barChart;
     }
 
+    
+    @Override
+    public BarChart<String, Number> createCategoryBarChart(CategoryChartData categoryChartData) {
+
+        CategoryAxis xAxis = new CategoryAxis();
+        NumberAxis yAxis = new NumberAxis();
+        xAxis.setLabel(categoryChartData.getXAxisLabel());
+        yAxis.setLabel(categoryChartData.getYAxisLabel());
+        xAxis.setCategories(FXCollections.observableArrayList(categoryChartData.getCategories()));
+
+        BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
+        barChart.setTitle(categoryChartData.getTitle());
+        barChart.setAnimated(categoryChartData.isAnimated());
+        barChart.setLegendVisible(categoryChartData.isShowLegend());
+
+        barChart.setBarGap(3);
+        barChart.setCategoryGap(20);
+
+        for (Map.Entry<String, List<Double>> entry : categoryChartData.getSeries().entrySet()) {
+            XYChart.Series<String, Number> series = new XYChart.Series<>();
+            series.setName(entry.getKey());
+
+            List<Double> values = entry.getValue();
+            for (int i = 0; i < categoryChartData.getCategories().size() && i < values.size(); i++) {
+                series.getData().add(new XYChart.Data<>(
+                    categoryChartData.getCategories().get(i),
+                    values.get(i)
+                ));
+            }
+
+            barChart.getData().add(series);
+        }
+
+        if (categoryChartData.getSeriesColors() != null) {
+            for (int i = 0; i < barChart.getData().size(); i++) {
+                XYChart.Series<String, Number> series = barChart.getData().get(i);
+                String color = categoryChartData.getSeriesColors().get(series.getName());
+
+                if (color != null) {
+                    for (XYChart.Data<String, Number> data : series.getData()) {
+                        data.getNode().setStyle("-fx-bar-fill: " + color + ";");
+                    }
+                }
+            }
+        }
+
+        for (XYChart.Series<String, Number> series : barChart.getData()) {
+            for (XYChart.Data<String, Number> data : series.getData()) {
+                Tooltip tooltip = new Tooltip(
+                    String.format("%s\n%s: ¥%.2f", series.getName(), data.getXValue(), data.getYValue().doubleValue())
+                );
+                Tooltip.install(data.getNode(), tooltip);
+            }
+        }
+
+        return barChart;
+    }
+
+    @Override
+    public StackedBarChart<String, Number> createStackedBarChart(TimeSeriesData timeSeriesData) {
+
+        CategoryAxis xAxis = new CategoryAxis();
+        NumberAxis yAxis = new NumberAxis();
+        xAxis.setLabel(timeSeriesData.getXAxisLabel());
+        yAxis.setLabel(timeSeriesData.getYAxisLabel());
+
+        StackedBarChart<String, Number> stackedBarChart = new StackedBarChart<>(xAxis, yAxis);
+        stackedBarChart.setTitle(timeSeriesData.getTitle());
+        stackedBarChart.setAnimated(timeSeriesData.isAnimated());
+        stackedBarChart.setLegendVisible(timeSeriesData.isShowLegend());
+
+        for (Map.Entry<String, List<ChartDataPoint>> entry : timeSeriesData.getSeries().entrySet()) {
+            XYChart.Series<String, Number> series = new XYChart.Series<>();
+            series.setName(entry.getKey());
+
+            for (ChartDataPoint point : entry.getValue()) {
+                series.getData().add(new XYChart.Data<>(point.getLabel(), point.getValue()));
+            }
+
+            stackedBarChart.getData().add(series);
+        }
+
+        for (int i = 0; i < stackedBarChart.getData().size(); i++) {
+            XYChart.Series<String, Number> series = stackedBarChart.getData().get(i);
+            String seriesName = series.getName();
+            String color = null;
+
+            for (List<ChartDataPoint> points : timeSeriesData.getSeries().values()) {
+                if (!points.isEmpty() && seriesName.equals(points.getFirst().getSeriesName())) {
+                    color = points.getFirst().getColor();
+                    break;
+                }
+            }
+
+            if (color != null) {
+                final String seriesColor = color;
+                for (XYChart.Data<String, Number> data : series.getData()) {
+                    if (data.getNode() != null) {
+                        data.getNode().setStyle("-fx-bar-fill: " + seriesColor + ";");
+                    }
+                }
+            }
+
+            for (XYChart.Data<String, Number> data : series.getData()) {
+                NumberFormat formatter = NumberFormat.getCurrencyInstance(Locale.CHINA);
+                Tooltip tooltip = new Tooltip(
+                    String.format("%s\n%s: %s", series.getName(), data.getXValue(),
+                                 formatter.format(data.getYValue()))
+                );
+                Tooltip.install(data.getNode(), tooltip);
+            }
+        }
+
+        return stackedBarChart;
+    }
+
     private void styleLineChartSeries(LineChart<String, Number> lineChart, TimeSeriesData timeSeriesData) {
 
         for (int i = 0; i < lineChart.getData().size(); i++) {
