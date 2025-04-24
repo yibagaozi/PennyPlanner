@@ -27,9 +27,6 @@ public class SharedDataModel {
 
     //Get Transaction Data
     public static ObservableList<tableModel> getTransactionData() {
-//        if (transactionAdapter != null && !dataInitialized) {
-//            refreshTransactionData();
-//        }
         checkAndRefreshUserData();
         return transactionData;
     }

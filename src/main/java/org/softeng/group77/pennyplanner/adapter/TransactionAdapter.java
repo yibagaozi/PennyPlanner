@@ -28,9 +28,8 @@ public class TransactionAdapter {
         this.transactionService = transactionService;
     }
 
-    /**
-     * 将前端tableModel转换为后端TransactionDetail
-     */
+
+    //将前端tableModel转换为后端TransactionDetail
     public TransactionDetail toTransactionDetail(tableModel model) {
         TransactionDetail detail = new TransactionDetail();
 
@@ -54,9 +53,8 @@ public class TransactionAdapter {
         return detail;
     }
 
-    /**
-     * 将后端TransactionDetail转换为前端tableModel
-     */
+
+    //将后端TransactionDetail转换为前端tableModel
     public tableModel toTableModel(TransactionDetail detail) {
         String formattedDate = detail.getTransactionDateTime().format(DATE_FORMATTER);
         double amount = detail.getAmount().doubleValue();
@@ -71,9 +69,8 @@ public class TransactionAdapter {
         );
     }
 
-    /**
-     * 获取当前用户所有交易记录
-     */
+
+    //获取用户的所有交易记录
     public ObservableList<tableModel> getUserTransactions() {
         try {
             List<TransactionDetail> details = transactionService.getUserTransactions()
@@ -97,9 +94,8 @@ public class TransactionAdapter {
         }
     }
 
-    /**
-     * 保存新交易记录
-     */
+
+    //保存新交易记录
     public boolean saveTransaction(tableModel model) {
         try {
             TransactionDetail detail = toTransactionDetail(model);
@@ -111,9 +107,8 @@ public class TransactionAdapter {
         }
     }
 
-    /**
-     * 更新交易记录
-     */
+
+    //更新交易记录
     public boolean updateTransaction(tableModel model) {
         try {
             TransactionDetail detail = toTransactionDetail(model);
@@ -125,9 +120,8 @@ public class TransactionAdapter {
         }
     }
 
-    /**
-     * 删除交易记录
-     */
+
+    //删除交易记录
     public boolean deleteTransaction(String transactionId) {
         try {
             return transactionService.deleteTransaction(transactionId);
@@ -137,9 +131,8 @@ public class TransactionAdapter {
         }
     }
 
-    /**
-     * 按日期范围筛选交易
-     */
+
+    //按日期范围筛选交易
     public ObservableList<tableModel> getTransactionsByDateRange(LocalDate startDate, LocalDate endDate) {
         try {
             List<TransactionDetail> details = transactionService.filterTransactionByDate(startDate, endDate);
@@ -153,9 +146,9 @@ public class TransactionAdapter {
         }
     }
 
-    /**
-     * 按类别筛选交易
-     */
+
+
+    //按类别筛选交易
     public ObservableList<tableModel> getTransactionsByCategory(String category) {
         try {
             List<TransactionDetail> details = transactionService.filterTransactionByCategory(category);
@@ -169,9 +162,8 @@ public class TransactionAdapter {
         }
     }
 
-    /**
-     * 获取各类别的支出总和
-     */
+
+    //获取各类别的支出总和
     public List<CategorySum> getCategorySummary() {
         ObservableList<tableModel> transactions = getUserTransactions();
         return transactions.stream()
@@ -185,9 +177,8 @@ public class TransactionAdapter {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * 按日期获取每日支出总和
-     */
+
+     //按日期获取每日支出总和
     public List<DateSum> getDailyExpenseSummary(int daysCount) {
         LocalDate endDate = LocalDate.now();
         LocalDate startDate = endDate.minusDays(daysCount);
@@ -204,6 +195,7 @@ public class TransactionAdapter {
                 .map(entry -> new DateSum(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
     }
+
 
     /**
      * 类别汇总数据结构

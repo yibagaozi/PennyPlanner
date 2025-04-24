@@ -41,7 +41,7 @@ public class MainApp extends Application {
         applicationContext.close();
         //clearFilesInDirectory("data");
 
-        SharedDataModel.clearUIData(); // 只清除UI上的数据，不清除存储的数据
+        //SharedDataModel.clearUIData(); // 只清除UI上的数据，不清除存储的数据
         authService.logout();
 
         Platform.exit();
@@ -56,7 +56,6 @@ public class MainApp extends Application {
         MainApp.primaryStage = primaryStage;
 
         applicationContext = new AnnotationConfigApplicationContext("org.softeng.group77.pennyplanner");
-        //clearFilesInDirectory("data");
         showLogin();
     }
 

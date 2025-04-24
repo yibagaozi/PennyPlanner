@@ -34,15 +34,6 @@ public class HistoryController {
 
     @FXML
     private void initialize() {
-        // 首先刷新数据，确保显示最新的交易记录
-        //SharedDataModel.refreshTransactionData();
-
-        // 创建FilteredList包装SharedDataModel的数据
-        //filteredData = new FilteredList<>(SharedDataModel.getTransactionData());
-
-        // 初始化日期标题（固定显示 March 2025）
-        //date.setText("April 2025");
-
         Year.setItems(FXCollections.observableArrayList(
                 null, // 空选项
                 2022, 2023, 2024, 2025
@@ -119,9 +110,6 @@ public class HistoryController {
         });
         // 不再需要使用model中的displayId作为值
         transactionidColumn.setCellValueFactory(new PropertyValueFactory<>("id")); // 任意属性，实际不会使用
-//        // 不再需要从模型中获取displayId
-//        transactionidColumn.setCellValueFactory(cellData ->
-//                new SimpleStringProperty(String.valueOf(filteredData.indexOf(cellData.getValue()) + 1)));
 
 
         // 禁用分割线的拖动
@@ -159,19 +147,10 @@ public class HistoryController {
         filteredData.setPredicate(predicate);
     }
 
-    // 示例数据初始化（与截图完全一致）
-//    private void addSampleData() {
-//        transactionData.add(new tableModel("1", "2023-06-15", "超市购物", -125.50, "Food", "信用卡"));
-//        transactionData.add(new tableModel("2", "2023-06-16", "工资收入", 5000.00, "Salary", "银行转账"));
-//        transactionData.add(new tableModel("3", "2023-06-17", "水电费", -230.75, "Living Bill", "自动扣款"));
-//    }
 
     @FXML
     public void refreshData() {
         SharedDataModel.refreshTransactionData();
-        // 重新初始化过滤数据
-        //filteredData = new FilteredList<>(SharedDataModel.getTransactionData());
-        //transactionTable.setItems(filteredData);
     }
 
     // 以下导航方法保持不变
