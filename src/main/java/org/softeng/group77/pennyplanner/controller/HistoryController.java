@@ -7,10 +7,14 @@ import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import org.softeng.group77.pennyplanner.adapter.TransactionAdapter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 
 import java.io.IOException;
 import java.util.function.Predicate;
 
+@Controller
 public class HistoryController {
     @FXML private Label date;
     @FXML private ComboBox<Integer> Year;
@@ -32,8 +36,18 @@ public class HistoryController {
     @FXML
     private SplitPane splitPane;
 
+    private TransactionAdapter transactionAdapter;
+
+    @Autowired
+    public void setTransactionAdapter(TransactionAdapter transactionAdapter) {
+        this.transactionAdapter = transactionAdapter;
+    }
+
     @FXML
     private void initialize() {
+        // 确保在页面初始化时就刷新数据
+        SharedDataModel.refreshTransactionData();
+
         Year.setItems(FXCollections.observableArrayList(
                 null, // 空选项
                 2022, 2023, 2024, 2025
@@ -116,6 +130,10 @@ public class HistoryController {
         splitPane.getDividers().forEach(divider -> divider.positionProperty().addListener((observable, oldValue, newValue) -> {
             divider.setPosition(0.1); // 固定分割线位置为 10%
         }));
+
+        // 重新应用过滤条件并刷新表格
+        updateFilter();
+        transactionTable.refresh();
     }
 
     // 统一筛选逻辑（核心修复）
@@ -151,6 +169,16 @@ public class HistoryController {
     @FXML
     public void refreshData() {
         SharedDataModel.refreshTransactionData();
+
+//        // 创建新的过滤列表并设置给表格
+//        filteredData = new FilteredList<>(transactionData);
+//        transactionTable.setItems(filteredData);
+
+        // 重新应用过滤条件
+        updateFilter();
+
+        // 刷新表格显示
+        transactionTable.refresh();
     }
 
     // 以下导航方法保持不变

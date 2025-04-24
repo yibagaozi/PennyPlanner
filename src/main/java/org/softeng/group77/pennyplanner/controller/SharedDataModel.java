@@ -4,6 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.softeng.group77.pennyplanner.adapter.TransactionAdapter;
 import org.softeng.group77.pennyplanner.service.AuthService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 
@@ -11,7 +12,10 @@ import org.springframework.stereotype.Controller;
 public class SharedDataModel {
     private static TransactionAdapter transactionAdapter;
     private static final ObservableList<tableModel> transactionData = FXCollections.observableArrayList();
+    private static AuthService authServiceStatic;
     private static boolean dataInitialized = false;
+
+    @Autowired
     private static AuthService authService;
     private static String currentUserId = null;
 
@@ -27,7 +31,7 @@ public class SharedDataModel {
 
     //Get Transaction Data
     public static ObservableList<tableModel> getTransactionData() {
-        checkAndRefreshUserData();
+        refreshTransactionData();
         return transactionData;
     }
 
@@ -61,15 +65,13 @@ public class SharedDataModel {
                     transactionData.clear();
                     ObservableList<tableModel> userTransactions = transactionAdapter.getUserTransactions();
                     transactionData.addAll(userTransactions);
-                    // 添加到UI数据集合
-                    transactionData.addAll(userTransactions);
                     dataInitialized = true;
                 } else {
-                    System.out.println("用户未登录，无法刷新交易数据");
+                    System.out.println("Not Login Yet");
                     transactionData.clear();
                 }
             }catch (Exception e) {
-                System.out.println("刷新交易数据失败: " + e.getMessage());
+                System.out.println("fail to refresh: " + e.getMessage());
                 e.printStackTrace();
                 transactionData.clear();
             }

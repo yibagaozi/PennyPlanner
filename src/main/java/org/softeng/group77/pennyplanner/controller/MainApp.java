@@ -118,6 +118,8 @@ public class MainApp extends Application {
         FXMLLoader loader = new FXMLLoader(
                 MainApp.class.getResource("/fxml/History_view.fxml")
         );
+
+        loader.setControllerFactory(applicationContext::getBean);
         Parent root = loader.load();
 
         Scene scene = new Scene(root,800,500);
