@@ -55,7 +55,7 @@ public class MainApp extends Application {
     public void start(Stage primaryStage) throws Exception {
         MainApp.primaryStage = primaryStage;
 
-        applicationContext = new AnnotationConfigApplicationContext("org.softeng.group77.pennyplanner");
+        //applicationContext = new AnnotationConfigApplicationContext("org.softeng.group77.pennyplanner");
         showLogin();
     }
 
@@ -112,7 +112,7 @@ public class MainApp extends Application {
     }
 
     public static void showhistory() throws IOException {
-        // 刷新交易数据 —— ensure 强制刷新
+        // 刷新交易数据
         SharedDataModel.refreshTransactionData();
 
         FXMLLoader loader = new FXMLLoader(
@@ -197,7 +197,7 @@ public class MainApp extends Application {
         this.authService = authService;
 
         // 设置适配器到共享模型
-        SharedDataModel.setTransactionAdapter(transactionAdapter);
+        //SharedDataModel.setTransactionAdapter(transactionAdapter);
         HomeController.setTransactionAdapter(transactionAdapter);
         HomeController.setAuthService(authService);
     }
