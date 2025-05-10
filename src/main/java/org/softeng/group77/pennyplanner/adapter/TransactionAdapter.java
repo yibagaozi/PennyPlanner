@@ -40,6 +40,7 @@ public class TransactionAdapter {
         detail.setDescription(model.getDescription());
         detail.setCategory(model.getCategory());
         detail.setAmount(BigDecimal.valueOf(model.getAmount()));
+        detail.setMethod(model.getMethod());
 
         // 转换日期字符串为LocalDateTime
         try {
@@ -65,7 +66,7 @@ public class TransactionAdapter {
                 detail.getDescription(),
                 amount,
                 detail.getCategory(),
-                "" // 支付方式在TransactionDetail中不存在，使用空字符串
+                detail.getMethod()
         );
     }
 
@@ -194,6 +195,19 @@ public class TransactionAdapter {
                 .entrySet().stream()
                 .map(entry -> new DateSum(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
+    }
+
+    public ObservableList<tableModel> getTransactionsByMethod(String method) {
+        try {
+            List<TransactionDetail> details = transactionService.filterTransactionByMethod(method);
+            List<tableModel> models = details.stream()
+                    .map(this::toTableModel)
+                    .collect(Collectors.toList());
+            return FXCollections.observableArrayList(models);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return FXCollections.observableArrayList(new ArrayList<>());
+        }
     }
 
 

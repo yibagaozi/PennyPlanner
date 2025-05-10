@@ -17,6 +17,7 @@ public class TransactionDetail {
     private final ObjectProperty<LocalDateTime> transactionDateTime = new SimpleObjectProperty<>();
     private final StringProperty userId = new SimpleStringProperty();
     private final ObjectProperty<LocalDateTime> createdAt = new SimpleObjectProperty<>();
+    private final StringProperty method = new SimpleStringProperty();
 
     public TransactionDetail() {
     }
@@ -29,6 +30,7 @@ public class TransactionDetail {
         setTransactionDateTime(transaction.getTransactionDateTime());
         setUserId(transaction.getUserId());
         setCreatedAt(transaction.getCreatedAt());
+        setMethod(transaction.getMethod());
     }
 
     public Transaction toModel() {
@@ -36,6 +38,7 @@ public class TransactionDetail {
             getDescription(),
             getCategory(),
             getAmount(),
+            getMethod(),
             getTransactionDateTime(),
             getUserId()
         );
@@ -68,6 +71,8 @@ public class TransactionDetail {
     public ObjectProperty<LocalDateTime> createdAtProperty() {
         return createdAt;
     }
+
+    public StringProperty methodProperty() { return method; }
 
     public String getId() {
         return id.get();
@@ -124,6 +129,10 @@ public class TransactionDetail {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt.set(createdAt);
     }
+
+    public String getMethod() { return method.get(); }
+
+    public void setMethod(String method) { this.method.set(method); }
 
     public boolean isExpense() {
         return amount.get() != null && amount.get().compareTo(BigDecimal.ZERO) < 0;

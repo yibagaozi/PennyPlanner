@@ -28,4 +28,6 @@ public interface TransactionService {
 
     List<TransactionDetail> filterTransactionByCategory(String category);
 
+    List<TransactionDetail> filterTransactionByMethod(String method);
+
 }

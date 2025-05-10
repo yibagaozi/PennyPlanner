@@ -34,8 +34,10 @@ public class Transaction {
     private String userId;
 
     private final LocalDateTime createdAt;
-    // 添加支付方式字段
-    private String paymentMethod;
+
+    @Setter
+    private String method;
+
     @Setter
     private LocalDateTime updatedAt;
 
@@ -44,7 +46,8 @@ public class Transaction {
         this.createdAt = LocalDateTime.now();
     }
 
-    public Transaction(String description, String category, BigDecimal amount, LocalDateTime transactionDateTime, String userId) {
+    public Transaction(String description, String category, BigDecimal amount, String method,
+                       LocalDateTime transactionDateTime, String userId) {
         this.id = UUID.randomUUID().toString();
         this.description = description;
         this.category = category;
@@ -53,7 +56,7 @@ public class Transaction {
         this.userId = userId;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
-       // this.paymentMethod = paymentMethod;
+        this.method = method;
     }
 
     public Transaction(String userId) {
