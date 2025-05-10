@@ -34,7 +34,8 @@ public class Transaction {
     private String userId;
 
     private final LocalDateTime createdAt;
-
+    // 添加支付方式字段
+    private String paymentMethod;
     @Setter
     private LocalDateTime updatedAt;
 
@@ -52,6 +53,7 @@ public class Transaction {
         this.userId = userId;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
+       // this.paymentMethod = paymentMethod;
     }
 
     public Transaction(String userId) {

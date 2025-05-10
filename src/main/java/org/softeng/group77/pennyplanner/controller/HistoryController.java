@@ -4,6 +4,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -29,7 +30,6 @@ public class HistoryController {
     @FXML private TableColumn<tableModel, String> methodColumn;
 
     // 数据存储结构：原始数据 + 动态过滤列表
-    //private final ObservableList<tableModel> transactionData = FXCollections.observableArrayList();
     private final ObservableList<tableModel> transactionData = SharedDataModel.getTransactionData();
     private FilteredList<tableModel> filteredData = new FilteredList<>(transactionData);
 
@@ -45,12 +45,17 @@ public class HistoryController {
 
     @FXML
     private void initialize() {
+        Year.setPromptText("Year");
+        Month.setPromptText("Month");
+        category.setPromptText("Category");
+
         // 确保在页面初始化时就刷新数据
         SharedDataModel.refreshTransactionData();
 
         Year.setItems(FXCollections.observableArrayList(
                 null, // 空选项
-                2022, 2023, 2024, 2025
+                2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021,
+                2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030
         ));
 
         // 月份选择框 (1-12月)
@@ -97,6 +102,55 @@ public class HistoryController {
                 } else {
                     setText(String.format("$%.2f", amount));
                     setStyle(amount < 0 ? "-fx-text-fill: red;" : "-fx-text-fill: green;");
+                }
+            }
+        });
+
+        // 为日期列添加格式化
+        dateColumn.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(String date, boolean empty) {
+                super.updateItem(date, empty);
+                if (empty || date == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(date);
+                    setStyle("-fx-alignment: CENTER;"); // 居中对齐
+                }
+            }
+        });
+
+        // 为类别列添加格式化和emoji
+        categoryColumn.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(String category, boolean empty) {
+                super.updateItem(category, empty);
+                if (empty || category == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    // 根据类别添加emoji
+                    String emoji = getEmojiForCategory(category);
+                    setText(emoji + " " + category);
+                    setStyle("-fx-alignment: CENTER-LEFT; -fx-padding: 0 0 0 10px;");
+                }
+            }
+        });
+
+        // 为支付方式列添加格式化和emoji (这是新增的关键部分)
+        methodColumn.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(String method, boolean empty) {
+                super.updateItem(method, empty);
+                if (empty || method == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    // 根据支付方式添加emoji
+                    String emoji = getEmojiForMethod(method);
+                    setText(emoji + " " + method);
+                    setStyle("-fx-alignment: CENTER-LEFT; -fx-padding: 0 0 0 10px;");
                 }
             }
         });
@@ -169,16 +223,59 @@ public class HistoryController {
     @FXML
     public void refreshData() {
         SharedDataModel.refreshTransactionData();
-
-//        // 创建新的过滤列表并设置给表格
-//        filteredData = new FilteredList<>(transactionData);
-//        transactionTable.setItems(filteredData);
-
         // 重新应用过滤条件
         updateFilter();
-
         // 刷新表格显示
         transactionTable.refresh();
+    }
+
+    // 为类别和支付方式列添加emoji和样式
+    private void styleColumnWithEmoji(TableColumn<tableModel, String> column) {
+        column.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    // 根据类别或支付方式添加emoji
+                    String emoji = getEmojiForCategory(item);
+                    setText(emoji + " " + item);
+                    setStyle("-fx-alignment: CENTER-LEFT; -fx-padding: 0 0 0 10px;");
+                }
+            }
+        });
+    }
+
+    // 根据类别返回对应的emoji
+    private String getEmojiForCategory(String category) {
+        if (category == null) return "";
+
+        switch (category) {
+            case "Food": return "🍔";
+            case "Salary": return "💰";
+            case "Living Bill": return "🏠";
+            case "Entertainment": return "🎬";
+            case "Transportation": return "🚗";
+            case "Education": return "🎓";
+            case "Clothes": return "👕";
+            default: return "🔖";
+        }
+    }
+
+    // 根据支付方式返回对应的emoji
+    private String getEmojiForMethod(String method) {
+        if (method == null) return "❓";
+
+        switch (method) {
+            case "Credit Card": return "💳";
+            case "Bank Transfer": return "🏦";
+            case "Auto-Payment": return "⏱️";
+            case "Cash": return "💵";
+            case "E-Payment": return "📱";
+            default: return "💲";
+        }
     }
 
     // 以下导航方法保持不变
