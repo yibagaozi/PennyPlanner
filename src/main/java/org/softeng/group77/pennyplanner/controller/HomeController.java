@@ -137,6 +137,8 @@ public class HomeController {
         System.out.println("Login");
         MainApp.showLogin();
     }
+
+    //收入趋势图
     private void setupExpenseTrendChart() {
         // 清除现有内容
         expenseTrendChartContainer.getChildren().clear();
@@ -169,44 +171,9 @@ public class HomeController {
         // 设置图表占满容器空间
         lineChart.prefWidthProperty().bind(expenseTrendChartContainer.widthProperty());
         lineChart.prefHeightProperty().bind(expenseTrendChartContainer.heightProperty());
-//        // 创建数据系列
-//        XYChart.Series<String, Number> series = new XYChart.Series<>();
-//        series.setName("Daily Expense");
-//
-//        if (transactionAdapter != null) {
-//            // 获取最近30天的支出数据
-//            List<TransactionAdapter.DateSum> dailyExpenses = transactionAdapter.getDailyExpenseSummary(30);
-//
-//            // 转换为图表数据点
-//            for (TransactionAdapter.DateSum dateSum : dailyExpenses) {
-//                series.getData().add(new XYChart.Data<>(dateSum.getDate(), dateSum.getAmount()));
-//            }
-//        } else{
-//            // 添加示例数据
-//            series.getData().add(new XYChart.Data<>("23 Mar", 5000));
-//            series.getData().add(new XYChart.Data<>("24", 8000));
-//            series.getData().add(new XYChart.Data<>("25", 12000));
-//            series.getData().add(new XYChart.Data<>("26", 15000));
-//            series.getData().add(new XYChart.Data<>("27", 18000));
-//            series.getData().add(new XYChart.Data<>("28", 22000));
-//            series.getData().add(new XYChart.Data<>("29", 26000));
-//            series.getData().add(new XYChart.Data<>("30", 30000));
-//        }
-//
-//
-//
-//        // 将系列添加到折线图
-//        expenseTrendChart.getData().add(series);
-//
-//        // 设置图表样式
-//        expenseTrendChart.setLegendVisible(false);
-//
-//        // 设置线条颜色为黑色(与图片一致)
-//        for (XYChart.Data<String, Number> data : series.getData()) {
-//            data.getNode().setStyle("-fx-background-color: black, white;");
-//        }
     }
 
+    // 收入分布--饼图
     private void setupExpenseDistributionChart() {
         // 清除现有内容
         expenseDistributionChartContainer.getChildren().clear();
@@ -238,6 +205,7 @@ public class HomeController {
         pieChart.prefHeightProperty().bind(expenseDistributionChartContainer.heightProperty());
     }
 
+
     // 从tableModel转换为Transaction对象
     private Transaction convertToTransaction(tableModel model) {
         Transaction tx = new Transaction();
@@ -257,6 +225,7 @@ public class HomeController {
 
         return tx;
     }
+
 
     // 创建示例交易数据
     private List<Transaction> createSampleTransactions() {

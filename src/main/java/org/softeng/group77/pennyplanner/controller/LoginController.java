@@ -46,6 +46,8 @@ public class LoginController {
             }
         });
     }
+
+    //登陆后跳转主页面
     @FXML
     private void turntoHome() throws IOException {
         String email = emailField.getText();
