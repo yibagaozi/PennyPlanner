@@ -271,7 +271,7 @@ public class HistoryController {
         switch (method) {
             case "Credit Card": return "💳";
             case "Bank Transfer": return "🏦";
-            case "Auto-Payment": return "⏱️";
+            case "Auto-Payment": return "\uD83E\uDD16";
             case "Cash": return "💵";
             case "E-Payment": return "📱";
             default: return "💲";
