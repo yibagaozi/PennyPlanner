@@ -2,6 +2,8 @@ package org.softeng.group77.pennyplanner.adapter;
 
 import org.softeng.group77.pennyplanner.controller.tableModel;
 import org.softeng.group77.pennyplanner.dto.TransactionDetail;
+import org.softeng.group77.pennyplanner.dto.UserInfo;
+import org.softeng.group77.pennyplanner.service.AuthService;
 import org.softeng.group77.pennyplanner.service.TransactionService;
 import org.springframework.stereotype.Component;
 
@@ -22,10 +24,12 @@ import javafx.collections.ObservableList;
 public class TransactionAdapter {
 
     private final TransactionService transactionService;
+    private final AuthService authService; // 添加AuthService
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    public TransactionAdapter(TransactionService transactionService) {
+    public TransactionAdapter(TransactionService transactionService, AuthService authService) {
         this.transactionService = transactionService;
+        this.authService = authService;
     }
 
 
@@ -41,6 +45,17 @@ public class TransactionAdapter {
         detail.setCategory(model.getCategory());
         detail.setAmount(BigDecimal.valueOf(model.getAmount()));
         detail.setMethod(model.getMethod());
+
+        // 设置当前用户ID - 关键修复点
+        try {
+            UserInfo currentUser = authService.getCurrentUser();
+            if (currentUser != null) {
+                detail.setUserId(currentUser.getId());
+            }
+        } catch (Exception e) {
+            System.out.println("获取用户ID失败: " + e.getMessage());
+        }
+
 
         // 转换日期字符串为LocalDateTime
         try {

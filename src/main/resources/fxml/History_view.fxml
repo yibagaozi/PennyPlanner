@@ -14,7 +14,7 @@
 
 <BorderPane styleClass="border-pane-no-gap" stylesheets="@/css/style-History.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.softeng.group77.pennyplanner.controller.HistoryController">
     <left>
-        <VBox styleClass="nav-bar" BorderPane.alignment="TOP_LEFT">
+        <VBox prefWidth="161.0" styleClass="nav-bar" BorderPane.alignment="TOP_LEFT">
             <Label styleClass="nav-title" text="PennyPlanner" />
             <Button onAction="#turntoHome" styleClass="nav-button" text="Home" />
             <Button onAction="#turntoReport" styleClass="nav-button" text="Report &amp; Forecast" />
@@ -99,7 +99,10 @@
                         </columnResizePolicy>
                      </TableView>
                      <ComboBox fx:id="category" layoutX="247.0" layoutY="166.0" prefHeight="23.0" prefWidth="107.0" />
-
+                            <HBox layoutX="11.0" layoutY="420.0" spacing="10.0">
+                                <Button fx:id="editButton" onAction="#handleEdit" prefHeight="25.0" prefWidth="80.0" text="Edit" />
+                                <Button fx:id="deleteButton" onAction="#handleDelete" prefHeight="25.0" prefWidth="80.0" text="Delete" />
+                            </HBox>
 
                         </children>
                     </AnchorPane>

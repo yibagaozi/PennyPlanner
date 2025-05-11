@@ -193,7 +193,7 @@ public class MainApp extends Application {
 
     @Autowired
     public void setServices(TransactionService transactionService, AuthService authService) {
-        this.transactionAdapter = new TransactionAdapter(transactionService);
+        this.transactionAdapter = new TransactionAdapter(transactionService, authService);
         this.authService = authService;
 
         // 设置适配器到共享模型

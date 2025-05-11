@@ -6,13 +6,20 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import org.softeng.group77.pennyplanner.adapter.TransactionAdapter;
+import org.softeng.group77.pennyplanner.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 @Controller
@@ -37,10 +44,16 @@ public class HistoryController {
     private SplitPane splitPane;
 
     private TransactionAdapter transactionAdapter;
+    private AuthService authService; // 添加AuthService
 
     @Autowired
     public void setTransactionAdapter(TransactionAdapter transactionAdapter) {
         this.transactionAdapter = transactionAdapter;
+    }
+
+    @Autowired
+    public void setAuthService(AuthService authService) {
+        this.authService = authService;
     }
 
     @FXML
@@ -277,6 +290,127 @@ public class HistoryController {
             default: return "💲";
         }
     }
+
+    /**
+     * 处理编辑按钮点击事件
+     */
+    @FXML
+    public void handleEdit() {
+        // 首先检查用户是否已登录
+        try {
+            if (authService.getCurrentUser() == null) {
+                showAlert("未登录", "您需要登录才能编辑交易记录", Alert.AlertType.WARNING);
+                return;
+            }
+        } catch (Exception e) {
+            showAlert("认证错误", "无法验证用户状态: " + e.getMessage(), Alert.AlertType.ERROR);
+            return;
+        }
+
+        tableModel selectedTransaction = transactionTable.getSelectionModel().getSelectedItem();
+        if (selectedTransaction != null) {
+            try {
+                // 加载编辑对话框
+                FXMLLoader loader = new FXMLLoader();
+                loader.setLocation(getClass().getClassLoader().getResource("fxml/Edit_Transaction_view.fxml"));
+                Parent root = loader.load();
+
+                EditTransactionController controller = loader.getController();
+
+                // 创建交易记录的深拷贝，避免直接修改表格中的对象
+                tableModel transactionCopy = new tableModel(
+                        selectedTransaction.getId(),
+                        selectedTransaction.getDate(),
+                        selectedTransaction.getDescription(),
+                        selectedTransaction.getAmount(),
+                        selectedTransaction.getCategory(),
+                        selectedTransaction.getMethod()
+                );
+
+                controller.setTransaction(transactionCopy);
+
+                Stage dialogStage = new Stage();
+                dialogStage.setTitle("编辑交易记录");
+                dialogStage.initModality(Modality.WINDOW_MODAL);
+                dialogStage.initOwner(transactionTable.getScene().getWindow());
+                dialogStage.setScene(new Scene(root));
+
+                // 显示对话框并等待用户关闭
+                dialogStage.showAndWait();
+
+                // 如果用户点击了"保存"按钮，则更新记录
+                if (controller.isSaveClicked()) {
+                    try {
+                        // 将修改后的数据复制回原始对象
+                        selectedTransaction.setDate(transactionCopy.getDate());
+                        selectedTransaction.setDescription(transactionCopy.getDescription());
+                        selectedTransaction.setAmount(transactionCopy.getAmount());
+                        selectedTransaction.setCategory(transactionCopy.getCategory());
+                        selectedTransaction.setMethod(transactionCopy.getMethod());
+
+                        boolean success = SharedDataModel.updateTransaction(selectedTransaction);
+                        if (success) {
+                            showAlert("成功", "交易记录已成功更新", Alert.AlertType.INFORMATION);
+                            refreshData(); // 刷新表格数据
+                        } else {
+                            showAlert("更新失败", "无法更新交易记录。可能是因为您没有权限修改该记录或者用户会话已过期。", Alert.AlertType.ERROR);
+                            // 回滚UI显示
+                            refreshData();
+                        }
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        showAlert("错误", "更新交易记录失败: " + ex.getMessage(), Alert.AlertType.ERROR);
+                        // 回滚UI显示
+                        refreshData();
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                showAlert("错误", "打开编辑对话框失败: " + e.getMessage(), Alert.AlertType.ERROR);
+            }
+        }
+    }
+
+    /**
+     * 处理删除按钮点击事件
+     */
+    @FXML
+    public void handleDelete() {
+        tableModel selectedTransaction = transactionTable.getSelectionModel().getSelectedItem();
+        if (selectedTransaction != null) {
+            // 确认删除
+            Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmAlert.setTitle("确认删除");
+            confirmAlert.setHeaderText("您确定要删除此交易记录吗？");
+            confirmAlert.setContentText("描述: " + selectedTransaction.getDescription() +
+                    "\n金额: " + String.format("$%.2f", selectedTransaction.getAmount()) +
+                    "\n日期: " + selectedTransaction.getDate());
+
+            Optional<ButtonType> result = confirmAlert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                // 用户确认删除
+                boolean success = SharedDataModel.deleteTransaction(selectedTransaction.getId());
+                if (success) {
+                    showAlert("成功", "交易记录已成功删除", Alert.AlertType.INFORMATION);
+                    refreshData(); // 刷新表格数据
+                } else {
+                    showAlert("错误", "删除交易记录失败", Alert.AlertType.ERROR);
+                }
+            }
+        }
+    }
+
+    /**
+     * 显示提示对话框
+     */
+    private void showAlert(String title, String message, Alert.AlertType alertType) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
 
     // 以下导航方法保持不变
     @FXML
