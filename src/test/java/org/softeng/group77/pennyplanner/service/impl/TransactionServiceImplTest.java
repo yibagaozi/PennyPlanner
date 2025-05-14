@@ -15,6 +15,7 @@ import org.softeng.group77.pennyplanner.service.AuthService;
 import org.softeng.group77.pennyplanner.service.TransactionService;
 import org.softeng.group77.pennyplanner.util.UserMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -23,6 +24,7 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -326,23 +328,25 @@ public class TransactionServiceImplTest {
         return calculateSummary(transactions);
     }//这个方法是如果用户没有输入开始结束日期就返回该月1号到当前时间的那三个数值
     
-
+    private Map<String, Double> calculateSummary(List<Transaction> transactions) {
+        // 使用 BigDecimal 进行精确计算，最后转换为 Double
+        BigDecimal income = transactions.stream()
+                .filter(t -> t.getAmount() != null && t.getAmount().compareTo(BigDecimal.ZERO) > 0)
+                .map(Transaction::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     
-    private SummaryResult calculateSummary(List<Transaction> transactions) {
-        double income = transactions.stream()
-                .filter(t -> TransactionType.INCOME.equals(t.getType()))
-                .mapToDouble(t -> t.getAmount().doubleValue())
-                .sum();
+        BigDecimal expense = transactions.stream()
+                .filter(t -> t.getAmount() != null && t.getAmount().compareTo(BigDecimal.ZERO) < 0)
+                .map(t -> t.getAmount().abs()) // 支出取绝对值
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     
-        double expense = transactions.stream()
-                .filter(t -> TransactionType.EXPENSE.equals(t.getType()))
-                .mapToDouble(t -> t.getAmount().doubleValue())
-                .sum();
+        BigDecimal balance = income.subtract(expense);
     
-        return new SummaryResult(income - expense, income, expense);
+        return Map.of(
+            "totalBalance", balance.doubleValue(),
+            "income", income.doubleValue(),
+            "expense", expense.doubleValue()
+        );
     }
-    
-    // 辅助记录类
-    private record SummaryResult(double balance, double income, double expense) {}
 
 }
