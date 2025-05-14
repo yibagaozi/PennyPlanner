@@ -305,5 +305,44 @@ public class TransactionServiceImplTest {
         Transaction transaction = createTestTransaction();
         return transactionRepository.save(transaction);
     }
+    
+    public Map<String, Double> getDefaultSummary(@RequestParam(required = false) LocalDateTime endTime) {
+        String userId = authService.getCurrentUser().getId();
+    
+        // 获取当前月份的第一天
+        LocalDate now = LocalDate.now();
+        LocalDate firstDayOfMonth = now.withDayOfMonth(1);
+    
+        // 如果用户未提供结束时间，则默认为当前时间
+        LocalDateTime effectiveEndTime = endTime != null ? endTime : LocalDateTime.now();
+    
+        // 查询从本月1号到指定时间点的数据
+        List<Transaction> transactions = transactionRepository.findByUserIdAndTransactionDateTimeBetween(
+                userId,
+                firstDayOfMonth.atStartOfDay(),
+                effectiveEndTime
+        );
+    
+        return calculateSummary(transactions);
+    }//这个方法是如果用户没有输入开始结束日期就返回该月1号到当前时间的那三个数值
+    
+
+    
+    private SummaryResult calculateSummary(List<Transaction> transactions) {
+        double income = transactions.stream()
+                .filter(t -> TransactionType.INCOME.equals(t.getType()))
+                .mapToDouble(t -> t.getAmount().doubleValue())
+                .sum();
+    
+        double expense = transactions.stream()
+                .filter(t -> TransactionType.EXPENSE.equals(t.getType()))
+                .mapToDouble(t -> t.getAmount().doubleValue())
+                .sum();
+    
+        return new SummaryResult(income - expense, income, expense);
+    }
+    
+    // 辅助记录类
+    private record SummaryResult(double balance, double income, double expense) {}
 
 }
