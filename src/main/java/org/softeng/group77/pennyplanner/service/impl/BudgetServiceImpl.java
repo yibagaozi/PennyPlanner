@@ -1,76 +1,94 @@
 package org.softeng.group77.pennyplanner.service.impl;
 
 import org.softeng.group77.pennyplanner.model.Budget;
+import org.softeng.group77.pennyplanner.service.AuthService;
 import org.softeng.group77.pennyplanner.service.BudgetService;
 import org.springframework.stereotype.Service;
 
+import java.io.*;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.HashMap;
 import java.util.Map;
 
 @Service
 public class BudgetServiceImpl implements BudgetService {
 
-    private final Map<LocalDate, Budget> budgetMap = new HashMap<>(); // 使用 Map 存储预算
+    private final Map<YearMonth, Budget> budgetMap = new HashMap<>();
+    private final String BUDGET_FILE = "data/budget.dat";
+    private final AuthService authService;
 
-    @Override
-    public void saveBudget(double amount, LocalDate date) {
-        if (amount < 0) {
-            throw new IllegalArgumentException("Amount cannot be negative");
-        }
-
-        // 不允许保存过去日期的预算
-        if (date == null || date.isBefore(LocalDate.now())) {
-            throw new IllegalArgumentException("Cannot set budget for past dates");
-        }
-
-        // 限制最大日期为2030-12-31
-        LocalDate maxValidDate = LocalDate.of(2030, 12, 31);
-        if (date.isAfter(maxValidDate)) {
-            throw new IllegalArgumentException("Invalid date: exceeds maximum valid date");
-        }
-
-        Budget budget = new Budget(amount, date);
-        budgetMap.put(date, budget); // 每次修改时，都会覆盖同一日期的预算
-
-        System.out.println("Saved budget: " + budget.getAmount() + " for " + budget.getDate());
+    public BudgetServiceImpl(AuthService authService) {
+        this.authService = authService;
+        loadBudgetData();
     }
 
     @Override
-    public Budget getBudgetByDate(LocalDate date) {
-        // 检查日期是否为 null
-        if (date == null) {
-            throw new IllegalArgumentException("Date cannot be null");
-        }
+    public void saveBudget(double amount, LocalDate date) {
+        try {
+            // 获取当前用户ID
+            String userId = authService.getCurrentUser().getId();
+            if (userId == null) {
+                throw new IllegalStateException("No user is logged in");
+            }
 
-        return budgetMap.get(date); // 返回指定日期的预算
+            // 创建预算对象
+            Budget budget = new Budget(amount, date);
+
+            // 存储当月预算
+            YearMonth yearMonth = YearMonth.from(date);
+            budgetMap.put(yearMonth, budget);
+
+            // 保存到文件
+            saveBudgetData();
+
+            System.out.println("Budget saved successfully: " + amount + " for " + yearMonth);
+        } catch (Exception e) {
+            System.err.println("Failed to save budget: " + e.getMessage());
+        }
     }
 
     @Override
     public Budget getCurrentBudget() {
-        LocalDate currentDate = LocalDate.now();
-        System.out.println("Current Date: " + currentDate);  // 打印当前日期
+        YearMonth currentMonth = YearMonth.now();
+        return budgetMap.get(currentMonth);
+    }
 
-        Budget latestBudget = null;
+    @Override
+    public Budget getBudgetByDate(LocalDate date) {
+        YearMonth yearMonth = YearMonth.from(date);
+        return budgetMap.get(yearMonth);
+    }
 
-        // 遍历所有预算，筛选当前月份的预算
-        for (Map.Entry<LocalDate, Budget> entry : budgetMap.entrySet()) {
-            System.out.println("Checking budget for date: " + entry.getKey()); // 打印每个预算的日期
-
-            // 如果预算日期属于当前月份和年份
-            if (entry.getKey().getMonth() == currentDate.getMonth() && entry.getKey().getYear() == currentDate.getYear()) {
-                if (latestBudget == null || entry.getValue().getDate().isAfter(latestBudget.getDate())) {
-                    latestBudget = entry.getValue(); // 保留最新的预算
-                }
-            }
+    // 保存预算数据到文件
+    private void saveBudgetData() {
+        File directory = new File("data");
+        if (!directory.exists()) {
+            directory.mkdirs();
         }
 
-        // 如果没有找到最新的预算
-        if (latestBudget == null) {
-            System.out.println("No budget found for the current month (" + currentDate.getMonth() + ")");
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(BUDGET_FILE))) {
+            oos.writeObject(new HashMap<>(budgetMap));
+        } catch (IOException e) {
+            System.err.println("Error saving budget data: " + e.getMessage());
+        }
+    }
+
+    // 从文件加载预算数据
+    @SuppressWarnings("unchecked")
+    private void loadBudgetData() {
+        File file = new File(BUDGET_FILE);
+        if (!file.exists()) {
+            return;
         }
 
-        return latestBudget; // 返回当前月份最新的预算，如果没有则返回 null
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(BUDGET_FILE))) {
+            Map<YearMonth, Budget> loadedMap = (Map<YearMonth, Budget>) ois.readObject();
+            budgetMap.clear();
+            budgetMap.putAll(loadedMap);
+        } catch (IOException | ClassNotFoundException e) {
+            System.err.println("Error loading budget data: " + e.getMessage());
+        }
     }
 
 }

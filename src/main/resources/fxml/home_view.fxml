@@ -55,7 +55,7 @@
                                 <VBox prefWidth="150.0" styleClass="card">
                                     <children>
                                         <Label styleClass="card-title" text="Total Balance" />
-                                        <Label styleClass="card-amount" text="12,345" />
+                                        <Label fx:id="totalBalanceLabel" styleClass="card-amount" text="12,345" />
                                         <HBox spacing="5">
                                             <Label styleClass="positive-change" text="↑" />
                                             <Label styleClass="positive-change" text="2.5%" />
@@ -67,7 +67,7 @@
                                 <VBox prefWidth="150.0" styleClass="card">
                                     <children>
                                         <Label styleClass="card-title" text="Income" />
-                                        <Label styleClass="card-amount" text="5,678" />
+                                        <Label fx:id="incomeAmountLabel" styleClass="card-amount" text="5,678" />
                                         <HBox spacing="5">
                                             <Label styleClass="positive-change" text="↑" />
                                             <Label styleClass="positive-change" text="1.8%" />
@@ -79,7 +79,7 @@
                                 <VBox prefWidth="150.0" styleClass="card">
                                     <children>
                                         <Label styleClass="card-title" text="Expense" />
-                                        <Label styleClass="card-amount" text="3,333" />
+                                        <Label fx:id="expenseAmountLabel" styleClass="card-amount" text="3,333" />
                                         <HBox spacing="5">
                                             <Label styleClass="negative-change" text="↓" />
                                             <Label styleClass="negative-change" text="0.8%" />
@@ -97,8 +97,8 @@
                <!--                     </StackPane>-->
                      <StackPane fx:id="expenseDistributionChartContainer" layoutX="255.0" layoutY="197.0" prefHeight="217.0" prefWidth="308.0" />
                      <Label layoutX="255.0" layoutY="19.0" prefHeight="22.0" prefWidth="52.0" text="Budget" />
-                     <TextField layoutX="312.0" layoutY="19.0" prefHeight="22.0" prefWidth="106.0" />
-                     <Button layoutX="448.0" layoutY="19.0" mnemonicParsing="false" text="Save" />
+                     <TextField fx:id="budgetField" layoutX="312.0" layoutY="19.0" prefHeight="22.0" prefWidth="106.0" />
+                     <Button fx:id="saveBudgetButton" onAction="#saveBudget" layoutX="448.0" layoutY="19.0" mnemonicParsing="false" text="Save" />
 
                         </children>
                     </AnchorPane>

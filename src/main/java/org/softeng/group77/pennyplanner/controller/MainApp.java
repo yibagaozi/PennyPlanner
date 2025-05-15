@@ -9,6 +9,7 @@ import javafx.stage.Stage;
 import org.softeng.group77.pennyplanner.PennyPlannerApplication;
 import org.softeng.group77.pennyplanner.adapter.TransactionAdapter;
 import org.softeng.group77.pennyplanner.service.AuthService;
+import org.softeng.group77.pennyplanner.service.BudgetService;
 import org.softeng.group77.pennyplanner.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -28,7 +29,6 @@ public class MainApp extends Application {
     private static ConfigurableApplicationContext applicationContext;
     private static TransactionAdapter transactionAdapter;
     private static AuthService authService;
-
     @Override
     public void init() {
 

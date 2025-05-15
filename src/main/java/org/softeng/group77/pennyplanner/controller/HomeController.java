@@ -6,15 +6,19 @@ import javafx.fxml.FXML;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.TextField;
 import org.softeng.group77.pennyplanner.adapter.TransactionAdapter;
 import org.softeng.group77.pennyplanner.service.AuthService;
 import org.softeng.group77.pennyplanner.model.*;
+import org.softeng.group77.pennyplanner.service.BudgetService;
 import org.softeng.group77.pennyplanner.service.ChartService;
 import org.softeng.group77.pennyplanner.service.ChartViewService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import java.time.YearMonth;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -35,25 +39,37 @@ public class HomeController {
     @FXML
     private SplitPane splitPane;
 
-//    @FXML
-//    private LineChart<String, Number> expenseTrendChart; // 支出趋势折线图
     @FXML
     private StackPane expenseTrendChartContainer; // 替换原来的LineChart
 
-//    @FXML
-//    private PieChart expenseDistributionChart; // 支出分布饼图
     @FXML
     private StackPane expenseDistributionChartContainer; // 替换原来的PieChart
+
+    @FXML
+    private Label totalBalanceLabel; // 总余额显示标签
+
+    @FXML
+    private Label incomeAmountLabel; // 收入金额显示标签
+
+    @FXML
+    private Label expenseAmountLabel; // 支出金额显示标签
+
+    @FXML
+    private TextField budgetField; // 预算输入框
+
+    @FXML
+    private Button saveBudgetButton; // 保存预算按钮
 
     @Autowired
     private ChartService chartService;
     @Autowired
     private ChartViewService chartViewService;
-
-
+    @Autowired
+    private BudgetService budgetService;
     //数据持久化相关
     private static TransactionAdapter transactionAdapter;
     private static AuthService authService;
+
 
     public static void setTransactionAdapter(TransactionAdapter adapter) {
         transactionAdapter = adapter;
@@ -65,14 +81,6 @@ public class HomeController {
 
     private static ChartService staticChartService;
     private static ChartViewService staticChartViewService;
-
-    public static void setChartService(ChartService service) {
-        staticChartService = service;
-    }
-
-    public static void setChartViewService(ChartViewService service) {
-        staticChartViewService = service;
-    }
 
     @FXML
     private void initialize() {
@@ -102,34 +110,132 @@ public class HomeController {
         // 3. 初始化支出分布饼图
         setupExpenseDistributionChart();
 
+        //4. 初始化预算服务
+//        setBudgetService(budgetService);
+        budgetService = budgetService;
+        System.out.println("BudgetService auto-wired successfully");
+
+        // 5. 更新卡片显示
+        updateCardInfo();
+
+        // 5. 加载预算信息
+        if (budgetService != null) {
+            loadBudgetInfo();
+        };
+
+        // 6. 设置预算保存按钮事件
+        setupSaveBudgetButton();
+
 
         // 禁用分割线的拖动
         splitPane.getDividers().forEach(divider -> divider.positionProperty().addListener((observable, oldValue, newValue) -> {
             divider.setPosition(0.1); // 固定分割线位置为 10%
         }));
-
-
     }
+
+    // 设置保存预算的按钮事件
+    private void setupSaveBudgetButton() {
+        saveBudgetButton.setOnAction(e -> saveBudget());
+    }
+
+    // 保存预算
+    @FXML
+    private void saveBudget() {
+        try {
+            String budgetText = budgetField.getText();
+            if (budgetText != null && !budgetText.isEmpty()) {
+                double budgetAmount = Double.parseDouble(budgetText);
+                if (budgetService != null) {
+                    budgetService.saveBudget(budgetAmount, LocalDate.now());
+                    System.out.println("Budget saved: " + budgetAmount);
+                } else {
+                    System.out.println("BudgetService is not initialized");
+                }
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid budget amount: " + e.getMessage());
+        }
+    }
+
+    // 加载预算信息
+    private void loadBudgetInfo() {
+        if (budgetService != null) {
+            Budget currentBudget = budgetService.getCurrentBudget();
+            if (currentBudget != null) {
+                budgetField.setText(String.format("%.2f", currentBudget.getAmount()));
+            }
+        }
+    }
+
+    // 更新卡片信息
+    private void updateCardInfo() {
+        // 获取当月的收入和支出数据
+        MonthlyFinancialSummary summary = calculateMonthlyFinancials();
+
+        // 更新卡片显示
+        totalBalanceLabel.setText(String.format("%.2f", summary.getTotalBalance()));
+        incomeAmountLabel.setText(String.format("%.2f", summary.getTotalIncome()));
+        expenseAmountLabel.setText(String.format("%.2f", Math.abs(summary.getTotalExpense())));
+    }
+
+    // 计算当月财务摘要
+    private MonthlyFinancialSummary calculateMonthlyFinancials() {
+        double totalIncome = 0;
+        double totalExpense = 0;
+
+        // 获取当前年月
+        YearMonth currentMonth = YearMonth.now();
+        LocalDate startOfMonth = currentMonth.atDay(1); // 当月第一天
+        LocalDate endOfMonth = currentMonth.atEndOfMonth(); // 当月最后一天
+
+        // 获取交易数据
+        List<Transaction> transactions = new ArrayList<>();
+        if (transactionAdapter != null) {
+            // 使用getUserTransactions方法获取数据，并转换为Transaction对象
+            ObservableList<tableModel> models = transactionAdapter.getUserTransactions();
+            transactions = models.stream()
+                    .map(this::convertToTransaction)
+                    .collect(Collectors.toList());
+        } else {
+            // 模拟数据
+            transactions = createSampleTransactions();
+        }
+
+        // 筛选当月交易并计算总收入和总支出
+        for (Transaction tx : transactions) {
+            LocalDate txDate = tx.getTransactionDateTime().toLocalDate();
+
+            // 检查交易是否在当前月内
+            if (!txDate.isBefore(startOfMonth) && !txDate.isAfter(endOfMonth)) {
+                double amount = tx.getAmountAsDouble();
+                if (amount > 0) {
+                    totalIncome += amount;
+                } else if (amount < 0) {
+                    totalExpense += amount; // 支出是负数
+                }
+            }
+        }
+
+        double totalBalance = totalIncome + totalExpense; // 总余额 = 收入 + 支出(负数)
+
+        return new MonthlyFinancialSummary(totalIncome, totalExpense, totalBalance);
+    }
+
     @FXML
     private void turntoHome() throws IOException {
-        //System.out.println("转到home页面");
         MainApp.showHome();
     }
     @FXML
     private void turntoReport() throws IOException {
-       // System.out.println("转到home页面");
         MainApp.showReport();
     }@FXML
     private void turntoHistory() throws IOException {
-       // System.out.println("转到home页面");
         MainApp.showhistory();
     }@FXML
     private void turntoManagement() throws IOException {
-       // System.out.println("转到home页面");
         MainApp.showmanagement();
     }@FXML
     private void turntoUser() throws IOException {
-      //  System.out.println("转到home页面");
         MainApp.showuser();
     }
     @FXML
@@ -278,5 +384,30 @@ public class HomeController {
                 new PieChart.Data("Transportation", 345),
                 new PieChart.Data("Others", 608)
         );
+    }
+
+    // 月度财务摘要内部类
+    private static class MonthlyFinancialSummary {
+        private final double totalIncome;
+        private final double totalExpense;
+        private final double totalBalance;
+
+        public MonthlyFinancialSummary(double totalIncome, double totalExpense, double totalBalance) {
+            this.totalIncome = totalIncome;
+            this.totalExpense = totalExpense;
+            this.totalBalance = totalBalance;
+        }
+
+        public double getTotalIncome() {
+            return totalIncome;
+        }
+
+        public double getTotalExpense() {
+            return totalExpense;
+        }
+
+        public double getTotalBalance() {
+            return totalBalance;
+        }
     }
 }
