@@ -29,6 +29,9 @@ public class MainApp extends Application {
     private static ConfigurableApplicationContext applicationContext;
     private static TransactionAdapter transactionAdapter;
     private static AuthService authService;
+    // 添加当前视图跟踪变量，用于刷新数据时确定当前页面
+    private static String currentView = "login";
+
     @Override
     public void init() {
 
@@ -51,6 +54,7 @@ public class MainApp extends Application {
         launch(args);
         // 在启动方法中添加
     }
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         MainApp.primaryStage = primaryStage;
@@ -201,4 +205,64 @@ public class MainApp extends Application {
         HomeController.setTransactionAdapter(transactionAdapter);
         HomeController.setAuthService(authService);
     }
+
+    /**
+     * 获取TransactionAdapter实例
+     * 该方法供CSV导入等功能使用
+     */
+    public static TransactionAdapter getTransactionAdapter() {
+        return transactionAdapter;
+    }
+
+    /**
+     * 获取当前Stage实例
+     */
+    public static Stage getPrimaryStage() {
+        return primaryStage;
+    }
+
+    /**
+     * 刷新所有数据显示
+     * 在导入CSV等数据变更后调用此方法以更新UI
+     */
+    public static void refreshData() {
+        // 首先刷新共享数据模型
+        SharedDataModel.refreshTransactionData();
+
+        // 根据当前视图刷新对应页面
+        try {
+            switch (currentView) {
+                case "home":
+                    showHome();
+                    break;
+                case "history":
+                    showhistory();
+                    break;
+                case "report":
+                    showReport();
+                    break;
+                case "management":
+                    // 管理页面通常不需要刷新，但如果需要也可以添加
+                    break;
+                case "user":
+                    showuser();
+                    break;
+                default:
+                    // 默认情况下不做任何操作
+                    break;
+            }
+        } catch (IOException e) {
+            System.err.println("刷新数据时出错: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 获取当前视图名称
+     */
+    public static String getCurrentView() {
+        return currentView;
+    }
+
+
 }
