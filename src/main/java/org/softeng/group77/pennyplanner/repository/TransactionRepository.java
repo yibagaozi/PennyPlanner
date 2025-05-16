@@ -18,10 +18,10 @@ public interface TransactionRepository {
     List<Transaction> findByUserId(String userId) throws IOException;
 
     List<Transaction> findByUserIdAndDescription(String userId, String description) throws IOException;
-     List<Transaction> findByUserIdAndTransactionDateTimeBetween(
-            String userId,
-            LocalDateTime start,
-            LocalDateTime end
-    );
+    List<Transaction> findByUserIdAndTransactionDateTimeBetween(
+        String userId,
+        LocalDateTime start,
+        LocalDateTime end
+);
 
 }
