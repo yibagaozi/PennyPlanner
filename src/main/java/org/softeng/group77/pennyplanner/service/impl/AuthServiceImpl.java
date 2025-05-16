@@ -136,7 +136,32 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public UserInfo updateUserInfo(String userId, UserInfo updatedInfo) {
-        return null;
+        try {
+            // 1. 查找用户
+            Optional<User> userOpt = userRepository.findById(userId);
+            if (userOpt.isEmpty()) {
+                log.warn("User with id {} not found.", userId);
+                return null;
+            }
+            User user = userOpt.get();
+    
+            // 2. 用 UserMapper 更新用户信息
+            UserMapper.updateUserFromUserInfo(user, updatedInfo);
+    
+            // 3. 保存用户
+            userRepository.save(user);
+    
+            // 4. 返回最新的 UserInfo
+            UserInfo newUserInfo = UserMapper.toUserInfo(user);
+    
+            // 5. 更新缓存
+            updateUserCache(newUserInfo);
+    
+            return newUserInfo;
+        } catch (Exception e) {
+            log.error("Error while updating user info: ", e);
+            return null;
+        }
     }
 
     @Override
