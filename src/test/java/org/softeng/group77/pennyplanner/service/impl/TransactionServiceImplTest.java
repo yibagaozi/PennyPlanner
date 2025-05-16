@@ -328,6 +328,25 @@ public class TransactionServiceImplTest {
         return calculateSummary(transactions);
     }//这个方法是如果用户没有输入开始结束日期就返回该月1号到当前时间的那三个数值
     
+    public Map<String, Double> getSummaryByDateRange(LocalDate startDate, LocalDate endDate) {
+        // 1. 验证日期范围
+        if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("End date must be after start date");
+        }
+    
+        String userId = authService.getCurrentUser().getId();
+    
+        // 2. 获取时间范围内的交易
+        List<Transaction> transactions = transactionRepository.findByUserIdAndTransactionDateTimeBetween(
+                userId,
+                startDate != null ? startDate.atStartOfDay() : null,
+                endDate != null ? endDate.atTime(23, 59, 59) : null
+        );
+    
+        // 3. 计算汇总数据
+        return calculateSummary(transactions);
+    }//这个方法是输入了特定时间返回三个数据
+
     private Map<String, Double> calculateSummary(List<Transaction> transactions) {
         // 使用 BigDecimal 进行精确计算，最后转换为 Double
         BigDecimal income = transactions.stream()
