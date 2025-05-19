@@ -10,7 +10,7 @@
             <Label styleClass="nav-title" text="PennyPlanner" />
             <Button onAction="#turntoHome" styleClass="nav-button" text="Home" />
             <Button onAction="#turntoReport" styleClass="nav-button" text="Report &amp; Forecast" />
-            <Button styleClass="nav-button" text="Settings" />
+            <Button style="-fx-font-weight: bold;" styleClass="nav-button" text="Track Spend!" />
             <Button onAction="#turntoHistory" styleClass="nav-button" text="History" />
             <Button onAction="#turntoManagement" styleClass="nav-button" text="Management" />
             <Button onAction="#turntoUser" styleClass="nav-button" text="User Profile" />
