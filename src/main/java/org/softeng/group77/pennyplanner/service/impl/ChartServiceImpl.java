@@ -24,8 +24,19 @@ public class ChartServiceImpl implements ChartService {
 
     @Override
     public PieChartData generateCategoryDistributionPieChart(List<Transaction> transactions, String title) {
+        // 获取当前月份的起始和结束时间
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startOfMonth = now.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime endOfMonth = startOfMonth.plusMonths(1);
+
         Map<String, Double> categoryTotals = transactions.stream()
             .filter(tx -> tx.getCategory() != null && !tx.getCategory().isEmpty())
+
+                // 筛选条件2: 只包含当前月份的交易
+                .filter(tx -> !tx.getTransactionDateTime().isBefore(startOfMonth) && tx.getTransactionDateTime().isBefore(endOfMonth))
+                // 筛选条件3: 只包含支出（金额小于0）
+                .filter(tx -> tx.getAmountAsDouble() < 0)
+
             .collect(Collectors.groupingBy(
                 Transaction::getCategory,
                 Collectors.summingDouble(Transaction::getAmountAsDouble)
@@ -63,7 +74,11 @@ public class ChartServiceImpl implements ChartService {
 
         Map<String, List<Transaction>> monthlyTransactions = transactions.stream()
             .filter(tx -> tx.getTransactionDateTime().getYear() == year)
-            .collect(Collectors.groupingBy(tx ->
+
+                // 重要筛选：只包含支出（金额小于0）
+                .filter(tx -> tx.getAmountAsDouble() < 0)
+
+                .collect(Collectors.groupingBy(tx ->
                 monthFormatter.format(tx.getTransactionDateTime())
             ));
 

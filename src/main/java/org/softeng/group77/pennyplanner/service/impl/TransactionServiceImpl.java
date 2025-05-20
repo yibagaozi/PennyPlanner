@@ -280,6 +280,40 @@ public class TransactionServiceImpl implements TransactionService {
         }
     }
 
+    @Override
+    @RequiresAuthentication
+    public List<TransactionDetail> filterTransactionByMethod(String method) {
+        try {
+            String userId = authService.getCurrentUser().getId();
+
+            List<Transaction> transactions = transactionRepository.findByUserId(userId);
+
+            if (transactions.isEmpty()) {
+                log.info("No transactions found for user: {} in the specified payment method", authService.getCurrentUser().getUsername());
+                return List.of();
+            }
+
+            List<Transaction> filteredTransactions = transactions.stream()
+                    .filter(transaction -> transaction.getMethod() != null && transaction.getMethod().equalsIgnoreCase(method))
+                    .toList();
+
+            if (filteredTransactions.isEmpty()) {
+                log.info("No transactions found for user: {} in the specified payment method", authService.getCurrentUser().getUsername());
+                return List.of();
+            } else {
+                log.info("Found {} transactions for user: {} in the specified payment method", filteredTransactions.size(), authService.getCurrentUser().getUsername());
+                return transactionMapper.toTransactionDetailList(filteredTransactions);
+            }
+
+        } catch (IOException e) {
+            log.error("File error while filtering transactions by payment method", e);
+            throw new TransactionProcessingException("Failed to filter transactions by payment method", e);
+        } catch (Exception e) {
+            log.error("Unexpected error filtering transactions by payment method", e);
+            throw new TransactionProcessingException("An unexpected error occurred", e);
+        }
+    }
+
     private void validateTransactionDetail(TransactionDetail transactionDetail) {
         if (transactionDetail == null) {
             throw new IllegalArgumentException("Transaction detail cannot be null");
@@ -296,6 +330,9 @@ public class TransactionServiceImpl implements TransactionService {
         if (transactionDetail.getCategory() == null || transactionDetail.getCategory().isEmpty()) {
             throw new IllegalArgumentException("Category is required");
         }
+        if (transactionDetail.getMethod() == null || transactionDetail.getMethod().isEmpty()) {
+            throw new IllegalArgumentException("Payment method is required");
+        }
     }
 
     private void updateTransactionFromDetail(Transaction transaction, TransactionDetail transactionDetail) {
@@ -303,6 +340,7 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setDescription(transactionDetail.getDescription());
         transaction.setCategory(transactionDetail.getCategory());
         transaction.setTransactionDateTime(transactionDetail.getTransactionDateTime());
+        transaction.setMethod(transactionDetail.getMethod());
     }
     public Map<String, Double> getDefaultSummary( LocalDateTime endTime) {
         String userId = authService.getCurrentUser().getId();

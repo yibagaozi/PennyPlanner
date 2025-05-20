@@ -148,6 +148,7 @@ public class TransactionServiceImplTest {
         updateDetail.setDescription("Updated Transaction");
         updateDetail.setCategory("Shopping");
         updateDetail.setTransactionDateTime(LocalDateTime.now());
+        updateDetail.setMethod("Cash");
 
         TransactionDetail result = transactionService.updateTransaction(updateDetail);
 
@@ -155,6 +156,7 @@ public class TransactionServiceImplTest {
         assertEquals(updateDetail.getAmount(), result.getAmount());
         assertEquals(updateDetail.getDescription(), result.getDescription());
         assertEquals(updateDetail.getCategory(), result.getCategory());
+        assertEquals(updateDetail.getMethod(), result.getMethod());
 
         List<Transaction> savedTransactions = ((JsonTransactionRepositoryImpl)transactionRepository).loadAll();
         assertEquals(1, savedTransactions.size());
@@ -291,6 +293,7 @@ public class TransactionServiceImplTest {
         detail.setDescription("Test Transaction");
         detail.setCategory("Food");
         detail.setTransactionDateTime(LocalDateTime.now());
+        detail.setMethod("Credit Card");
         return detail;
     }
 
@@ -300,6 +303,7 @@ public class TransactionServiceImplTest {
         transaction.setDescription("Test Transaction");
         transaction.setCategory("Food");
         transaction.setTransactionDateTime(LocalDateTime.now());
+        transaction.setMethod("Credit Card");
         return transaction;
     }
 

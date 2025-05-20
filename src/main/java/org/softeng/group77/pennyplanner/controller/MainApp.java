@@ -41,7 +41,7 @@ public class MainApp extends Application {
         applicationContext.close();
         //clearFilesInDirectory("data");
 
-        SharedDataModel.clearUIData(); // 只清除UI上的数据，不清除存储的数据
+        //SharedDataModel.clearUIData(); // 只清除UI上的数据，不清除存储的数据
         authService.logout();
 
         Platform.exit();
@@ -55,8 +55,7 @@ public class MainApp extends Application {
     public void start(Stage primaryStage) throws Exception {
         MainApp.primaryStage = primaryStage;
 
-        applicationContext = new AnnotationConfigApplicationContext("org.softeng.group77.pennyplanner");
-        //clearFilesInDirectory("data");
+        //applicationContext = new AnnotationConfigApplicationContext("org.softeng.group77.pennyplanner");
         showLogin();
     }
 
@@ -113,12 +112,14 @@ public class MainApp extends Application {
     }
 
     public static void showhistory() throws IOException {
-        // 刷新交易数据 —— ensure 强制刷新
+        // 刷新交易数据
         SharedDataModel.refreshTransactionData();
 
         FXMLLoader loader = new FXMLLoader(
                 MainApp.class.getResource("/fxml/History_view.fxml")
         );
+
+        loader.setControllerFactory(applicationContext::getBean);
         Parent root = loader.load();
 
         Scene scene = new Scene(root,800,500);
@@ -192,11 +193,11 @@ public class MainApp extends Application {
 
     @Autowired
     public void setServices(TransactionService transactionService, AuthService authService) {
-        this.transactionAdapter = new TransactionAdapter(transactionService);
+        this.transactionAdapter = new TransactionAdapter(transactionService, authService);
         this.authService = authService;
 
         // 设置适配器到共享模型
-        SharedDataModel.setTransactionAdapter(transactionAdapter);
+        //SharedDataModel.setTransactionAdapter(transactionAdapter);
         HomeController.setTransactionAdapter(transactionAdapter);
         HomeController.setAuthService(authService);
     }

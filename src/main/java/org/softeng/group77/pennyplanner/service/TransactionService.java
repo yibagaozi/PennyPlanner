@@ -34,5 +34,8 @@ public interface TransactionService {
     Map<String, Double> getSummaryByDateRange(LocalDate startDate, LocalDate endDate);
 
     Map<String, Double> calculateSummary(List<Transaction> transactions);
+
+    List<TransactionDetail> filterTransactionByMethod(String method);
+
 }
     

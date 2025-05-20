@@ -2,7 +2,12 @@ package org.softeng.group77.pennyplanner.controller;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import java.io.File;
@@ -10,14 +15,16 @@ import java.math.BigDecimal;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Locale;
 import java.util.UUID;
 
 public class ManagementController {
     // 字段绑定
-    @FXML private TextField dateField;
+    @FXML private DatePicker dateField;
     @FXML private TextField descriptionField;
     @FXML private TextField amountField;
     @FXML private ComboBox<String> categoryComboBox;
@@ -27,22 +34,77 @@ public class ManagementController {
     private boolean isExpense = true;
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
+    // 类别和对应的emoji
+    private final String[][] CATEGORIES = {
+            {null, ""},
+            {"Food", "🍔"},
+            {"Salary", "💰"},
+            {"Living Bill", "🏠"},
+            {"Entertainment", "🎬"},
+            {"Transportation", "🚗"},
+            {"Education", "🎓"},
+            {"Clothes", "👕"},
+            {"Others", "🔖"}
+    };
+
+    // 支付方式和对应的emoji
+    private final String[][] PAYMENT_METHODS = {
+            {null, ""},
+            {"Credit Card", "💳"},
+            {"Bank Transfer", "🏦"},
+            {"Auto-Payment", "\uD83E\uDD16"},
+            {"Cash", "💵"},
+            {"E-Payment", "📱"}
+    };
+
+
         // 在initialize方法中初始化分类和支付方式
         public void initialize() {
-            // 初始化分类选项
-            categoryComboBox.setItems(FXCollections.observableArrayList(
-                    null, "Food", "Salary", "Living Bill", "Entertainment",
-                    "Transportation", "Education", "Clothes", "Others"
-            ));
+            Locale.setDefault(Locale.ENGLISH);
+//            // 初始化分类选项
+//            categoryComboBox.setItems(FXCollections.observableArrayList(
+//                    null, "Food 🍔", "Salary 💰", "Living Bill", "Entertainment",
+//                    "Transportation", "Education", "Clothes", "Others"
+//            ));
+//
+//            // 初始化支付方式
+//            methodComboBox.setItems(FXCollections.observableArrayList(
+//                    null, "Credit Card", "Bank Transfer", "Auto-Payment", "Cash", "E-Payment"
+//            ));
+//
+//            // 设置默认选择
+//            categoryComboBox.getSelectionModel().selectFirst();
+//            methodComboBox.getSelectionModel().selectFirst();
 
-            // 初始化支付方式
-            methodComboBox.setItems(FXCollections.observableArrayList(
-                    null, "Credit Card", "Bank Transfer", "Auto-Payment", "Cash", "E-Payment"
-            ));
+            // 配置DatePicker
+            dateField.setPromptText("Select Date");
+            // 设置当前日期为默认日期
+            dateField.setValue(LocalDate.now());
+            // 设置日期格式
+            dateField.setConverter(new javafx.util.StringConverter<LocalDate>() {
+                @Override
+                public String toString(LocalDate date) {
+                    if (date != null) {
+                        return DATE_FORMATTER.format(date);
+                    } else {
+                        return "";
+                    }
+                }
 
-            // 设置默认选择
-            categoryComboBox.getSelectionModel().selectFirst();
-            methodComboBox.getSelectionModel().selectFirst();
+                @Override
+                public LocalDate fromString(String string) {
+                    if (string != null && !string.isEmpty()) {
+                        return LocalDate.parse(string, DATE_FORMATTER);
+                    } else {
+                        return null;
+                    }
+                }
+            });
+
+            // 初始化分类选择器
+            setupCategoryComboBox();
+            // 初始化支付方式选择器
+            setupMethodComboBox();
 
             // 禁用分割线的拖动
             splitPane.getDividers().forEach(divider -> divider.positionProperty().addListener((observable, oldValue, newValue) -> {
@@ -50,15 +112,168 @@ public class ManagementController {
             }));
         }
 
+
+    private void setupCategoryComboBox() {
+        // 将二维数组的第一列（类别名称）提取为一维数组
+        String[] categoryNames = new String[CATEGORIES.length];
+        for (int i = 0; i < CATEGORIES.length; i++) {
+            categoryNames[i] = CATEGORIES[i][0];
+        }
+
+        categoryComboBox.setItems(FXCollections.observableArrayList(categoryNames));
+
+        // 设置单元格工厂
+        categoryComboBox.setCellFactory(param -> new ListCell<String>() {
+            @Override
+            protected void updateItem(String category, boolean empty) {
+                super.updateItem(category, empty);
+
+                if (empty || category == null) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    // 查找对应的emoji
+                    String emoji = "";
+                    for (String[] cat : CATEGORIES) {
+                        if (category.equals(cat[0])) {
+                            emoji = cat[1];
+                            break;
+                        }
+                    }
+
+                    // 创建带有emoji的显示项
+                    HBox hbox = new HBox(10); // 10是间距
+                    hbox.setAlignment(Pos.CENTER_LEFT);
+
+                    Text emojiText = new Text(emoji);
+                    emojiText.setFont(Font.font(14)); // emoji稍大一点
+
+                    Text categoryText = new Text(category);
+
+                    hbox.getChildren().addAll(emojiText, categoryText);
+                    setGraphic(hbox);
+                    setText(null); // 因为我们使用自定义节点，所以setText设为null
+                }
+            }
+        });
+
+        // 设置按钮单元格
+        categoryComboBox.setButtonCell(new ListCell<String>() {
+            @Override
+            protected void updateItem(String category, boolean empty) {
+                super.updateItem(category, empty);
+
+                if (empty || category == null) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    // 查找对应的emoji
+                    String emoji = "";
+                    for (String[] cat : CATEGORIES) {
+                        if (category.equals(cat[0])) {
+                            emoji = cat[1];
+                            break;
+                        }
+                    }
+
+                    // 直接在按钮单元格中显示emoji + 类别名称
+                    setText(emoji + " " + category);
+                }
+            }
+        });
+
+        categoryComboBox.getSelectionModel().selectFirst();
+    }
+
+    private void setupMethodComboBox() {
+        // 将二维数组的第一列（支付方式名称）提取为一维数组
+        String[] methodNames = new String[PAYMENT_METHODS.length];
+        for (int i = 0; i < PAYMENT_METHODS.length; i++) {
+            methodNames[i] = PAYMENT_METHODS[i][0];
+        }
+
+        methodComboBox.setItems(FXCollections.observableArrayList(methodNames));
+
+        // 设置单元格工厂
+        methodComboBox.setCellFactory(param -> new ListCell<String>() {
+            @Override
+            protected void updateItem(String method, boolean empty) {
+                super.updateItem(method, empty);
+
+                if (empty || method == null) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    // 查找对应的emoji
+                    String emoji = "";
+                    for (String[] m : PAYMENT_METHODS) {
+                        if (method.equals(m[0])) {
+                            emoji = m[1];
+                            break;
+                        }
+                    }
+
+                    // 创建带有emoji的显示项
+                    HBox hbox = new HBox(10);
+                    hbox.setAlignment(Pos.CENTER_LEFT);
+
+                    Text emojiText = new Text(emoji);
+                    emojiText.setFont(Font.font(14));
+
+                    Text methodText = new Text(method);
+
+                    hbox.getChildren().addAll(emojiText, methodText);
+                    setGraphic(hbox);
+                    setText(null);
+                }
+            }
+        });
+
+        // 设置按钮单元格
+        methodComboBox.setButtonCell(new ListCell<String>() {
+            @Override
+            protected void updateItem(String method, boolean empty) {
+                super.updateItem(method, empty);
+
+                if (empty || method == null) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    // 查找对应的emoji
+                    String emoji = "";
+                    for (String[] m : PAYMENT_METHODS) {
+                        if (method.equals(m[0])) {
+                            emoji = m[1];
+                            break;
+                        }
+                    }
+
+                    // 直接在按钮单元格中显示emoji + 方法名称
+                    setText(emoji + " " + method);
+                }
+            }
+        });
+
+        methodComboBox.getSelectionModel().selectFirst();
+    }
+
+
+
         // "Save"按钮处理方法
         @FXML
         private void handleSave() {
             try {
-                dateField.setPromptText("YYYY-MM-DD");
+                //dateField.setPromptText("YYYY-MM-DD");
                 // 数据校验
-                if (dateField.getText().isEmpty() ||
-                        !dateField.getText().matches("\\d{4}-\\d{2}-\\d{2}")) {
-                    showAlert("日期格式错误，请使用YYYY-MM-DD格式");
+//                if (dateField.getText().isEmpty() ||
+//                        !dateField.getText().matches("\\d{4}-\\d{2}-\\d{2}")) {
+//                    showAlert("日期格式错误，请使用YYYY-MM-DD格式");
+//                    return;
+//                }
+
+                // 检查日期是否已选择
+                if (dateField.getValue() == null) {
+                    showAlert("请选择日期");
                     return;
                 }
 
@@ -76,7 +291,8 @@ public class ManagementController {
                 tableModel newTransaction = new tableModel(
                         //newId,
                         java.util.UUID.randomUUID().toString(), // 使用UUID作为后端ID
-                        dateField.getText(),
+                        //dateField.getText(),
+                        dateField.getValue().format(DATE_FORMATTER), // 从DatePicker获取格式化日期
                         descriptionField.getText(),
                         finalAmount,
                         categoryComboBox.getValue(),
@@ -89,18 +305,18 @@ public class ManagementController {
                 boolean success = SharedDataModel.addTransaction(newTransaction);
 
                 if (success) {
-                    showAlert("交易记录已成功保存");
+                    showSuccessAlert("Saved Successfully");
                     // 清空输入框
                     clearForm();
                 } else {
-                    showAlert("保存失败，请稍后再试");
+                    showAlert("Failed. Try again later.");
                 }
 
                 // 清空输入框
                 clearForm();
 
             } catch (NumberFormatException e) {
-                showAlert("金额必须为有效数字");
+                showAlert("Invalid Amount");
             }
         }
 
@@ -123,7 +339,9 @@ public class ManagementController {
 
 
         private void clearForm() {
-            dateField.clear();
+            // 重置DatePicker为当前日期
+            dateField.setValue(LocalDate.now());
+            //dateField.clear();
             descriptionField.clear();
             amountField.clear();
             categoryComboBox.getSelectionModel().selectFirst();
@@ -133,6 +351,14 @@ public class ManagementController {
         private void showAlert(String message) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("输入错误");
+            alert.setHeaderText(null);
+            alert.setContentText(message);
+            alert.showAndWait();
+        }
+
+        private void showSuccessAlert(String message) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("操作成功");
             alert.setHeaderText(null);
             alert.setContentText(message);
             alert.showAndWait();
@@ -183,6 +409,7 @@ public class ManagementController {
                     );
 
                     System.out.println("文件上传成功 ▶ " + destFile.getAbsolutePath());
+                    showSuccessAlert("文件上传成功: " + destFile.getAbsolutePath());
                 } catch (IOException e) {
                     System.out.println("上传失败: " + e.getMessage());
                 }
