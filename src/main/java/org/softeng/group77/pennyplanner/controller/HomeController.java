@@ -83,7 +83,7 @@ public class HomeController {
     private static ChartViewService staticChartViewService;
 
     @FXML
-    private void initialize() {
+    private void initialize() throws Exception {
         // 1. 设置用户名
         String username = "Guest";
         if (authService != null) {
@@ -154,11 +154,13 @@ public class HomeController {
             }
         } catch (NumberFormatException e) {
             System.out.println("Invalid budget amount: " + e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
     // 加载预算信息
-    private void loadBudgetInfo() {
+    private void loadBudgetInfo() throws Exception {
         if (budgetService != null) {
             Budget currentBudget = budgetService.getCurrentBudget();
             if (currentBudget != null) {
