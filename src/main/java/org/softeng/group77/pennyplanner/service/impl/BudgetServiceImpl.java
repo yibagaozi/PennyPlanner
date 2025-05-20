@@ -1,5 +1,7 @@
 package org.softeng.group77.pennyplanner.service.impl;
 
+import org.softeng.group77.pennyplanner.exception.BudgetNotFoundException;
+import org.softeng.group77.pennyplanner.exception.BudgetProcessingException;
 import org.softeng.group77.pennyplanner.model.Budget;
 import org.softeng.group77.pennyplanner.repository.BudgetRepository;
 import org.softeng.group77.pennyplanner.service.AuthService;
@@ -24,7 +26,7 @@ public class BudgetServiceImpl implements BudgetService {
     }
 
     @Override
-    public Budget saveBudget(double amount, LocalDate date) throws IOException {
+    public Budget saveBudget(double amount, LocalDate date) throws Exception {
         try {
             // 验证用户登录状态
             if (authService.getCurrentUser() == null) {
@@ -55,14 +57,23 @@ public class BudgetServiceImpl implements BudgetService {
 
             // 返回创建的预算对象
             return budget;
+        } catch (IllegalArgumentException e) {
+            System.err.println("Invalid argument: " + e.getMessage());
+            throw new BudgetProcessingException("Invalid argument", e);
+        } catch (IllegalStateException e) {
+            System.err.println("Illegal state: " + e.getMessage());
+            throw new BudgetProcessingException("Illegal state", e);
+        } catch (IOException e) {
+            System.err.println("IO error: " + e.getMessage());
+            throw new BudgetProcessingException("IO error", e);
         } catch (Exception e) {
-            System.err.println("Error saving budget: " + e.getMessage());
-            throw new IOException("Error saving budget", e);
+            System.err.println("Unexpected error: " + e.getMessage());
+            throw new BudgetProcessingException("Unexpected error", e);
         }
     }
 
     @Override
-    public Budget getBudgetByDate(LocalDate date) throws IOException {
+    public Budget getBudgetByDate(LocalDate date) throws Exception {
         try {
             // 检查日期是否为 null
             if (date == null) {
@@ -75,21 +86,31 @@ public class BudgetServiceImpl implements BudgetService {
                 System.out.println("Retrieved budget: " + budget.getAmount() + " for " + budget.getDate());
                 return budget;
             } else {
-                throw new IllegalArgumentException("No budget found for the specified date: " + date);
+                throw new BudgetNotFoundException("No budget found for the specified date: " + date);
             }
+        } catch (IllegalArgumentException e) {
+            System.err.println("Invalid argument: " + e.getMessage());
+            throw new BudgetProcessingException("Invalid ", e);
         } catch (IOException e) {
+            System.err.println("IO error: " + e.getMessage());
+            throw new BudgetProcessingException("IO error", e);
+        } catch (IllegalStateException e) {
+            System.err.println("Illegal state: " + e.getMessage());
+            throw new BudgetProcessingException("Illegal state", e);
+        } catch (Exception e) {
             System.err.println("Error retrieving budget by date: " + e.getMessage());
-            throw new IOException("Error retrieving budget by date", e);
+            throw new BudgetProcessingException("Error retrieving budget by date", e);
         }
     }
 
     @Override
-    public Budget getCurrentBudget() throws IOException {
+    public Budget getCurrentBudget() throws BudgetNotFoundException, BudgetProcessingException {
+        Budget latestBudget = null;
+
         try {
             LocalDate currentDate = LocalDate.now();
             System.out.println("Current Date: " + currentDate);  // 打印当前日期
 
-            Budget latestBudget = null;
             Map<LocalDate, Budget> allBudgets = budgetRepository.findAll();
 
             for (Map.Entry<LocalDate, Budget> entry : allBudgets.entrySet()) {
@@ -103,21 +124,22 @@ public class BudgetServiceImpl implements BudgetService {
                     }
                 }
             }
-
-            // 如果没有找到最新的预算
-            if (latestBudget == null) {
-                System.out.println("No budget found for the current month (" + currentDate.getMonth() + ")");
-            }
-
-            return latestBudget;
-        } catch (IOException e) {
+        } catch (Exception e) {
             System.err.println("Error retrieving current budget: " + e.getMessage());
-            throw new IOException("Error retrieving current budget", e);
+            throw new BudgetProcessingException("Error retrieving current budget", e);
         }
+
+        if (latestBudget == null) {
+            LocalDate currentDate = LocalDate.now();
+            throw new BudgetNotFoundException("No budget found for the current month and year: "
+                + currentDate.getMonth() + " " + currentDate.getYear());
+        }
+
+        return latestBudget;
     }
 
     @Override
-    public Budget getBudgetByYearMonth(YearMonth yearMonth) throws IOException {
+    public Budget getBudgetByYearMonth(YearMonth yearMonth) {
         try {
             if (yearMonth == null) {
                 throw new IllegalArgumentException("YearMonth cannot be null");
@@ -139,9 +161,15 @@ public class BudgetServiceImpl implements BudgetService {
             }
 
             return latestBudget;
+        } catch (IllegalArgumentException e){
+            System.err.println("Invalid argument: " + e.getMessage());
+            throw new BudgetProcessingException("Invalid argument", e);
         } catch (IOException e) {
+            System.err.println("IO error: " + e.getMessage());
+            throw new BudgetProcessingException("IO error", e);
+        } catch (Exception e) {
             System.err.println("Error retrieving budget by year-month: " + e.getMessage());
-            throw new IOException("Error retrieving budget by year-month", e);
+            throw new BudgetProcessingException("Error retrieving budget by year-month", e);
         }
     }
 }
