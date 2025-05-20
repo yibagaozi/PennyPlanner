@@ -83,7 +83,7 @@ public class HomeController {
     private static ChartViewService staticChartViewService;
 
     @FXML
-    private void initialize() {
+    private void initialize() throws Exception {
         // 1. 设置用户名
         String username = "Guest";
         if (authService != null) {
@@ -154,11 +154,16 @@ public class HomeController {
             }
         } catch (NumberFormatException e) {
             System.out.println("Invalid budget amount: " + e.getMessage());
+        } catch (IOException e) {
+            System.out.println("An I/O error occurred: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("An unexpected error occurred: " + e.getMessage());
+            throw new RuntimeException("Error while saving budget", e);
         }
     }
 
     // 加载预算信息
-    private void loadBudgetInfo() {
+    private void loadBudgetInfo() throws Exception {
         if (budgetService != null) {
             Budget currentBudget = budgetService.getCurrentBudget();
             if (currentBudget != null) {

@@ -8,13 +8,13 @@ import java.time.YearMonth;
 
 public interface BudgetService {
     // 保存预算
-    Budget saveBudget(double amount, LocalDate date) throws IOException;
+    Budget saveBudget(double amount, LocalDate date) throws Exception;
 
     // 获取当前日期的预算
-    Budget getCurrentBudget() throws IOException;
+    Budget getCurrentBudget() throws Exception;
 
     // 获取指定日期的预算
-    Budget getBudgetByDate(LocalDate date) throws IOException;
+    Budget getBudgetByDate(LocalDate date) throws Exception;
 
-    Budget getBudgetByYearMonth(YearMonth yearMonth) throws IOException;
+    Budget getBudgetByYearMonth(YearMonth yearMonth) throws Exception;
 }
