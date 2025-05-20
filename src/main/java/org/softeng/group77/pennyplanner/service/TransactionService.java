@@ -29,11 +29,9 @@ public interface TransactionService {
     List<TransactionDetail> filterTransactionByDate(LocalDate startDate, LocalDate endDate);
 
     List<TransactionDetail> filterTransactionByCategory(String category);
-    Map<String, Double> getDefaultSummary( LocalDateTime endTime);
+    Map<String, Double> getDefaultSummary( LocalDateTime endTime) throws IOException;
 
-    Map<String, Double> getSummaryByDateRange(LocalDate startDate, LocalDate endDate);
-
-    Map<String, Double> calculateSummary(List<Transaction> transactions);
+    Map<String, Double> getSummaryByDateRange(LocalDate startDate, LocalDate endDate) throws IOException;
 
     List<TransactionDetail> filterTransactionByMethod(String method);
 

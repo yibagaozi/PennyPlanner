@@ -312,7 +312,7 @@ public class TransactionServiceImplTest {
         return transactionRepository.save(transaction);
     }
     
-    public Map<String, Double> getDefaultSummary(@RequestParam(required = false) LocalDateTime endTime) {
+    public Map<String, Double> getDefaultSummary(@RequestParam(required = false) LocalDateTime endTime) throws IOException {
         String userId = authService.getCurrentUser().getId();
     
         // 获取当前月份的第一天
@@ -332,7 +332,7 @@ public class TransactionServiceImplTest {
         return calculateSummary(transactions);
     }//这个方法是如果用户没有输入开始结束日期就返回该月1号到当前时间的那三个数值
     
-    public Map<String, Double> getSummaryByDateRange(LocalDate startDate, LocalDate endDate) {
+    public Map<String, Double> getSummaryByDateRange(LocalDate startDate, LocalDate endDate) throws IOException {
         // 1. 验证日期范围
         if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
             throw new IllegalArgumentException("End date must be after start date");
