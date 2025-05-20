@@ -215,6 +215,7 @@ public class AuthServiceImpl implements AuthService {
         } else {
             log.info("No changes detected for user ID: {}. No update performed.", userId);
             return UserMapper.toUserInfo(userToUpdate); // Return current info if no changes
+
         }
     }
 

@@ -52,4 +52,15 @@ public class JsonTransactionRepositoryImpl extends JsonDataManager<Transaction> 
         );
     }
 
+    @Override
+    public List<Transaction> findByUserIdAndTransactionDateTimeBetween(String userId, LocalDateTime start, LocalDateTime end) throws IOException {
+        return findAll(transaction ->
+            transaction.getUserId() != null &&
+            transaction.getUserId().equals(userId) &&
+            transaction.getTransactionDateTime() != null &&
+            !transaction.getTransactionDateTime().isBefore(start) &&
+            !transaction.getTransactionDateTime().isAfter(end)
+        );
+    }
+
 }

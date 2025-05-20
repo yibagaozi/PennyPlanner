@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.math.BigDecimal;
 
 @Service
 @Slf4j
@@ -339,5 +341,64 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setCategory(transactionDetail.getCategory());
         transaction.setTransactionDateTime(transactionDetail.getTransactionDateTime());
         transaction.setMethod(transactionDetail.getMethod());
+    }
+    public Map<String, Double> getDefaultSummary( LocalDateTime endTime) throws IOException {
+        String userId = authService.getCurrentUser().getId();
+    
+        // 获取当前月份的第一天
+        LocalDate now = LocalDate.now();
+        LocalDate firstDayOfMonth = now.withDayOfMonth(1);
+    
+        // 如果用户未提供结束时间，则默认为当前时间
+        LocalDateTime effectiveEndTime = endTime != null ? endTime : LocalDateTime.now();
+    
+        // 查询从本月1号到指定时间点的数据
+        List<Transaction> transactions = transactionRepository.findByUserIdAndTransactionDateTimeBetween(
+                userId,
+                firstDayOfMonth.atStartOfDay(),
+                effectiveEndTime
+        );
+    
+        return calculateSummary(transactions);
+    }//这个方法是如果用户没有输入开始结束日期就返回该月1号到当前时间的那三个数值
+    
+    public Map<String, Double> getSummaryByDateRange(LocalDate startDate, LocalDate endDate) throws IOException {
+        // 1. 验证日期范围
+        if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("End date must be after start date");
+        }
+    
+        String userId = authService.getCurrentUser().getId();
+    
+        // 2. 获取时间范围内的交易
+        List<Transaction> transactions = transactionRepository.findByUserIdAndTransactionDateTimeBetween(
+                userId,
+                startDate != null ? startDate.atStartOfDay() : null,
+                endDate != null ? endDate.atTime(23, 59, 59) : null
+        );
+    
+        // 3. 计算汇总数据
+        return calculateSummary(transactions);
+    }//这个方法是输入了特定时间返回三个数据
+
+    private Map<String, Double> calculateSummary(List<Transaction> transactions) {
+        // 使用 BigDecimal 进行精确计算，最后转换为 Double
+        BigDecimal income = transactions.stream()
+                .filter(t -> t.getAmount() != null && t.getAmount().compareTo(BigDecimal.ZERO) > 0)
+                .map(Transaction::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    
+        BigDecimal expense = transactions.stream()
+                .filter(t -> t.getAmount() != null && t.getAmount().compareTo(BigDecimal.ZERO) < 0)
+                .map(t -> t.getAmount().abs()) // 支出取绝对值
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    
+        BigDecimal balance = income.subtract(expense);
+    
+        return Map.of(
+            "totalBalance", balance.doubleValue(),
+            "income", income.doubleValue(),
+            "expense", expense.doubleValue()
+        );
     }
 }
