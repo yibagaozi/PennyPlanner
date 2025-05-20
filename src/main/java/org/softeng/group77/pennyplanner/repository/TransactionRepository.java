@@ -21,6 +21,6 @@ public interface TransactionRepository {
         String userId,
         LocalDateTime start,
         LocalDateTime end
-);
+) throws IOException;
 
 }
