@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane prefHeight="500.0" prefWidth="800.0" styleClass="border-pane-no-gap" stylesheets="@/css/style-User.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.softeng.group77.pennyplanner.controller.UserController">
+    <left>
+        <VBox prefWidth="200.0" styleClass="nav-bar" BorderPane.alignment="TOP_LEFT">
+            <Label styleClass="nav-title" text="PennyPlanner" />
+            <Button onAction="#turntoHome" styleClass="nav-button" text="Home" />
+            <Button onAction="#turntoReport" styleClass="nav-button" text="Report &amp; Forecast" />
+            <Button style="-fx-font-weight: bold;" styleClass="nav-button" text="Track Spend!" />
+            <Button onAction="#turntoHistory" styleClass="nav-button" text="History" />
+            <Button onAction="#turntoManagement" styleClass="nav-button" text="Management" />
+            <Button onAction="#turntoUser" styleClass="nav-button" text="User Profile" />
+        </VBox>
+    </left>
+    <right>
+        <SplitPane orientation="VERTICAL" styleClass="right-split">
+            <SplitPane fx:id="splitPane" dividerPositions="0.1" layoutX="179.0" layoutY="1.0" orientation="VERTICAL" prefHeight="398.0" prefWidth="418.0">
+                <items>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+                        <children>
+                            <Button layoutX="450.0" layoutY="7.0" mnemonicParsing="false" onAction="#turntoLogin" text="Log out" />
+                            <Label layoutX="14.0" layoutY="11.0" style="-fx-font-weight: bold;" text="User Profile">
+                                <font>
+                                    <Font size="17.0" />
+                                </font>
+                            </Label>
+                        </children>
+                    </AnchorPane>
+                    <AnchorPane>
+                        <children>
+                              <Label layoutX="198.0" layoutY="26.0" style="-fx-font-size: 18px; -fx-font-weight: bold;" text="Update User Profile" />
+                            <VBox alignment="CENTER" layoutX="18.0" layoutY="60.0" prefHeight="357.0" prefWidth="557.0" spacing="15" AnchorPane.leftAnchor="18.0" AnchorPane.rightAnchor="22.0" AnchorPane.topAnchor="60.0">
+                                <children>
+                                    <!-- 头像和表单 -->
+                                    <HBox alignment="CENTER" prefHeight="276.0" prefWidth="557.0" spacing="45.0">
+                                        <!-- 头像区域 -->
+                                        <VBox alignment="CENTER" spacing="10">
+                                            <ImageView fx:id="avatarImageView" fitHeight="100.0" fitWidth="100.0" preserveRatio="true" style="-fx-border-color: #ccc; -fx-border-width: 2; -fx-border-radius: 5;" />
+                                            <Button fx:id="uploadAvatarButton" text="Upload Avatar" onAction="#handleUploadAvatar" />
+                                        </VBox>
+                                        <!-- 表单 -->
+                                        <GridPane hgap="10" vgap="15">
+                                            <columnConstraints>
+                                                <ColumnConstraints halignment="RIGHT" />
+                                                <ColumnConstraints hgrow="ALWAYS" />
+                                            </columnConstraints>
+                                            <children>
+                                                <!-- 用户名 -->
+                                                <Label text="Username:" GridPane.rowIndex="0" />
+                                                <TextField fx:id="usernameField" promptText="Enter username" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                                                <!-- 邮箱 -->
+                                                <Label text="Email:" GridPane.rowIndex="1" />
+                                                <TextField fx:id="emailField" promptText="Enter email" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                                                <!-- 电话 -->
+                                                <Label text="Phone:" GridPane.rowIndex="2" />
+                                                <TextField fx:id="phoneField" promptText="Enter phone number" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                                                <!-- 旧密码 -->
+                                                <Label text="Old Password:" GridPane.rowIndex="3" />
+                                                <PasswordField fx:id="oldPasswordField" promptText="Enter old password" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                                                <!-- 新密码 -->
+                                                <Label text="New Password:" GridPane.rowIndex="4" />
+                                                <PasswordField fx:id="newPasswordField" promptText="Enter new password" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                              <Button fx:id="cancelButton" prefHeight="25.0" prefWidth="57.0" text="Cancel" GridPane.columnIndex="1" GridPane.rowIndex="6" onAction="#handleCancel" />
+                                              <Button fx:id="saveButton" prefHeight="25.0" prefWidth="57.0" text="Save" GridPane.rowIndex="6" onAction="#handleSave" />
+                                            </children>
+                                 <rowConstraints>
+                                    <RowConstraints />
+                                    <RowConstraints />
+                                    <RowConstraints />
+                                    <RowConstraints />
+                                    <RowConstraints />
+                                    <RowConstraints />
+                                    <RowConstraints />
+                                 </rowConstraints>
+                                        </GridPane>
+                                    </HBox>
+                                </children>
+                            </VBox>
+                        </children>
+                    </AnchorPane>
+                </items>
+            </SplitPane>
+        </SplitPane>
+    </right>
+</BorderPane>

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,6 +49,17 @@ public class JsonTransactionRepositoryImpl extends JsonDataManager<Transaction> 
         transaction.getUserId().equals(userId) &&
         transaction.getDescription() != null &&
         transaction.getDescription().toLowerCase().contains(description.toLowerCase())
+        );
+    }
+
+    @Override
+    public List<Transaction> findByUserIdAndTransactionDateTimeBetween(String userId, LocalDateTime start, LocalDateTime end) throws IOException {
+        return findAll(transaction ->
+            transaction.getUserId() != null &&
+            transaction.getUserId().equals(userId) &&
+            transaction.getTransactionDateTime() != null &&
+            !transaction.getTransactionDateTime().isBefore(start) &&
+            !transaction.getTransactionDateTime().isAfter(end)
         );
     }
 
