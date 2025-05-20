@@ -148,9 +148,11 @@ public class MainApp extends Application {
 
     public static void showuser() throws IOException {
         FXMLLoader loader = new FXMLLoader(
-                MainApp.class.getResource("/fxml/User_view.fxml")
+                MainApp.class.getResource("/fxml/User.fxml")
         );
+        loader.setControllerFactory(applicationContext::getBean);
         Parent root = loader.load();
+
 
         Scene scene = new Scene(root,800,500);
         scene.getStylesheets().add(MainApp.class.getResource("/css/style-User.css").toExternalForm());
