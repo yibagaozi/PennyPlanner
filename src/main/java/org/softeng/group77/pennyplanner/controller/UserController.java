@@ -93,8 +93,12 @@ public class UserController {
                 }
 
                 File avatarFile = new File(currentAvatarPath);
-                selectedFile.renameTo(avatarFile);
+                boolean isRenamed = selectedFile.renameTo(avatarFile);
 
+                if (!isRenamed) {
+                    showAlert(Alert.AlertType.ERROR, "Error", "Failed to save the avatar. Please try again.");
+                    return;
+                }
                 // Update avatar display - it's good to clear the cache for the image if using URLs
                 // To ensure JavaFX reloads the image from the file system and not its cache:
                 Image newImage = new Image(avatarFile.toURI().toString(), false); // false means don't use cache
