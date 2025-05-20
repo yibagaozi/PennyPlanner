@@ -106,9 +106,10 @@ public class BudgetServiceImpl implements BudgetService {
     @Override
     public Budget getCurrentBudget() throws BudgetNotFoundException, BudgetProcessingException {
         Budget latestBudget = null;
+        LocalDate currentDate = LocalDate.now();
 
         try {
-            LocalDate currentDate = LocalDate.now();
+
             System.out.println("Current Date: " + currentDate);  // 打印当前日期
 
             Map<LocalDate, Budget> allBudgets = budgetRepository.findAll();
