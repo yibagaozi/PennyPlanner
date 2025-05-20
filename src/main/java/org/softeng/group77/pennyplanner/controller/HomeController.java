@@ -154,8 +154,11 @@ public class HomeController {
             }
         } catch (NumberFormatException e) {
             System.out.println("Invalid budget amount: " + e.getMessage());
+        } catch (IOException e) {
+            System.out.println("An I/O error occurred: " + e.getMessage());
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            System.out.println("An unexpected error occurred: " + e.getMessage());
+            throw new RuntimeException("Error while saving budget", e);
         }
     }
 
