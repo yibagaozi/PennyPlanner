@@ -26,7 +26,7 @@ public class BudgetServiceImpl implements BudgetService {
     }
 
     @Override
-    public Budget saveBudget(double amount, LocalDate date) throws Exception {
+    public Budget saveBudget(double amount, LocalDate date) {
         try {
             // 验证用户登录状态
             if (authService.getCurrentUser() == null) {
