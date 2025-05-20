@@ -8,6 +8,7 @@ import lombok.Getter;
 import org.softeng.group77.pennyplanner.model.User;
 
 import java.time.LocalDateTime;
+import lombok.Data;
 
 public class UserInfo {
 
@@ -20,9 +21,15 @@ public class UserInfo {
     private final ObjectProperty<LocalDateTime> lastLoginAt = new SimpleObjectProperty<>();
     private final ObjectProperty<LocalDateTime> createdAt = new SimpleObjectProperty<>();
 
+    public UserInfo() {
+        id = "";
+    }
+
+
     public UserInfo(String id) {
         this.id = id;
     }
+
 
     public UserInfo(User user) {
         this.id = user.getId();

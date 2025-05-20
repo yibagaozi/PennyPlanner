@@ -1,24 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.DatePicker?>
-<BorderPane styleClass="border-pane-no-gap" stylesheets="@/css/style-Management.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.softeng.group77.pennyplanner.controller.ManagementController">
+<BorderPane styleClass="border-pane-no-gap" stylesheets="@/css/style-Management.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.softeng.group77.pennyplanner.controller.ManagementController">
     <left>
         <VBox styleClass="nav-bar" BorderPane.alignment="TOP_LEFT">
             <Label styleClass="nav-title" text="PennyPlanner" />
             <Button onAction="#turntoHome" styleClass="nav-button" text="Home" />
             <Button onAction="#turntoReport" styleClass="nav-button" text="Report &amp; Forecast" />
-            <Button styleClass="nav-button" text="Settings" />
+            <Button style="-fx-font-weight: bold;" styleClass="nav-button" text="Track Spend!" />
             <Button onAction="#turntoHistory" styleClass="nav-button" text="History" />
             <Button onAction="#turntoManagement" styleClass="nav-button" text="Management" />
             <Button onAction="#turntoUser" styleClass="nav-button" text="User Profile" />
@@ -44,7 +36,7 @@
                            <Font size="16.0" />
                         </font>
                      </Label>
-                     <DatePicker fx:id="dateField" layoutX="48.0" layoutY="86.0" promptText="Choose Date"/>
+                     <DatePicker fx:id="dateField" layoutX="48.0" layoutY="86.0" promptText="Choose Date" />
                      <Label layoutX="47.0" layoutY="57.0" prefHeight="29.0" prefWidth="67.0" text="Date">
                         <font>
                            <Font size="14.0" />
@@ -124,10 +116,10 @@
 <!--                           <Button mnemonicParsing="false" prefHeight="23.0" prefWidth="60.0" text="cash" />-->
 <!--                        </children>-->
 <!--                     </HBox>-->
-                     <Button layoutX="493.0" layoutY="266.0" mnemonicParsing="false" text="Cancel" onAction="#handleCancel" />
-                     <Button layoutX="386.0" layoutY="266.0" mnemonicParsing="false" prefHeight="23.0" prefWidth="60.0" text="Save" onAction="#handleSave"/>
-                     <Button layoutX="273.0" layoutY="12.0" mnemonicParsing="false" text="Expense" onAction="#handleExpense"/>
-                     <Button layoutX="379.0" layoutY="12.0" mnemonicParsing="false" text="Income" onAction="#handleIncome"/>
+                     <Button layoutX="493.0" layoutY="266.0" mnemonicParsing="false" onAction="#handleCancel" text="Cancel" />
+                     <Button layoutX="386.0" layoutY="266.0" mnemonicParsing="false" onAction="#handleSave" prefHeight="23.0" prefWidth="60.0" text="Save" />
+                     <Button layoutX="273.0" layoutY="12.0" mnemonicParsing="false" onAction="#handleExpense" text="Expense" />
+                     <Button layoutX="379.0" layoutY="12.0" mnemonicParsing="false" onAction="#handleIncome" text="Income" />
          <!--                                 <Label layoutX="60.0" prefHeight="50.0" prefWidth="176.0" text="import from csv file">-->
          <!--                                    <font>-->
          <!--                                       <Font size="16.0" />-->
@@ -140,6 +132,7 @@
                         </font>
                      </Label>
                        <Button fx:id="uploadButton" layoutX="270.0" layoutY="348.0" onAction="#handleFileUpload" text="Upload" />
+                       <Button fx:id="helpButton" layoutX="269.0" layoutY="387.0" onAction="#showImportHelp" prefHeight="25.0" prefWidth="59.0" text="Help" />
                   </children>
                </AnchorPane>
 
@@ -147,7 +140,6 @@
                 </items>
             </SplitPane>
         </SplitPane>
-
 
     </right>
 </BorderPane>

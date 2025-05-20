@@ -135,32 +135,87 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public UserInfo updateUserInfo(String userId, UserInfo updatedInfo) {
-        try {
-            // 1. 查找用户
-            Optional<User> userOpt = userRepository.findById(userId);
-            if (userOpt.isEmpty()) {
-                log.warn("User with id {} not found.", userId);
-                return null;
-            }
-            User user = userOpt.get();
-    
-            // 2. 用 UserMapper 更新用户信息
-            UserMapper.updateUserFromUserInfo(user, updatedInfo);
-    
-            // 3. 保存用户
-            userRepository.save(user);
-    
-            // 4. 返回最新的 UserInfo
-            UserInfo newUserInfo = UserMapper.toUserInfo(user);
-    
-            // 5. 更新缓存
-            updateUserCache(newUserInfo);
-    
-            return newUserInfo;
-        } catch (Exception e) {
-            log.error("Error while updating user info: ", e);
+    public UserInfo updateUserInfo(String userId, UserInfo updatedInfo) throws RegistrationException, IOException {
+        if (StringUtils.isBlank(userId) || updatedInfo == null) {
+            log.warn("Attempted to update user info with blank userId or null updatedInfo.");
             return null;
+        }
+        // Assuming userRepository.findById() can take a String ID as per changePassword method.
+        // If User entity's ID is Long, you'd need: Optional<User> userOpt = userRepository.findById(Long.valueOf(userId));
+        Optional<User> userOpt = userRepository.findById(userId);
+
+        if (userOpt.isEmpty()) {
+            log.warn("User with ID {} not found for update.", userId);
+            return null; // Or throw a specific UserNotFoundException
+        }
+
+        User userToUpdate = userOpt.get();
+        log.info("Updating user info for user ID: {}", userId);
+
+        boolean modified = false;
+
+        // Update username
+        if (StringUtils.isNotBlank(updatedInfo.getUsername()) && !userToUpdate.getUsername().equals(updatedInfo.getUsername().trim())) {
+            // If username needs to be unique and can be changed, add uniqueness check:
+            // Optional<User> existingUsername = userRepository.findByUsername(updatedInfo.getUsername().trim());
+            // if (existingUsername.isPresent() && !existingUsername.get().getId().equals(userToUpdate.getId())) {
+            //     throw new RegistrationException("Username is already taken by another user.");
+            // }
+            userToUpdate.setUsername(updatedInfo.getUsername().trim());
+            modified = true;
+            log.debug("Updating username for user ID: {}", userId);
+        }
+
+        // Update email
+        if (StringUtils.isNotBlank(updatedInfo.getEmail()) && !userToUpdate.getEmail().equals(updatedInfo.getEmail().trim())) {
+            String newEmailTrim = updatedInfo.getEmail().trim();
+            if (!EMAIL_PATTERN.matcher(newEmailTrim).matches()) {
+                throw new RegistrationException("Invalid new email format.");
+            }
+            Optional<User> existingEmailUser = userRepository.findByEmail(newEmailTrim);
+            if (existingEmailUser.isPresent() && !existingEmailUser.get().getId().equals(userToUpdate.getId())) {
+                // The new email is already registered to a DIFFERENT user.
+                throw new RegistrationException("Email is already registered by another user.");
+            }
+            userToUpdate.setEmail(newEmailTrim);
+            modified = true;
+            log.debug("Updating email for user ID: {}", userId);
+        }
+
+        // Update phone
+        if (StringUtils.isNotBlank(updatedInfo.getPhone()) && !userToUpdate.getPhone().equals(updatedInfo.getPhone().trim())) {
+            String newPhoneTrim = updatedInfo.getPhone().trim();
+            if (!CHINA_PHONE_PATTERN.matcher(newPhoneTrim).matches() && !UK_PHONE_PATTERN.matcher(newPhoneTrim).matches() && !INTERNATIONAL_PHONE_PATTERN.matcher(newPhoneTrim).matches()) {
+                throw new RegistrationException("Invalid new phone number format.");
+            }
+            userToUpdate.setPhone(newPhoneTrim);
+            modified = true;
+            log.debug("Updating phone for user ID: {}", userId);
+        }
+
+        if (modified) {
+            try {
+                // userToUpdate.setUpdatedAt(LocalDateTime.now()); // If you have an updatedAt field
+                User savedUser = userRepository.save(userToUpdate);
+                UserInfo newUserInfo = UserMapper.toUserInfo(savedUser);
+
+                // Important: Update cache only if the updated user is the currently cached user
+                if (cachedUser != null && cachedUser.getId().equals(savedUser.getId().toString())) {
+                    updateUserCache(newUserInfo);
+                }
+                log.info("User info updated successfully for user ID: {}", userId);
+                return newUserInfo;
+            } catch (Exception e) {
+                log.error("Error while saving updated user info for ID {}: ", userId, e);
+                // Depending on the exception, you might want to throw a more specific one.
+                // For now, rethrowing as a generic runtime exception or returning null.
+                // throw new RuntimeException("Failed to save updated user information.", e);
+                return null; // Or throw custom exception
+            }
+        } else {
+            log.info("No changes detected for user ID: {}. No update performed.", userId);
+            return UserMapper.toUserInfo(userToUpdate); // Return current info if no changes
+
         }
     }
 
