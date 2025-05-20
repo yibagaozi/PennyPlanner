@@ -130,7 +130,6 @@ public class BudgetServiceImpl implements BudgetService {
         }
 
         if (latestBudget == null) {
-            LocalDate currentDate = LocalDate.now();
             throw new BudgetNotFoundException("No budget found for the current month and year: "
                 + currentDate.getMonth() + " " + currentDate.getYear());
         }
