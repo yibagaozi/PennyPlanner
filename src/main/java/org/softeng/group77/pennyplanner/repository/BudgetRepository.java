@@ -5,6 +5,7 @@ import org.softeng.group77.pennyplanner.model.Budget;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface BudgetRepository {
@@ -19,7 +20,7 @@ public interface BudgetRepository {
     Optional<Budget> findByDate(LocalDate date) throws IOException;
 
     // 获取所有预算
-    List<Budget> findAll() throws IOException;
+    Map<LocalDate, Budget> findAll() throws IOException;
 
     // 更新预算
     Optional<Budget> update(LocalDate date, Budget updatedBudget) throws IOException;
