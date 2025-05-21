@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>org.softeng.group77</groupId>
 	<artifactId>PennyPlanner</artifactId>
-	<version>1.2.0</version>
+	<version>1.2.1</version>
 	<name>PennyPlanner</name>
 	<description>PennyPlanner</description>
 	<url/>
