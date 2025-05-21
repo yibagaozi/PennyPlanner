@@ -7,6 +7,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import lombok.extern.slf4j.Slf4j;
 import org.softeng.group77.pennyplanner.dto.UserInfo;
 import org.softeng.group77.pennyplanner.service.AuthService;
 import org.softeng.group77.pennyplanner.util.JsonFileUtil;
@@ -19,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 
 @Controller
+@Slf4j
 public class UserController {
     @FXML
     SplitPane splitPane;
@@ -134,7 +136,7 @@ public class UserController {
             }
 
             // 同步数据到 user.json
-            JsonFileUtil.updateJson("data/user.json", UserInfo.class, userInfo -> currentUser);
+            //JsonFileUtil.updateJson("data/user.json", UserInfo.class, userInfo -> currentUser);
 
             // 提示保存成功
             showAlert(Alert.AlertType.INFORMATION, "Success", "User information updated successfully.");
@@ -142,6 +144,7 @@ public class UserController {
             showAlert(Alert.AlertType.ERROR, "Error", "Password update failed: " + e.getMessage());
         }
         catch (IOException e) {
+            log.error("Error saving user information: ", e);
             showAlert(Alert.AlertType.ERROR, "Error", "Failed to save user information.");
             e.printStackTrace();
         }
