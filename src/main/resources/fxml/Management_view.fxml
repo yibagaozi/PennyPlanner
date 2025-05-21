@@ -116,8 +116,8 @@
 <!--                           <Button mnemonicParsing="false" prefHeight="23.0" prefWidth="60.0" text="cash" />-->
 <!--                        </children>-->
 <!--                     </HBox>-->
-                     <Button layoutX="493.0" layoutY="266.0" mnemonicParsing="false" onAction="#handleCancel" text="Cancel" />
-                     <Button layoutX="386.0" layoutY="266.0" mnemonicParsing="false" onAction="#handleSave" prefHeight="23.0" prefWidth="60.0" text="Save" />
+                     <Button layoutX="426.0" layoutY="238.0" mnemonicParsing="false" onAction="#handleCancel" text="Cancel" />
+                     <Button layoutX="328.0" layoutY="238.0" mnemonicParsing="false" onAction="#handleSave" prefHeight="23.0" prefWidth="60.0" text="Save" />
                      <Button layoutX="273.0" layoutY="12.0" mnemonicParsing="false" onAction="#handleExpense" text="Expense" />
                      <Button layoutX="379.0" layoutY="12.0" mnemonicParsing="false" onAction="#handleIncome" text="Income" />
          <!--                                 <Label layoutX="60.0" prefHeight="50.0" prefWidth="176.0" text="import from csv file">-->
@@ -126,7 +126,7 @@
          <!--                                    </font>-->
          <!--                                 </Label>-->
                       <VBox layoutX="379.0" layoutY="360.0" />
-                       <Label layoutX="230.0" layoutY="316.0" text="OR import as csv file">
+                       <Label layoutX="230.0" layoutY="316.0" style="-fx-font-weight: bold;" text="OR import as csv file">
                         <font>
                            <Font size="14.0" />
                         </font>

@@ -6,10 +6,7 @@ import javafx.fxml.FXML;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import lombok.extern.slf4j.Slf4j;
 import org.softeng.group77.pennyplanner.adapter.TransactionAdapter;
 import org.softeng.group77.pennyplanner.exception.BudgetNotFoundException;
@@ -63,6 +60,9 @@ public class HomeController {
     @FXML
     private Button saveBudgetButton; // 保存预算按钮
 
+    @FXML // 新增 ProgressBar 字段
+    private ProgressBar budgetProgressBar;
+
     @Autowired
     private ChartService chartService;
     @Autowired
@@ -73,6 +73,8 @@ public class HomeController {
     private static TransactionAdapter transactionAdapter;
     private static AuthService authService;
 
+    // 用于存储当月财务摘要，避免重复计算
+    private MonthlyFinancialSummary currentMonthlySummary;
 
     public static void setTransactionAdapter(TransactionAdapter adapter) {
         transactionAdapter = adapter;
@@ -129,6 +131,9 @@ public class HomeController {
         // 6. 设置预算保存按钮事件
         setupSaveBudgetButton();
 
+        // 7. 更新预算进度条
+        updateBudgetProgressBar();
+
 
         // 禁用分割线的拖动
         splitPane.getDividers().forEach(divider -> divider.positionProperty().addListener((observable, oldValue, newValue) -> {
@@ -176,7 +181,7 @@ public class HomeController {
             }
         } catch (BudgetNotFoundException e) {
         log.info("No budget found for current month. Displaying default values.");
-        budgetField.setText("No budget set");
+        //budgetField.setText("No budget set");
     }
     }
 
@@ -233,6 +238,8 @@ public class HomeController {
 
         return new MonthlyFinancialSummary(totalIncome, totalExpense, totalBalance);
     }
+
+
 
     @FXML
     private void turntoHome() throws IOException {
@@ -399,7 +406,7 @@ public class HomeController {
         );
     }
 
-    // 月度财务摘要内部类
+    // 月度财务summary内部类
     private static class MonthlyFinancialSummary {
         private final double totalIncome;
         private final double totalExpense;
@@ -423,4 +430,65 @@ public class HomeController {
             return totalBalance;
         }
     }
+
+    // 更新预算进度条
+    private void updateBudgetProgressBar() {
+        if (budgetProgressBar == null) {
+            log.warn("budgetProgressBar is null. Cannot update progress.");
+            return;
+        }
+
+        double budgetAmount = 0.0;
+        boolean budgetSet = false;
+
+        try {
+            if (budgetService != null) {
+                Budget currentBudget = budgetService.getCurrentBudget(); // 从服务获取最新预算
+                if (currentBudget != null) {
+                    budgetAmount = currentBudget.getAmount();
+                    budgetSet = true;
+                }
+            }
+        } catch (BudgetNotFoundException e) {
+            // 这是正常情况，表示用户未设置预算
+            budgetSet = false;
+        } catch (Exception e) {
+            log.error("Error fetching budget for progress bar: {}", e.getMessage(), e);
+            budgetSet = false; // 如果获取预算出错，也视为未设置
+        }
+
+        // 如果未设置预算或预算金额无效 (小于等于0)
+        if (!budgetSet || budgetAmount <= 0) {
+            budgetProgressBar.setProgress(0.0);
+            return;
+        }
+
+        // 获取当月支出
+        double currentMonthExpenses = 0.0;
+        MonthlyFinancialSummary summary_1 = calculateMonthlyFinancials();
+        if (summary_1 != null) {
+            currentMonthExpenses = Math.abs(summary_1.getTotalExpense());
+        } else {
+            // 如果 currentMonthlySummary 尚未计算（理论上不应发生，因为 updateCardInfo 应该先调用）
+            // 或者计算失败，则支出视为0，进度条将显示全部预算剩余。
+            // 更健壮的做法是确保 currentMonthlySummary 总是有值，或者在这里重新计算（但可能效率低）。
+            log.warn("summary_1 is null when updating progress bar. Expenses assumed to be 0 for progress calculation.");
+        }
+
+        double remainingBudget = budgetAmount - currentMonthExpenses;
+        double progress;
+
+        if (remainingBudget > 0) {
+            progress = remainingBudget / budgetAmount;
+        } else {
+            // 支出已达到或超过预算
+            progress = 0.0;
+        }
+
+        // 确保进度值在0到1之间
+        progress = Math.max(0.0, Math.min(1.0, progress));
+
+        budgetProgressBar.setProgress(progress);
+    }
+
 }

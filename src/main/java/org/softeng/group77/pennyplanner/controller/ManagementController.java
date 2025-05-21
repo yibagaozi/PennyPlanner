@@ -66,20 +66,6 @@ public class ManagementController {
     // 在initialize方法中初始化分类和支付方式
     public void initialize() {
         Locale.setDefault(Locale.ENGLISH);
-//            // 初始化分类选项
-//            categoryComboBox.setItems(FXCollections.observableArrayList(
-//                    null, "Food 🍔", "Salary 💰", "Living Bill", "Entertainment",
-//                    "Transportation", "Education", "Clothes", "Others"
-//            ));
-//
-//            // 初始化支付方式
-//            methodComboBox.setItems(FXCollections.observableArrayList(
-//                    null, "Credit Card", "Bank Transfer", "Auto-Payment", "Cash", "E-Payment"
-//            ));
-//
-//            // 设置默认选择
-//            categoryComboBox.getSelectionModel().selectFirst();
-//            methodComboBox.getSelectionModel().selectFirst();
 
         // 配置DatePicker
         dateField.setPromptText("Select Date");
@@ -268,14 +254,6 @@ public class ManagementController {
     @FXML
     private void handleSave() {
         try {
-            //dateField.setPromptText("YYYY-MM-DD");
-            // 数据校验
-//                if (dateField.getText().isEmpty() ||
-//                        !dateField.getText().matches("\\d{4}-\\d{2}-\\d{2}")) {
-//                    showAlert("日期格式错误，请使用YYYY-MM-DD格式");
-//                    return;
-//                }
-
             // 检查日期是否已选择
             if (dateField.getValue() == null) {
                 showAlert("请选择日期");
@@ -289,12 +267,10 @@ public class ManagementController {
             }
 
             // 创建新交易记录
-            //String newId = String.valueOf(SharedDataModel.getTransactionData().size() + 1);
             String newId = UUID.randomUUID().toString(); // 使用UUID生成唯一ID
             double finalAmount = isExpense ? -Math.abs(amount) : Math.abs(amount);
 
             tableModel newTransaction = new tableModel(
-                    //newId,
                     java.util.UUID.randomUUID().toString(), // 使用UUID作为后端ID
                     //dateField.getText(),
                     dateField.getValue().format(DATE_FORMATTER), // 从DatePicker获取格式化日期
@@ -363,7 +339,7 @@ public class ManagementController {
 
     private void showSuccessAlert(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("操作成功");
+        alert.setTitle("Success");
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
@@ -383,7 +359,7 @@ public class ManagementController {
     @FXML
     private void handleFileUpload() {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("选择CSV交易记录文件");
+        fileChooser.setTitle("Choose Transaction Detail CSV File");
 
         // 设置文件过滤器，只接受CSV文件
         fileChooser.getExtensionFilters().addAll(

@@ -330,7 +330,7 @@ public class HistoryController {
                 controller.setTransaction(transactionCopy);
 
                 Stage dialogStage = new Stage();
-                dialogStage.setTitle("编辑交易记录");
+                dialogStage.setTitle("Edit Transaction Entry");
                 dialogStage.initModality(Modality.WINDOW_MODAL);
                 dialogStage.initOwner(transactionTable.getScene().getWindow());
                 dialogStage.setScene(new Scene(root));
@@ -350,7 +350,7 @@ public class HistoryController {
 
                         boolean success = SharedDataModel.updateTransaction(selectedTransaction);
                         if (success) {
-                            showAlert("成功", "交易记录已成功更新", Alert.AlertType.INFORMATION);
+                            showAlert("Success", "Updated Successfully", Alert.AlertType.INFORMATION);
                             refreshData(); // 刷新表格数据
                         } else {
                             showAlert("更新失败", "无法更新交易记录。可能是因为您没有权限修改该记录或者用户会话已过期。", Alert.AlertType.ERROR);
@@ -380,9 +380,9 @@ public class HistoryController {
         if (selectedTransaction != null) {
             // 确认删除
             Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
-            confirmAlert.setTitle("确认删除");
-            confirmAlert.setHeaderText("您确定要删除此交易记录吗？");
-            confirmAlert.setContentText("描述: " + selectedTransaction.getDescription() +
+            confirmAlert.setTitle("Delete");
+            confirmAlert.setHeaderText("Delete this entry?");
+            confirmAlert.setContentText("Description " + selectedTransaction.getDescription() +
                     "\n金额: " + String.format("$%.2f", selectedTransaction.getAmount()) +
                     "\n日期: " + selectedTransaction.getDate());
 
@@ -391,10 +391,10 @@ public class HistoryController {
                 // 用户确认删除
                 boolean success = SharedDataModel.deleteTransaction(selectedTransaction.getId());
                 if (success) {
-                    showAlert("成功", "交易记录已成功删除", Alert.AlertType.INFORMATION);
+                    showAlert("Success", "Deleted Successfully", Alert.AlertType.INFORMATION);
                     refreshData(); // 刷新表格数据
                 } else {
-                    showAlert("错误", "删除交易记录失败", Alert.AlertType.ERROR);
+                    showAlert("Error", "Failed to delete", Alert.AlertType.ERROR);
                 }
             }
         }
