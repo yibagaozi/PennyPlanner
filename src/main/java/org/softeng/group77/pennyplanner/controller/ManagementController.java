@@ -417,8 +417,8 @@ public class ManagementController {
 
                     // 显示导入结果
                     StringBuilder message = new StringBuilder();
-                    message.append("导入完成！\n");
-                    message.append("成功导入记录: ").append(result.getTotalSuccessful()).append("\n");
+                    message.append("Import Successfully\n");
+                    message.append("Loaded RecordsL ").append(result.getTotalSuccessful()).append("\n");
 
                     if (result.hasErrors()) {
                         message.append("\n出现以下错误:\n");
@@ -431,7 +431,7 @@ public class ManagementController {
                         if (errors.size() > displayLimit) {
                             message.append("... 以及其他 ").append(errors.size() - displayLimit).append(" 个错误\n");
                         }
-                        message.append("\n详细导入日志已保存至: uploads/import_log_")
+                        message.append("\nDetailed import log saved to: uploads/import_log_")
                                 .append(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")))
                                 .append(".txt");
 
@@ -443,7 +443,7 @@ public class ManagementController {
                     if (result.getTotalSuccessful() > 0) {
                         // 通知应用刷新数据
                         MainApp.refreshData();
-                        message.append("\n\n数据已更新！请前往历史记录页面查看。");
+                        message.append("\n\nData has been updated! You can check in History page.");
                     }
 
                     showAlert(result.hasErrors() ? Alert.AlertType.WARNING : Alert.AlertType.INFORMATION,
@@ -505,14 +505,14 @@ public class ManagementController {
     @FXML
     private void showImportHelp() {
         Alert helpDialog = new Alert(Alert.AlertType.INFORMATION);
-        helpDialog.setTitle("CSV导入帮助");
-        helpDialog.setHeaderText("如何准备交易记录CSV文件");
+        helpDialog.setTitle("CSV Import Help");
+        helpDialog.setHeaderText("How to prepare Transaction Records CSV File");
 
-        String helpContent = "CSV文件应包含以下列（表头必须包含）：\n\n" +
-                "1. date - 日期格式为YYYY-MM-DD (例如: 2024-05-15)\n" +
-                "2. description - 交易描述\n" +
-                "3. amount - 金额，支出为负数，收入为正数\n" +
-                "4. category - 必须是以下类别之一：\n" +
+        String helpContent = "CSV file should contain following columns\n\n" +
+                "1. date - YYYY-MM-DD (e.g. 2024-05-15)\n" +
+                "2. description - Description of each entry\n" +
+                "3. amount - Expense is negative，income is positive\n" +
+                "4. category - Must be one of the followings：\n" +
                 "   • Food\n" +
                 "   • Salary\n" +
                 "   • Living Bill\n" +
@@ -521,17 +521,17 @@ public class ManagementController {
                 "   • Education\n" +
                 "   • Clothes\n" +
                 "   • Others\n" +
-                "5. method - 必须是以下支付方式之一：\n" +
+                "5. method - Must be one of the followings：\n" +
                 "   • Credit Card\n" +
                 "   • Bank Transfer\n" +
                 "   • Auto-Payment\n" +
                 "   • Cash\n" +
                 "   • E-Payment\n\n" +
-                "CSV例子：\n" +
+                "Sample CSV：\n" +
                 "date,description,amount,category,method\n" +
                 "2024-05-01,Grocery Shopping,-50.75,Food,Cash\n" +
                 "2024-05-03,Salary Deposit,3000.00,Salary,Bank Transfer\n\n" +
-                "您可以下载示例CSV文件作为参考。";
+                "You can download sample CSV file for reference。";
 
         TextArea textArea = new TextArea(helpContent);
         textArea.setEditable(false);
@@ -541,10 +541,10 @@ public class ManagementController {
 
         helpDialog.getDialogPane().setContent(textArea);
 
-        Button downloadButton = new Button("下载示例CSV");
+        Button downloadButton = new Button("Download Sample CSV");
         downloadButton.setOnAction(e -> downloadExampleCsv());
 
-        ButtonType closeButton = new ButtonType("关闭", ButtonBar.ButtonData.OK_DONE);
+        ButtonType closeButton = new ButtonType("Close", ButtonBar.ButtonData.OK_DONE);
         helpDialog.getButtonTypes().setAll(closeButton);
 
         // 添加自定义按钮到对话框
@@ -560,15 +560,15 @@ public class ManagementController {
         try {
             // 创建一个示例CSV内容
             String exampleCsvContent = "date,description,amount,category,method\n" +
-                    "2024-05-01,Grocery Shopping,-50.75,Food,Cash\n" +
-                    "2024-05-03,Salary Deposit,3000.00,Salary,Bank Transfer\n" +
-                    "2024-05-05,Electricity Bill,-120.35,Living Bill,Auto-Payment\n" +
-                    "2024-05-07,Movie Night,-25.50,Entertainment,Credit Card\n" +
-                    "2024-05-10,Bus Pass,-45.00,Transportation,E-Payment\n";
+                    "2025-06-01,Grocery Shopping,-50.75,Food,Cash\n" +
+                    "2025-06-03,Salary Deposit,3000.00,Salary,Bank Transfer\n" +
+                    "2025-06-05,Electricity Bill,-120.35,Living Bill,Auto-Payment\n" +
+                    "2025-06-07,Movie Night,-25.50,Entertainment,Credit Card\n" +
+                    "2025-06-10,Bus Pass,-45.00,Transportation,E-Payment\n";
 
             // 让用户选择保存位置
             FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("保存示例CSV文件");
+            fileChooser.setTitle("Download Sample CSV");
             fileChooser.setInitialFileName("example_transactions.csv");
             fileChooser.getExtensionFilters().add(
                     new FileChooser.ExtensionFilter("CSV文件", "*.csv"));
@@ -578,7 +578,7 @@ public class ManagementController {
                 try (FileWriter writer = new FileWriter(file)) {
                     writer.write(exampleCsvContent);
                 }
-                showAlert(Alert.AlertType.INFORMATION, "下载成功", "示例CSV文件已保存至:\n" + file.getAbsolutePath());
+                showAlert(Alert.AlertType.INFORMATION, "Downloaded Successfully", "Sample CSV format has been saved:\n" + file.getAbsolutePath());
             }
         } catch (IOException e) {
             showAlert(Alert.AlertType.ERROR, "下载失败", "无法保存示例CSV文件: " + e.getMessage());

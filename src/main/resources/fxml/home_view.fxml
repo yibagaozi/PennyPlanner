@@ -22,7 +22,7 @@
                 <items>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                         <children>
-                            <Button layoutX="450.0" layoutY="7.0" mnemonicParsing="false" onAction="#turntoLogin" text="Log out" />
+                            <Button layoutX="450.0" layoutY="7.0" mnemonicParsing="false" onAction="#turntoLogin" styleClass="logout-button" text="Log out" />
                             <Label layoutX="14.0" layoutY="11.0" style="-fx-font-weight: bold;" text="Home">
                         <font>
                            <Font size="17.0" />
@@ -32,15 +32,10 @@
 
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="353.0" prefWidth="505.0">
                         <children>
-                            <Label fx:id="usernameLabel" layoutX="12.0" prefHeight="37.0" prefWidth="114.0" text="Hello username">
+                            <Label fx:id="usernameLabel" layoutX="14.0" layoutY="11.0" prefHeight="37.0" prefWidth="164.0" text="Hello username">
                         <font>
                            <Font size="14.0" />
                         </font></Label>
-                            <Label layoutX="12.0" layoutY="30.0" prefHeight="15.0" prefWidth="212.0" text="Good times are like running in the match">
-                                <font>
-                                    <Font size="10.0" />
-                                </font>
-                            </Label>
 
                             <!-- 卡片容器HBox -->
                             <HBox layoutX="56.0" layoutY="56.0" prefHeight="100.0" prefWidth="481.0" spacing="20.0">
@@ -81,17 +76,12 @@
                                 </VBox>
                             </HBox>
                      <StackPane fx:id="expenseTrendChartContainer" layoutX="24.0" layoutY="198.0" prefHeight="210.0" prefWidth="222.0" />
-               <!--                       <xAxis>-->
-               <!--                         <CategoryAxis side="BOTTOM" />-->
-               <!--                       </xAxis>-->
-               <!--                       <yAxis>-->
-               <!--                         <NumberAxis side="LEFT" />-->
-               <!--                       </yAxis>-->
-               <!--                     </StackPane>-->
                      <StackPane fx:id="expenseDistributionChartContainer" layoutX="255.0" layoutY="197.0" prefHeight="217.0" prefWidth="308.0" />
-                     <Label layoutX="255.0" layoutY="19.0" prefHeight="22.0" prefWidth="52.0" text="Budget" />
-                     <TextField fx:id="budgetField" layoutX="312.0" layoutY="19.0" prefHeight="22.0" prefWidth="106.0" />
-                     <Button fx:id="saveBudgetButton" layoutX="448.0" layoutY="19.0" mnemonicParsing="false" onAction="#saveBudget" text="Save" />
+<!--                     <HBox layoutX="388.0" layoutY="17.0" prefHeight="25.0" prefWidth="175.0" styleClass="budget-container">-->
+                     <Label layoutX="290.0" layoutY="21.0" prefHeight="22.0" prefWidth="111.0" text="Monthly Budget" />
+                     <TextField fx:id="budgetField" layoutX="391.0" layoutY="19.0" prefHeight="25.0" prefWidth="118.0" promptText="Monthly Budget" styleClass="modern-input" />
+                     <Button fx:id="saveBudgetButton" layoutX="530.0" layoutY="19.0" mnemonicParsing="false" onAction="#saveBudget" styleClass="action-button" text="Save" />
+<!--                     </HBox>-->
 
                         </children>
                     </AnchorPane>

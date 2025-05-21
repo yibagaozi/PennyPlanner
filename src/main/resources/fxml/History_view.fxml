@@ -31,53 +31,20 @@
                     </AnchorPane>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="353.0" prefWidth="505.0">
                         <children>
-                            <Label fx:id="date" layoutX="12.0" prefHeight="37.0" prefWidth="103.0" style="-fx-font-weight: bold;" text="April 2025">
+                            <Label fx:id="date" layoutX="218.0" layoutY="14.0" prefHeight="37.0" prefWidth="161.0" style="-fx-font-weight: bold;" text="Spending Details">
                         <font>
                            <Font size="15.0" />
                         </font></Label>
                             <!-- 卡片容器HBox -->
-                            <HBox layoutX="56.0" layoutY="56.0" prefHeight="100.0" prefWidth="481.0" spacing="20.0">
-                                <!-- 卡片1: 总余额 -->
-                                <VBox prefWidth="150.0" styleClass="card">
-                                    <children>
-                                        <Label styleClass="card-title" text="Total Balance" />
-                                        <Label styleClass="card-amount" text="12,345" />
-                                        <HBox spacing="5">
-                                            <Label styleClass="positive-change" text="↑" />
-                                            <Label styleClass="positive-change" text="2.5%" />
-                                        </HBox>
-                                    </children>
-                                </VBox>
-
-                                <!-- 卡片2: 收入 -->
-                                <VBox prefWidth="150.0" styleClass="card">
-                                    <children>
-                                        <Label styleClass="card-title" text="Income" />
-                                        <Label styleClass="card-amount" text="5,678" />
-                                        <HBox spacing="5">
-                                            <Label styleClass="positive-change" text="↑" />
-                                            <Label styleClass="positive-change" text="1.8%" />
-                                        </HBox>
-                                    </children>
-                                </VBox>
-
-                                <!-- 卡片3: 支出 -->
-                                <VBox prefWidth="150.0" styleClass="card">
-                                    <children>
-                                        <Label styleClass="card-title" text="Expense" />
-                                        <Label styleClass="card-amount" text="3,333" />
-                                        <HBox spacing="5">
-                                            <Label styleClass="negative-change" text="↓" />
-                                            <Label styleClass="negative-change" text="0.8%" />
-                                        </HBox>
-                                    </children>
-                                </VBox>
-                            </HBox>
-                     <ComboBox fx:id="Year" layoutX="14.0" layoutY="166.0" onAction="#initialize" prefHeight="23.0" prefWidth="105.0" />
-                     <ComboBox fx:id="Month" layoutX="135.0" layoutY="166.0" prefHeight="23.0" prefWidth="98.0" />
-                     <Button layoutX="377.0" layoutY="166.0" mnemonicParsing="false" onAction="#turntoManagement" prefHeight="23.0" prefWidth="80.0" text="Add items" />
-                     <Button layoutX="477.0" layoutY="166.0" mnemonicParsing="false" onAction="#refreshData" prefHeight="23.0" prefWidth="80.0" text="Refresh" />
-                     <TableView fx:id="transactionTable" layoutX="11.0" layoutY="196.0" prefHeight="217.0" prefWidth="572.0">
+                            <HBox layoutX="19.0" layoutY="61.0" prefHeight="39.0" prefWidth="578.0" spacing="20.0">
+                        <children>
+                           <ComboBox fx:id="Year" onAction="#initialize" prefHeight="23.0" prefWidth="105.0" />
+                           <ComboBox fx:id="Month" prefHeight="23.0" prefWidth="98.0" />
+                           <ComboBox fx:id="category" prefHeight="23.0" prefWidth="107.0" />
+                           <Button mnemonicParsing="false" onAction="#turntoManagement" prefHeight="23.0" prefWidth="80.0" text="Add items" />
+                           <Button mnemonicParsing="false" onAction="#refreshData" prefHeight="23.0" prefWidth="80.0" text="Refresh" />
+                        </children></HBox>
+                     <TableView fx:id="transactionTable" layoutX="13.0" layoutY="108.0" prefHeight="217.0" prefWidth="572.0">
                        <columns>
                            <TableColumn fx:id="transactionidColumn" prefWidth="50" text="No." />
                            <TableColumn fx:id="dateColumn" prefWidth="100.00001525878906" text="Date" />
@@ -90,11 +57,9 @@
                            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                         </columnResizePolicy>
                      </TableView>
-                     <ComboBox fx:id="category" layoutX="247.0" layoutY="166.0" prefHeight="23.0" prefWidth="107.0" />
-                            <HBox layoutX="11.0" layoutY="420.0" spacing="10.0">
-                                <Button fx:id="editButton" onAction="#handleEdit" prefHeight="9.0" prefWidth="61.0" text="Edit" />
-                                <Button fx:id="deleteButton" onAction="#handleDelete" prefHeight="9.0" prefWidth="62.0" text="Delete" />
-                            </HBox>
+                            <HBox layoutX="11.0" layoutY="420.0" spacing="10.0" />
+                             <Button fx:id="editButton" layoutX="427.0" layoutY="338.0" onAction="#handleEdit" prefHeight="9.0" prefWidth="61.0" text="Edit" />
+                             <Button fx:id="deleteButton" layoutX="521.0" layoutY="338.0" onAction="#handleDelete" prefHeight="9.0" prefWidth="62.0" text="Delete" />
 
                         </children>
                     </AnchorPane>
