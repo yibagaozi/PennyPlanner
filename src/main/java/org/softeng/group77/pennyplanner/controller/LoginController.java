@@ -49,7 +49,7 @@ public class LoginController {
 
     //登陆后跳转主页面
     @FXML
-    private void turntoHome() throws IOException {
+    private void turntoHome() {
         String email = emailField.getText();
         String password = passwordField.getText();
 
@@ -74,7 +74,11 @@ public class LoginController {
                             SharedDataModel.refreshTransactionData();
                             MainApp.showHome(); // 登录成功，跳转主页
                         } catch (IOException e) {
-                            Platform.runLater(() -> errorLabel.setText("无法跳转到主页: " + e.getMessage()));
+                            String errorMsg = "跳转主页失败: " + e.getMessage();
+                            System.err.println(errorMsg);
+                            e.printStackTrace();
+                            throw new RuntimeException("跳转主页失败: " + e.getMessage());
+                            //Platform.runLater(() -> errorLabel.setText("无法跳转到主页: " + e.getMessage()));
                         }
                     });
                 } catch (AuthenticationException e) {
