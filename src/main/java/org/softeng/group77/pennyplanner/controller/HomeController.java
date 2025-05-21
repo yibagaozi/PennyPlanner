@@ -10,7 +10,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
+import lombok.extern.slf4j.Slf4j;
 import org.softeng.group77.pennyplanner.adapter.TransactionAdapter;
+import org.softeng.group77.pennyplanner.exception.BudgetNotFoundException;
 import org.softeng.group77.pennyplanner.service.AuthService;
 import org.softeng.group77.pennyplanner.model.*;
 import org.softeng.group77.pennyplanner.service.BudgetService;
@@ -32,6 +34,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
+@Slf4j
 public class HomeController {
     @FXML
     private Label usernameLabel; // 必须与fx:id完全一致
@@ -164,12 +167,17 @@ public class HomeController {
 
     // 加载预算信息
     private void loadBudgetInfo() throws Exception {
-        if (budgetService != null) {
-            Budget currentBudget = budgetService.getCurrentBudget();
-            if (currentBudget != null) {
-                budgetField.setText(String.format("%.2f", currentBudget.getAmount()));
+        try {
+            if (budgetService != null) {
+                Budget currentBudget = budgetService.getCurrentBudget();
+                if (currentBudget != null) {
+                    budgetField.setText(String.format("%.2f", currentBudget.getAmount()));
+                }
             }
-        }
+        } catch (BudgetNotFoundException e) {
+        log.info("No budget found for current month. Displaying default values.");
+        budgetField.setText("No budget set");
+    }
     }
 
     // 更新卡片信息
