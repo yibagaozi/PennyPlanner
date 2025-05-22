@@ -58,8 +58,7 @@ public class MainApp extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         MainApp.primaryStage = primaryStage;
-
-        //applicationContext = new AnnotationConfigApplicationContext("org.softeng.group77.pennyplanner");
+        primaryStage.setResizable(false);
         showLogin();
     }
 
