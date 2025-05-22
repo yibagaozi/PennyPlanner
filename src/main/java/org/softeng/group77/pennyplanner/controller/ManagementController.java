@@ -1,16 +1,25 @@
 package org.softeng.group77.pennyplanner.controller;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.softeng.group77.pennyplanner.service.TransactionAnalysisService;
 import org.softeng.group77.pennyplanner.util.CsvImporter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Controller;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -27,6 +36,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
+@Controller
 public class ManagementController {
     // 字段绑定
     @FXML private DatePicker dateField;
@@ -62,6 +72,18 @@ public class ManagementController {
             {"E-Payment", "📱"}
     };
 
+    @FXML
+    private Button classifyButton;
+
+    @FXML private Label classificationStatusLabel; // 显示分类状态
+    @FXML private ProgressIndicator classifyProgress; // 显示处理中状态
+
+    private ApplicationContext applicationContext;
+
+    @Autowired
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
 
     // 在initialize方法中初始化分类和支付方式
     public void initialize() {
@@ -101,6 +123,23 @@ public class ManagementController {
         splitPane.getDividers().forEach(divider -> divider.positionProperty().addListener((observable, oldValue, newValue) -> {
             divider.setPosition(0.1); // 固定分割线位置为 10%
         }));
+
+        if (classifyButton != null) {
+            classifyButton.setOnAction(e -> openClassificationWindow());
+        }
+
+        // 初始化AI分类组件
+        if (classificationStatusLabel != null) {
+            classificationStatusLabel.setText("Ready to classify");
+        }
+
+        if (classifyProgress != null) {
+            classifyProgress.setVisible(false);
+        }
+
+        if (classifyButton != null) {
+            classifyButton.setOnAction(e -> openClassificationWindow());
+        }
     }
 
 
@@ -559,6 +598,49 @@ public class ManagementController {
         } catch (IOException e) {
             showAlert(Alert.AlertType.ERROR, "下载失败", "无法保存示例CSV文件: " + e.getMessage());
         }
+    }
+
+    @FXML
+    private void openClassificationWindow() {
+        // 获取当前描述字段内容
+        String description = descriptionField.getText();
+
+        if (description == null || description.trim().isEmpty()) {
+            classificationStatusLabel.setText("Type description first");
+            classificationStatusLabel.setTextFill(Color.RED);
+            return;
+        }
+
+        // 显示处理中状态
+        classifyButton.setDisable(true);
+        classifyProgress.setVisible(true);
+        classificationStatusLabel.setText("Analysing...");
+        classificationStatusLabel.setTextFill(Color.BLUE);
+
+        // 获取TransactionAnalysisService
+        TransactionAnalysisService transactionAnalysisService =
+                applicationContext.getBean(TransactionAnalysisService.class);
+
+        // 调用AI分类服务
+        transactionAnalysisService.classifyTransaction(description)
+                .thenAccept(category -> {
+                    Platform.runLater(() -> {
+                        classificationStatusLabel.setText("Recommended: " + category);
+                        classificationStatusLabel.setTextFill(Color.GREEN);
+                        categoryComboBox.setValue(category);
+                        classifyButton.setDisable(false);
+                        classifyProgress.setVisible(false);
+                    });
+                })
+                .exceptionally(ex -> {
+                    Platform.runLater(() -> {
+                        classificationStatusLabel.setText("Failed to classify " + ex.getMessage());
+                        classificationStatusLabel.setTextFill(Color.RED);
+                        classifyButton.setDisable(false);
+                        classifyProgress.setVisible(false);
+                    });
+                    return null;
+                });
     }
 
 

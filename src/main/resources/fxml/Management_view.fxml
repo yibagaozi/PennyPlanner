@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
@@ -60,71 +61,31 @@
                         </font>
                      </Label>
                       <ComboBox fx:id="categoryComboBox" layoutX="46.0" layoutY="238.0" prefWidth="150.0" />
+                      <Button fx:id="classifyButton" layoutX="45.0" layoutY="275.0" text="AI-Classification" />
+                      <!-- 在描述字段的HBox后面添加新的HBox -->
+                      <HBox alignment="CENTER_LEFT" layoutX="22.0" layoutY="308.0" prefHeight="53.0" prefWidth="205.0" spacing="10.0">
+                          <children>
+                              <Label fx:id="classificationStatusLabel" prefHeight="43.0" prefWidth="153.0" style="-fx-font-weight: bold;" text="Status" />
+                              <ProgressIndicator fx:id="classifyProgress" prefHeight="43.0" prefWidth="38.0" visible="false" />
+<!--                              <Button fx:id="classifyButton" text="AI智能分类" />-->
+                          </children>
+                          <padding>
+                              <Insets bottom="5.0" top="5.0" />
+                          </padding>
+                      </HBox>
 
-<!--                     <VBox layoutX="42.0" layoutY="238.0" prefHeight="55.0" prefWidth="271.0">-->
-<!--                        <children>-->
-<!--                           <HBox prefHeight="23.0" prefWidth="228.0">-->
-<!--                              <children>-->
-<!--                                 <Button mnemonicParsing="false" prefHeight="23.0" prefWidth="65.0" text="Food">-->
-<!--                                    <font>-->
-<!--                                       <Font size="10.0" />-->
-<!--                                    </font>-->
-<!--                                 </Button>-->
-<!--                                 <Button mnemonicParsing="false" prefHeight="23.0" prefWidth="98.0" text="Entertainment">-->
-<!--                                    <font>-->
-<!--                                       <Font size="10.0" />-->
-<!--                                    </font>-->
-<!--                                 </Button>-->
-<!--                                 <Button mnemonicParsing="false" prefHeight="23.0" prefWidth="100.0" text="Transportation">-->
-<!--                                    <font>-->
-<!--                                       <Font size="10.0" />-->
-<!--                                    </font>-->
-<!--                                 </Button>-->
-<!--                              </children>-->
-<!--                           </HBox>-->
-<!--                           <HBox prefHeight="35.0" prefWidth="228.0">-->
-<!--                              <children>-->
-<!--                                 <Button mnemonicParsing="false" prefHeight="23.0" prefWidth="65.0" text="Educatioin">-->
-<!--                                    <font>-->
-<!--                                       <Font size="10.0" />-->
-<!--                                    </font>-->
-<!--                                 </Button>-->
-<!--                                 <Button mnemonicParsing="false" prefHeight="23.0" prefWidth="98.0" text="Clothes">-->
-<!--                                    <font>-->
-<!--                                       <Font size="10.0" />-->
-<!--                                    </font>-->
-<!--                                 </Button>-->
-<!--                                 <Button mnemonicParsing="false" prefHeight="23.0" prefWidth="100.0" text="Others">-->
-<!--                                    <font>-->
-<!--                                       <Font size="10.0" />-->
-<!--                                    </font>-->
-<!--                                 </Button>-->
-<!--                              </children>-->
-<!--                           </HBox>-->
-<!--                        </children>-->
-<!--                     </VBox>-->
                      <Label layoutX="318.0" layoutY="121.0" prefHeight="29.0" prefWidth="136.0" text="Payment method">
                         <font>
                            <Font size="14.0" />
                         </font>
                      </Label>
                       <ComboBox fx:id="methodComboBox" layoutX="318.0" layoutY="155.0" prefWidth="150.0" />
-<!--                     <HBox layoutX="314.0" layoutY="155.0" prefHeight="37.0" prefWidth="223.0">-->
-<!--                        <children>-->
-<!--                           <Button mnemonicParsing="false" text="e-payment" />-->
-<!--                           <Button mnemonicParsing="false" text="credit card" />-->
-<!--                           <Button mnemonicParsing="false" prefHeight="23.0" prefWidth="60.0" text="cash" />-->
-<!--                        </children>-->
-<!--                     </HBox>-->
+
                      <Button layoutX="426.0" layoutY="238.0" mnemonicParsing="false" onAction="#handleCancel" text="Cancel" />
                      <Button layoutX="328.0" layoutY="238.0" mnemonicParsing="false" onAction="#handleSave" prefHeight="23.0" prefWidth="60.0" text="Save" />
                      <Button layoutX="273.0" layoutY="12.0" mnemonicParsing="false" onAction="#handleExpense" text="Expense" />
                      <Button layoutX="379.0" layoutY="12.0" mnemonicParsing="false" onAction="#handleIncome" text="Income" />
-         <!--                                 <Label layoutX="60.0" prefHeight="50.0" prefWidth="176.0" text="import from csv file">-->
-         <!--                                    <font>-->
-         <!--                                       <Font size="16.0" />-->
-         <!--                                    </font>-->
-         <!--                                 </Label>-->
+
                       <VBox layoutX="379.0" layoutY="360.0" />
                        <Label layoutX="230.0" layoutY="316.0" style="-fx-font-weight: bold;" text="OR import as csv file">
                         <font>

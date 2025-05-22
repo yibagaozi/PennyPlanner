@@ -13,6 +13,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.springframework.context.ApplicationContext;
 import org.softeng.group77.pennyplanner.adapter.TransactionAdapter;
 import org.softeng.group77.pennyplanner.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +55,15 @@ public class HistoryController {
     @Autowired
     public void setAuthService(AuthService authService) {
         this.authService = authService;
+    }
+
+    @FXML
+    private Button classifyButton;
+
+    private final ApplicationContext applicationContext;
+
+    public HistoryController(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
     }
 
     @FXML
@@ -201,6 +211,11 @@ public class HistoryController {
         // 重新应用过滤条件并刷新表格
         updateFilter();
         transactionTable.refresh();
+
+        // 分类按钮 -- 事件处理
+        if (classifyButton != null) {
+            classifyButton.setOnAction(e -> openClassificationWindow());
+        }
     }
 
     // 统一筛选逻辑（核心修复）
@@ -313,6 +328,7 @@ public class HistoryController {
                 // 加载编辑对话框
                 FXMLLoader loader = new FXMLLoader();
                 loader.setLocation(getClass().getClassLoader().getResource("fxml/Edit_Transaction_view.fxml"));
+                loader.setControllerFactory(this.applicationContext::getBean);
                 Parent root = loader.load();
 
                 EditTransactionController controller = loader.getController();
@@ -411,6 +427,37 @@ public class HistoryController {
         alert.showAndWait();
     }
 
+    private void openClassificationWindow() {
+        try {
+            // 创建FXML加载器
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/classification_window_view.fxml"));
+            loader.setControllerFactory(applicationContext::getBean);
+
+            // 加载布局
+            Scene scene = new Scene(loader.load());
+
+            // 设置窗口
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("AI-Classification");
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.setScene(scene);
+
+            // 显示窗口并等待关闭
+            dialogStage.showAndWait();
+
+            // 获取控制器
+            ClassificationWindowController controller = loader.getController();
+            if (controller.isConfirmClicked()) {
+                // 如果用户确认使用分类结果，可以在这里处理
+                String category = controller.getClassificationResult();
+                // 可以用于预填充新增交易的分类字段或其他用途
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            // 显示错误对话框
+        }
+    }
 
     // 以下导航方法保持不变
     @FXML
@@ -435,4 +482,5 @@ public class HistoryController {
         System.out.println("Login");
         MainApp.showLogin();
     }
+
 }
