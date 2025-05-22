@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<AnchorPane prefHeight="200.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.softeng.group77.pennyplanner.controller.ClassificationWindowController">
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
+    <VBox spacing="15" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0"
+          AnchorPane.topAnchor="10.0" AnchorPane.bottomAnchor="10.0">
+        <Label text="Transaction Description" />
+        <TextField fx:id="descriptionField" promptText="Type transaction description"/>
+
+        <Label text="Classification Result:" />
+        <Label fx:id="resultLabel" wrapText="true" style="-fx-border-color: lightgray; -fx-padding: 5px;"
+               prefHeight="50.0" />
+
+        <HBox spacing="10" alignment="CENTER_RIGHT">
+            <Button fx:id="classifyButton" text="Analyse Categoty" onAction="#handleClassify" defaultButton="true" />
+            <Button fx:id="cancelButton" text="Cancel" onAction="#handleCancel" />
+        </HBox>
+    </VBox>
+</AnchorPane>

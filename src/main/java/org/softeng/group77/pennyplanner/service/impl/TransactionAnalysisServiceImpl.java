@@ -177,7 +177,7 @@ public CompletableFuture<String> generateSpendingAnalysisReport(LocalDate startD
                         .append(" (").append(transactionType).append(")\n");
                 });
 
-            // 3. 构建系统提示
+            // 3. 构建系统提示词
             String systemPromptText = String.format(
                     "You are a personal finance analyst and advisor with expertise in budgeting and financial planning. " +
                             "Based on the transaction data provided, analyze the spending patterns, identify trends, and provide " +

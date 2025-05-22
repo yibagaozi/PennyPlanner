@@ -2,15 +2,22 @@ package org.softeng.group77.pennyplanner.controller;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.softeng.group77.pennyplanner.util.CsvImporter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Controller;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -27,6 +34,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
+@Controller
 public class ManagementController {
     // 字段绑定
     @FXML private DatePicker dateField;
@@ -62,6 +70,18 @@ public class ManagementController {
             {"E-Payment", "📱"}
     };
 
+    @FXML
+    private Button classifyButton;
+
+    @FXML private Label classificationStatusLabel; // 显示分类状态
+    @FXML private ProgressIndicator classifyProgress; // 显示处理中状态
+
+    private ApplicationContext applicationContext;
+
+    @Autowired
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
 
     // 在initialize方法中初始化分类和支付方式
     public void initialize() {
@@ -101,6 +121,10 @@ public class ManagementController {
         splitPane.getDividers().forEach(divider -> divider.positionProperty().addListener((observable, oldValue, newValue) -> {
             divider.setPosition(0.1); // 固定分割线位置为 10%
         }));
+
+        if (classifyButton != null) {
+            classifyButton.setOnAction(e -> openClassificationWindow());
+        }
     }
 
 
@@ -558,6 +582,52 @@ public class ManagementController {
             }
         } catch (IOException e) {
             showAlert(Alert.AlertType.ERROR, "下载失败", "无法保存示例CSV文件: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void openClassificationWindow() {
+        try {
+            // 获取当前描述字段内容
+            String description = descriptionField.getText();
+
+            // 创建FXML加载器
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/classification_window_view.fxml"));
+            loader.setControllerFactory(applicationContext::getBean);
+            // 加载布局
+            Scene scene = new Scene(loader.load());
+
+            // 设置窗口
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("AI-Classification");
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.setScene(scene);
+
+            // 获取控制器
+            ClassificationWindowController controller = loader.getController();
+
+            // 如果描述不为空，设置描述并自动分析
+            if (description != null && !description.trim().isEmpty()) {
+                controller.setDescription(description);
+            }
+
+            // 显示窗口并等待关闭
+            dialogStage.showAndWait();
+
+            // 如果用户确认使用分类结果，则更新分类字段
+            if (controller.isConfirmClicked()) {
+                String category = controller.getClassificationResult();
+                categoryComboBox.setValue(category);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            // 显示错误对话框
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("错误");
+            alert.setHeaderText(null);
+            alert.setContentText("无法打开分类窗口: " + e.getMessage());
+            alert.showAndWait();
         }
     }
 
