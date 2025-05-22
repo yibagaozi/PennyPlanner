@@ -58,8 +58,7 @@ public class MainApp extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         MainApp.primaryStage = primaryStage;
-
-        //applicationContext = new AnnotationConfigApplicationContext("org.softeng.group77.pennyplanner");
+        primaryStage.setResizable(false);
         showLogin();
     }
 
@@ -166,6 +165,8 @@ public class MainApp extends Application {
         FXMLLoader loader = new FXMLLoader(
                 MainApp.class.getResource("/fxml/Report_view.fxml")
         );
+
+        loader.setControllerFactory(applicationContext::getBean);
         Parent root = loader.load();
 
         Scene scene = new Scene(root,800,500);
