@@ -77,7 +77,7 @@ public class SharedDataModel {
 
     // Refresh Data
     public static void refreshTransactionData() {
-        if (transactionAdapterStatic != null && authServiceStatic != null) {
+        if (transactionAdapterStatic != null && authServiceStatic.getCurrentUser() != null) {
             try {
                 String userId = authServiceStatic.getCurrentUser().getId();
                 if (userId != null) {
