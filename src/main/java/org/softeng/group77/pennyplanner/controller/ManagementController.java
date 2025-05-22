@@ -1,16 +1,25 @@
 package org.softeng.group77.pennyplanner.controller;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.softeng.group77.pennyplanner.service.TransactionAnalysisService;
 import org.softeng.group77.pennyplanner.util.CsvImporter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Controller;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -27,6 +36,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
+@Controller
 public class ManagementController {
     // 字段绑定
     @FXML private DatePicker dateField;
@@ -62,60 +72,75 @@ public class ManagementController {
             {"E-Payment", "📱"}
     };
 
+    @FXML
+    private Button classifyButton;
 
-        // 在initialize方法中初始化分类和支付方式
-        public void initialize() {
-            Locale.setDefault(Locale.ENGLISH);
-//            // 初始化分类选项
-//            categoryComboBox.setItems(FXCollections.observableArrayList(
-//                    null, "Food 🍔", "Salary 💰", "Living Bill", "Entertainment",
-//                    "Transportation", "Education", "Clothes", "Others"
-//            ));
-//
-//            // 初始化支付方式
-//            methodComboBox.setItems(FXCollections.observableArrayList(
-//                    null, "Credit Card", "Bank Transfer", "Auto-Payment", "Cash", "E-Payment"
-//            ));
-//
-//            // 设置默认选择
-//            categoryComboBox.getSelectionModel().selectFirst();
-//            methodComboBox.getSelectionModel().selectFirst();
+    @FXML private Label classificationStatusLabel; // 显示分类状态
+    @FXML private ProgressIndicator classifyProgress; // 显示处理中状态
 
-            // 配置DatePicker
-            dateField.setPromptText("Select Date");
-            // 设置当前日期为默认日期
-            dateField.setValue(LocalDate.now());
-            // 设置日期格式
-            dateField.setConverter(new javafx.util.StringConverter<LocalDate>() {
-                @Override
-                public String toString(LocalDate date) {
-                    if (date != null) {
-                        return DATE_FORMATTER.format(date);
-                    } else {
-                        return "";
-                    }
+    private ApplicationContext applicationContext;
+
+    @Autowired
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
+
+    // 在initialize方法中初始化分类和支付方式
+    public void initialize() {
+        Locale.setDefault(Locale.ENGLISH);
+
+        // 配置DatePicker
+        dateField.setPromptText("Select Date");
+        // 设置当前日期为默认日期
+        dateField.setValue(LocalDate.now());
+        // 设置日期格式
+        dateField.setConverter(new javafx.util.StringConverter<LocalDate>() {
+            @Override
+            public String toString(LocalDate date) {
+                if (date != null) {
+                    return DATE_FORMATTER.format(date);
+                } else {
+                    return "";
                 }
+            }
 
-                @Override
-                public LocalDate fromString(String string) {
-                    if (string != null && !string.isEmpty()) {
-                        return LocalDate.parse(string, DATE_FORMATTER);
-                    } else {
-                        return null;
-                    }
+            @Override
+            public LocalDate fromString(String string) {
+                if (string != null && !string.isEmpty()) {
+                    return LocalDate.parse(string, DATE_FORMATTER);
+                } else {
+                    return null;
                 }
-            });
+            }
+        });
 
-            // 初始化分类选择器
-            setupCategoryComboBox();
-            // 初始化支付方式选择器
-            setupMethodComboBox();
+        // 初始化分类选择器
+        setupCategoryComboBox();
+        // 初始化支付方式选择器
+        setupMethodComboBox();
 
-            // 禁用分割线的拖动
-            splitPane.getDividers().forEach(divider -> divider.positionProperty().addListener((observable, oldValue, newValue) -> {
-                divider.setPosition(0.1); // 固定分割线位置为 10%
-            }));
+        // 禁用分割线的拖动
+        splitPane.getDividers().forEach(divider -> divider.positionProperty().addListener((observable, oldValue, newValue) -> {
+            divider.setPosition(0.1); // 固定分割线位置为 10%
+        }));
+
+        if (classifyButton != null) {
+            classifyButton.setOnAction(e -> openClassificationWindow());
         }
+
+        // 初始化AI分类组件
+        if (classificationStatusLabel != null) {
+            classificationStatusLabel.setText("Ready to classify");
+        }
+
+        if (classifyProgress != null) {
+            classifyProgress.setVisible(false);
+        }
+
+        if (classifyButton != null) {
+            classifyButton.setOnAction(e -> openClassificationWindow());
+        }
+    }
 
 
     private void setupCategoryComboBox() {
@@ -264,196 +289,186 @@ public class ManagementController {
 
 
 
-        // "Save"按钮处理方法
-        @FXML
-        private void handleSave() {
-            try {
-                //dateField.setPromptText("YYYY-MM-DD");
-                // 数据校验
-//                if (dateField.getText().isEmpty() ||
-//                        !dateField.getText().matches("\\d{4}-\\d{2}-\\d{2}")) {
-//                    showAlert("日期格式错误，请使用YYYY-MM-DD格式");
-//                    return;
-//                }
-
-                // 检查日期是否已选择
-                if (dateField.getValue() == null) {
-                    showAlert("请选择日期");
-                    return;
-                }
-
-                double amount = Double.parseDouble(amountField.getText());
-                if (amount <= 0) {
-                    showAlert("金额必须大于0");
-                    return;
-                }
-
-                // 创建新交易记录
-                //String newId = String.valueOf(SharedDataModel.getTransactionData().size() + 1);
-                String newId = UUID.randomUUID().toString(); // 使用UUID生成唯一ID
-                double finalAmount = isExpense ? -Math.abs(amount) : Math.abs(amount);
-
-                tableModel newTransaction = new tableModel(
-                        //newId,
-                        java.util.UUID.randomUUID().toString(), // 使用UUID作为后端ID
-                        //dateField.getText(),
-                        dateField.getValue().format(DATE_FORMATTER), // 从DatePicker获取格式化日期
-                        descriptionField.getText(),
-                        finalAmount,
-                        categoryComboBox.getValue(),
-                        methodComboBox.getValue()
-                );
-
-                //添加到共享数据
-                SharedDataModel.getTransactionData().add(newTransaction);
-                // 添加到共享数据并持久化
-                boolean success = SharedDataModel.addTransaction(newTransaction);
-
-                if (success) {
-                    showSuccessAlert("Saved Successfully");
-                    // 清空输入框
-                    clearForm();
-                } else {
-                    showAlert("Failed. Try again later.");
-                }
-
-                // 清空输入框
-                clearForm();
-
-            } catch (NumberFormatException e) {
-                showAlert("Invalid Amount");
+    // "Save"按钮处理方法
+    @FXML
+    private void handleSave() {
+        try {
+            // 检查日期是否已选择
+            if (dateField.getValue() == null) {
+                showAlert("请选择日期");
+                return;
             }
-        }
 
-        @FXML
-        private void handleCancel() {
-            // 清空输入框
-            clearForm();
-        }
+            double amount = Double.parseDouble(amountField.getText());
+            if (amount <= 0) {
+                showAlert("金额必须大于0");
+                return;
+            }
 
-        // 新增类型选择处理方法
-        @FXML
-        private void handleExpense() {
-            isExpense = true;
-        }
+            // 创建新交易记录
+            String newId = UUID.randomUUID().toString(); // 使用UUID生成唯一ID
+            double finalAmount = isExpense ? -Math.abs(amount) : Math.abs(amount);
 
-        @FXML
-        private void handleIncome() {
-            isExpense = false;
-        }
-
-
-        private void clearForm() {
-            // 重置DatePicker为当前日期
-            dateField.setValue(LocalDate.now());
-            //dateField.clear();
-            descriptionField.clear();
-            amountField.clear();
-            categoryComboBox.getSelectionModel().selectFirst();
-            methodComboBox.getSelectionModel().selectFirst();
-        }
-
-        private void showAlert(String message) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("输入错误");
-            alert.setHeaderText(null);
-            alert.setContentText(message);
-            alert.showAndWait();
-        }
-
-        private void showSuccessAlert(String message) {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("操作成功");
-            alert.setHeaderText(null);
-            alert.setContentText(message);
-            alert.showAndWait();
-        }
-
-        // 获取当前Stage的两种方式（任选其一）
-        private Stage getCurrentStage() {
-            // 方式1：通过任意界面元素获取（比如上传按钮）
-            return (Stage) uploadButton.getScene().getWindow();
-            // 方式2：通过MainApp的静态方法获取（如果存在）
-            // return MainApp.getPrimaryStage();
-        }
-
-        @FXML
-        private Button uploadButton; // 对应FXML中的上传按钮
-        // 文件上传核心方法
-        @FXML
-        private void handleFileUpload() {
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("选择CSV交易记录文件");
-
-            // 设置文件过滤器，只接受CSV文件
-            fileChooser.getExtensionFilters().addAll(
-                    new FileChooser.ExtensionFilter("CSV文件", "*.csv")
+            tableModel newTransaction = new tableModel(
+                    java.util.UUID.randomUUID().toString(), // 使用UUID作为后端ID
+                    //dateField.getText(),
+                    dateField.getValue().format(DATE_FORMATTER), // 从DatePicker获取格式化日期
+                    descriptionField.getText(),
+                    finalAmount,
+                    categoryComboBox.getValue(),
+                    methodComboBox.getValue()
             );
 
-            // 获取当前窗口
-            Stage currentStage = getCurrentStage();
+            //添加到共享数据
+            SharedDataModel.getTransactionData().add(newTransaction);
+            // 添加到共享数据并持久化
+            boolean success = SharedDataModel.addTransaction(newTransaction);
 
-            // 显示文件选择对话框
-            File selectedFile = fileChooser.showOpenDialog(currentStage);
+            if (success) {
+                showSuccessAlert("Saved Successfully");
+                // 清空输入框
+                clearForm();
+            } else {
+                showAlert("Failed. Try again later.");
+            }
 
-            if (selectedFile != null) {
-                try {
-                    // 创建目标目录
-                    File destDir = new File("uploads");
-                    if (!destDir.exists()) destDir.mkdir();
+            // 清空输入框
+            clearForm();
 
-                    // 构造目标路径
-                    File destFile = new File(destDir, selectedFile.getName());
+        } catch (NumberFormatException e) {
+            showAlert("Invalid Amount");
+        }
+    }
 
-                    // 执行文件复制
-                    Files.copy(
-                            selectedFile.toPath(),
-                            destFile.toPath(),
-                            StandardCopyOption.REPLACE_EXISTING
-                    );
+    @FXML
+    private void handleCancel() {
+        // 清空输入框
+        clearForm();
+    }
 
-                    // 解析CSV文件并导入交易记录
-                    CsvImporter.ImportResult result = CsvImporter.importTransactions(destFile, MainApp.getTransactionAdapter());
+    // 新增类型选择处理方法
+    @FXML
+    private void handleExpense() {
+        isExpense = true;
+    }
 
-                    // 显示导入结果
-                    StringBuilder message = new StringBuilder();
-                    message.append("导入完成！\n");
-                    message.append("成功导入记录: ").append(result.getTotalSuccessful()).append("\n");
+    @FXML
+    private void handleIncome() {
+        isExpense = false;
+    }
 
-                    if (result.hasErrors()) {
-                        message.append("\n出现以下错误:\n");
-                        List<String> errors = result.getErrorMessages();
-                        // 限制显示的错误数量，以防对话框过大
-                        int displayLimit = Math.min(errors.size(), 5);
-                        for (int i = 0; i < displayLimit; i++) {
-                            message.append("• ").append(errors.get(i)).append("\n");
-                        }
-                        if (errors.size() > displayLimit) {
-                            message.append("... 以及其他 ").append(errors.size() - displayLimit).append(" 个错误\n");
-                        }
-                        message.append("\n详细导入日志已保存至: uploads/import_log_")
-                                .append(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")))
-                                .append(".txt");
 
-                        // 保存详细错误日志
-                        saveErrorLog(errors);
+    private void clearForm() {
+        // 重置DatePicker为当前日期
+        dateField.setValue(LocalDate.now());
+        //dateField.clear();
+        descriptionField.clear();
+        amountField.clear();
+        categoryComboBox.getSelectionModel().selectFirst();
+        methodComboBox.getSelectionModel().selectFirst();
+    }
+
+    private void showAlert(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("输入错误");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    private void showSuccessAlert(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Success");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    // 获取当前Stage的两种方式（任选其一）
+    private Stage getCurrentStage() {
+        // 方式1：通过任意界面元素获取（比如上传按钮）
+        return (Stage) uploadButton.getScene().getWindow();
+        // 方式2：通过MainApp的静态方法获取（如果存在）
+        // return MainApp.getPrimaryStage();
+    }
+
+    @FXML
+    private Button uploadButton; // 对应FXML中的上传按钮
+    // 文件上传核心方法
+    @FXML
+    private void handleFileUpload() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Choose Transaction Detail CSV File");
+
+        // 设置文件过滤器，只接受CSV文件
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("CSV文件", "*.csv")
+        );
+
+        // 获取当前窗口
+        Stage currentStage = getCurrentStage();
+
+        // 显示文件选择对话框
+        File selectedFile = fileChooser.showOpenDialog(currentStage);
+
+        if (selectedFile != null) {
+            try {
+                // 创建目标目录
+                File destDir = new File("uploads");
+                if (!destDir.exists()) destDir.mkdir();
+
+                // 构造目标路径
+                File destFile = new File(destDir, selectedFile.getName());
+
+                // 执行文件复制
+                Files.copy(
+                        selectedFile.toPath(),
+                        destFile.toPath(),
+                        StandardCopyOption.REPLACE_EXISTING
+                );
+
+                // 解析CSV文件并导入交易记录
+                CsvImporter.ImportResult result = CsvImporter.importTransactions(destFile, MainApp.getTransactionAdapter());
+
+                // 显示导入结果
+                StringBuilder message = new StringBuilder();
+                message.append("Import Successfully\n");
+                message.append("Loaded RecordsL ").append(result.getTotalSuccessful()).append("\n");
+
+                if (result.hasErrors()) {
+                    message.append("\n出现以下错误:\n");
+                    List<String> errors = result.getErrorMessages();
+                    // 限制显示的错误数量，以防对话框过大
+                    int displayLimit = Math.min(errors.size(), 5);
+                    for (int i = 0; i < displayLimit; i++) {
+                        message.append("• ").append(errors.get(i)).append("\n");
                     }
-
-                    // 如果有成功导入的记录，刷新UI
-                    if (result.getTotalSuccessful() > 0) {
-                        // 通知应用刷新数据
-                        MainApp.refreshData();
-                        message.append("\n\n数据已更新！请前往历史记录页面查看。");
+                    if (errors.size() > displayLimit) {
+                        message.append("... 以及其他 ").append(errors.size() - displayLimit).append(" 个错误\n");
                     }
+                    message.append("\nDetailed import log saved to: uploads/import_log_")
+                            .append(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")))
+                            .append(".txt");
 
-                    showAlert(result.hasErrors() ? Alert.AlertType.WARNING : Alert.AlertType.INFORMATION,
-                            "导入结果", message.toString());
-
-                } catch (IOException e) {
-                    showAlert(Alert.AlertType.ERROR, "导入失败", "处理CSV文件时出错: " + e.getMessage());
+                    // 保存详细错误日志
+                    saveErrorLog(errors);
                 }
+
+                // 如果有成功导入的记录，刷新UI
+                if (result.getTotalSuccessful() > 0) {
+                    // 通知应用刷新数据
+                    MainApp.refreshData();
+                    message.append("\n\nData has been updated! You can check in History page.");
+                }
+
+                showAlert(result.hasErrors() ? Alert.AlertType.WARNING : Alert.AlertType.INFORMATION,
+                        "导入结果", message.toString());
+
+            } catch (IOException e) {
+                showAlert(Alert.AlertType.ERROR, "导入失败", "处理CSV文件时出错: " + e.getMessage());
             }
         }
+    }
 
     /**
      * 保存错误日志到文件
@@ -505,14 +520,14 @@ public class ManagementController {
     @FXML
     private void showImportHelp() {
         Alert helpDialog = new Alert(Alert.AlertType.INFORMATION);
-        helpDialog.setTitle("CSV导入帮助");
-        helpDialog.setHeaderText("如何准备交易记录CSV文件");
+        helpDialog.setTitle("CSV Import Help");
+        helpDialog.setHeaderText("How to prepare Transaction Records CSV File");
 
-        String helpContent = "CSV文件应包含以下列（表头必须包含）：\n\n" +
-                "1. date - 日期格式为YYYY-MM-DD (例如: 2024-05-15)\n" +
-                "2. description - 交易描述\n" +
-                "3. amount - 金额，支出为负数，收入为正数\n" +
-                "4. category - 必须是以下类别之一：\n" +
+        String helpContent = "CSV file should contain following columns\n\n" +
+                "1. date - YYYY-MM-DD (e.g. 2024-05-15)\n" +
+                "2. description - Description of each entry\n" +
+                "3. amount - Expense is negative，income is positive\n" +
+                "4. category - Must be one of the followings：\n" +
                 "   • Food\n" +
                 "   • Salary\n" +
                 "   • Living Bill\n" +
@@ -521,17 +536,17 @@ public class ManagementController {
                 "   • Education\n" +
                 "   • Clothes\n" +
                 "   • Others\n" +
-                "5. method - 必须是以下支付方式之一：\n" +
+                "5. method - Must be one of the followings：\n" +
                 "   • Credit Card\n" +
                 "   • Bank Transfer\n" +
                 "   • Auto-Payment\n" +
                 "   • Cash\n" +
                 "   • E-Payment\n\n" +
-                "CSV例子：\n" +
+                "Sample CSV：\n" +
                 "date,description,amount,category,method\n" +
                 "2024-05-01,Grocery Shopping,-50.75,Food,Cash\n" +
                 "2024-05-03,Salary Deposit,3000.00,Salary,Bank Transfer\n\n" +
-                "您可以下载示例CSV文件作为参考。";
+                "You can download sample CSV file for reference。";
 
         TextArea textArea = new TextArea(helpContent);
         textArea.setEditable(false);
@@ -541,10 +556,10 @@ public class ManagementController {
 
         helpDialog.getDialogPane().setContent(textArea);
 
-        Button downloadButton = new Button("下载示例CSV");
+        Button downloadButton = new Button("Download Sample CSV");
         downloadButton.setOnAction(e -> downloadExampleCsv());
 
-        ButtonType closeButton = new ButtonType("关闭", ButtonBar.ButtonData.OK_DONE);
+        ButtonType closeButton = new ButtonType("Close", ButtonBar.ButtonData.OK_DONE);
         helpDialog.getButtonTypes().setAll(closeButton);
 
         // 添加自定义按钮到对话框
@@ -560,15 +575,15 @@ public class ManagementController {
         try {
             // 创建一个示例CSV内容
             String exampleCsvContent = "date,description,amount,category,method\n" +
-                    "2024-05-01,Grocery Shopping,-50.75,Food,Cash\n" +
-                    "2024-05-03,Salary Deposit,3000.00,Salary,Bank Transfer\n" +
-                    "2024-05-05,Electricity Bill,-120.35,Living Bill,Auto-Payment\n" +
-                    "2024-05-07,Movie Night,-25.50,Entertainment,Credit Card\n" +
-                    "2024-05-10,Bus Pass,-45.00,Transportation,E-Payment\n";
+                    "2025-06-01,Grocery Shopping,-50.75,Food,Cash\n" +
+                    "2025-06-03,Salary Deposit,3000.00,Salary,Bank Transfer\n" +
+                    "2025-06-05,Electricity Bill,-120.35,Living Bill,Auto-Payment\n" +
+                    "2025-06-07,Movie Night,-25.50,Entertainment,Credit Card\n" +
+                    "2025-06-10,Bus Pass,-45.00,Transportation,E-Payment\n";
 
             // 让用户选择保存位置
             FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("保存示例CSV文件");
+            fileChooser.setTitle("Download Sample CSV");
             fileChooser.setInitialFileName("example_transactions.csv");
             fileChooser.getExtensionFilters().add(
                     new FileChooser.ExtensionFilter("CSV文件", "*.csv"));
@@ -578,45 +593,88 @@ public class ManagementController {
                 try (FileWriter writer = new FileWriter(file)) {
                     writer.write(exampleCsvContent);
                 }
-                showAlert(Alert.AlertType.INFORMATION, "下载成功", "示例CSV文件已保存至:\n" + file.getAbsolutePath());
+                showAlert(Alert.AlertType.INFORMATION, "Downloaded Successfully", "Sample CSV format has been saved:\n" + file.getAbsolutePath());
             }
         } catch (IOException e) {
             showAlert(Alert.AlertType.ERROR, "下载失败", "无法保存示例CSV文件: " + e.getMessage());
         }
     }
 
+    @FXML
+    private void openClassificationWindow() {
+        // 获取当前描述字段内容
+        String description = descriptionField.getText();
+
+        if (description == null || description.trim().isEmpty()) {
+            classificationStatusLabel.setText("Type description first");
+            classificationStatusLabel.setTextFill(Color.RED);
+            return;
+        }
+
+        // 显示处理中状态
+        classifyButton.setDisable(true);
+        classifyProgress.setVisible(true);
+        classificationStatusLabel.setText("Analysing...");
+        classificationStatusLabel.setTextFill(Color.BLUE);
+
+        // 获取TransactionAnalysisService
+        TransactionAnalysisService transactionAnalysisService =
+                applicationContext.getBean(TransactionAnalysisService.class);
+
+        // 调用AI分类服务
+        transactionAnalysisService.classifyTransaction(description)
+                .thenAccept(category -> {
+                    Platform.runLater(() -> {
+                        classificationStatusLabel.setText("Recommended: " + category);
+                        classificationStatusLabel.setTextFill(Color.GREEN);
+                        categoryComboBox.setValue(category);
+                        classifyButton.setDisable(false);
+                        classifyProgress.setVisible(false);
+                    });
+                })
+                .exceptionally(ex -> {
+                    Platform.runLater(() -> {
+                        classificationStatusLabel.setText("Failed to classify " + ex.getMessage());
+                        classificationStatusLabel.setTextFill(Color.RED);
+                        classifyButton.setDisable(false);
+                        classifyProgress.setVisible(false);
+                    });
+                    return null;
+                });
+    }
+
 
     @FXML
-        private void turntoHome() throws IOException {
-            System.out.println("转到home页面");
-            MainApp.showHome();
-        }
-        @FXML
-        private void turntoReport() throws IOException {
-            //System.out.println("转到home页面");
-            MainApp.showReport();
-        }@FXML
-        private void turntoHistory() throws IOException {
-            //System.out.println("转到home页面");
-            MainApp.showhistory();
-        }@FXML
-        private void turntoManagement() throws IOException {
-            //System.out.println("转到home页面");
-            MainApp.showmanagement();
-        }@FXML
-        private void turntoUser() throws IOException {
-            //System.out.println("转到home页面");
-            MainApp.showuser();
-        }
-        @FXML
-        private void turntoLogin() throws IOException {
-            System.out.println("Login");
-            MainApp.showLogin();
-        }
-        @FXML
-        private void useAI() throws IOException {
-            System.out.println("调用api接口");
-        }
+    private void turntoHome() throws IOException {
+        System.out.println("转到home页面");
+        MainApp.showHome();
+    }
+    @FXML
+    private void turntoReport() throws IOException {
+        //System.out.println("转到home页面");
+        MainApp.showReport();
+    }@FXML
+    private void turntoHistory() throws IOException {
+        //System.out.println("转到home页面");
+        MainApp.showhistory();
+    }@FXML
+    private void turntoManagement() throws IOException {
+        //System.out.println("转到home页面");
+        MainApp.showmanagement();
+    }@FXML
+    private void turntoUser() throws IOException {
+        //System.out.println("转到home页面");
+        MainApp.showuser();
+    }
+    @FXML
+    private void turntoLogin() throws IOException {
+        System.out.println("Login");
+        MainApp.showLogin();
+    }
+    @FXML
+    private void useAI() throws IOException {
+        System.out.println("调用api接口");
+    }
 
 }
 

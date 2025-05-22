@@ -13,6 +13,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.springframework.context.ApplicationContext;
 import org.softeng.group77.pennyplanner.adapter.TransactionAdapter;
 import org.softeng.group77.pennyplanner.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +55,15 @@ public class HistoryController {
     @Autowired
     public void setAuthService(AuthService authService) {
         this.authService = authService;
+    }
+
+    @FXML
+    private Button classifyButton;
+
+    private final ApplicationContext applicationContext;
+
+    public HistoryController(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
     }
 
     @FXML
@@ -201,6 +211,11 @@ public class HistoryController {
         // 重新应用过滤条件并刷新表格
         updateFilter();
         transactionTable.refresh();
+
+        // 分类按钮 -- 事件处理
+        if (classifyButton != null) {
+            classifyButton.setOnAction(e -> openClassificationWindow());
+        }
     }
 
     // 统一筛选逻辑（核心修复）
@@ -313,6 +328,7 @@ public class HistoryController {
                 // 加载编辑对话框
                 FXMLLoader loader = new FXMLLoader();
                 loader.setLocation(getClass().getClassLoader().getResource("fxml/Edit_Transaction_view.fxml"));
+                loader.setControllerFactory(this.applicationContext::getBean);
                 Parent root = loader.load();
 
                 EditTransactionController controller = loader.getController();
@@ -330,7 +346,7 @@ public class HistoryController {
                 controller.setTransaction(transactionCopy);
 
                 Stage dialogStage = new Stage();
-                dialogStage.setTitle("编辑交易记录");
+                dialogStage.setTitle("Edit Transaction Entry");
                 dialogStage.initModality(Modality.WINDOW_MODAL);
                 dialogStage.initOwner(transactionTable.getScene().getWindow());
                 dialogStage.setScene(new Scene(root));
@@ -350,7 +366,7 @@ public class HistoryController {
 
                         boolean success = SharedDataModel.updateTransaction(selectedTransaction);
                         if (success) {
-                            showAlert("成功", "交易记录已成功更新", Alert.AlertType.INFORMATION);
+                            showAlert("Success", "Updated Successfully", Alert.AlertType.INFORMATION);
                             refreshData(); // 刷新表格数据
                         } else {
                             showAlert("更新失败", "无法更新交易记录。可能是因为您没有权限修改该记录或者用户会话已过期。", Alert.AlertType.ERROR);
@@ -380,9 +396,9 @@ public class HistoryController {
         if (selectedTransaction != null) {
             // 确认删除
             Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
-            confirmAlert.setTitle("确认删除");
-            confirmAlert.setHeaderText("您确定要删除此交易记录吗？");
-            confirmAlert.setContentText("描述: " + selectedTransaction.getDescription() +
+            confirmAlert.setTitle("Delete");
+            confirmAlert.setHeaderText("Delete this entry?");
+            confirmAlert.setContentText("Description " + selectedTransaction.getDescription() +
                     "\n金额: " + String.format("$%.2f", selectedTransaction.getAmount()) +
                     "\n日期: " + selectedTransaction.getDate());
 
@@ -391,10 +407,10 @@ public class HistoryController {
                 // 用户确认删除
                 boolean success = SharedDataModel.deleteTransaction(selectedTransaction.getId());
                 if (success) {
-                    showAlert("成功", "交易记录已成功删除", Alert.AlertType.INFORMATION);
+                    showAlert("Success", "Deleted Successfully", Alert.AlertType.INFORMATION);
                     refreshData(); // 刷新表格数据
                 } else {
-                    showAlert("错误", "删除交易记录失败", Alert.AlertType.ERROR);
+                    showAlert("Error", "Failed to delete", Alert.AlertType.ERROR);
                 }
             }
         }
@@ -411,6 +427,37 @@ public class HistoryController {
         alert.showAndWait();
     }
 
+    private void openClassificationWindow() {
+        try {
+            // 创建FXML加载器
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/classification_window_view.fxml"));
+            loader.setControllerFactory(applicationContext::getBean);
+
+            // 加载布局
+            Scene scene = new Scene(loader.load());
+
+            // 设置窗口
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("AI-Classification");
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.setScene(scene);
+
+            // 显示窗口并等待关闭
+            dialogStage.showAndWait();
+
+            // 获取控制器
+            ClassificationWindowController controller = loader.getController();
+            if (controller.isConfirmClicked()) {
+                // 如果用户确认使用分类结果，可以在这里处理
+                String category = controller.getClassificationResult();
+                // 可以用于预填充新增交易的分类字段或其他用途
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            // 显示错误对话框
+        }
+    }
 
     // 以下导航方法保持不变
     @FXML
@@ -435,4 +482,5 @@ public class HistoryController {
         System.out.println("Login");
         MainApp.showLogin();
     }
+
 }

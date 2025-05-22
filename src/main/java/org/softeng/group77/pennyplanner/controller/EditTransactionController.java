@@ -2,14 +2,23 @@ package org.softeng.group77.pennyplanner.controller;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.softeng.group77.pennyplanner.controller.tableModel;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Controller;
+
+@Controller
 public class EditTransactionController {
     @FXML private RadioButton expenseRadioButton;
     @FXML private RadioButton incomeRadioButton;
@@ -26,6 +35,14 @@ public class EditTransactionController {
     private boolean saveClicked = false;
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
+    @FXML private Button suggestCategoryButton;
+    private ApplicationContext applicationContext;
+
+    @Autowired
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
+
     /**
      * 初始化控制器
      */
@@ -41,6 +58,10 @@ public class EditTransactionController {
         methodComboBox.setItems(FXCollections.observableArrayList(
                 "Credit Card", "Bank Transfer", "Auto-Payment", "Cash", "E-Payment"
         ));
+
+        if(suggestCategoryButton != null) {
+            suggestCategoryButton.setOnAction(e -> handleSuggestCategory());
+        }
     }
 
     /**
@@ -187,5 +208,90 @@ public class EditTransactionController {
      */
     public boolean isSaveClicked() {
         return saveClicked;
+    }
+
+    /**
+     * 获取描述文本
+     */
+    public String getDescriptionText() {
+        return descriptionField.getText();
+    }
+
+    /**
+     * 从AI设置分类
+     */
+    public void setCategoryFromAI(String category) {
+        if (category != null && !category.isEmpty()) {
+            categoryComboBox.setValue(category);
+        }
+    }
+
+    @FXML
+    private void handleSuggestCategory() {
+        String description = descriptionField.getText();
+        if (description == null || description.trim().isEmpty()) {
+            // 显示错误提示
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("输入不完整");
+            alert.setHeaderText(null);
+            alert.setContentText("请先输入交易描述");
+            alert.showAndWait();
+            return;
+        }
+
+        openClassificationWindow(description);
+    }
+
+    private void openClassificationWindow(String description) {
+        try {
+            // 创建FXML加载器
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/classification_window_view.fxml"));
+            loader.setControllerFactory(applicationContext::getBean);
+
+            // 加载布局
+            Scene scene = new Scene(loader.load());
+
+            // 设置窗口
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("AI-Classification");
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.setScene(scene);
+
+            // 获取控制器并设置描述
+            ClassificationWindowController controller = loader.getController();
+            controller.setDescription(description);
+
+            // 显示窗口并等待关闭
+            dialogStage.showAndWait();
+
+            // 如果用户确认使用分类结果，则更新分类字段
+            if (controller.isConfirmClicked()) {
+                String category = controller.getClassificationResult();
+                setCategoryFromAI(category);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            // 显示错误对话框
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("错误");
+            alert.setHeaderText(null);
+            alert.setContentText("无法打开分类窗口: " + e.getMessage());
+            alert.showAndWait();
+        }
+    }
+    private void openClassificationWindow() {
+        String description = descriptionField.getText();
+        if (description == null || description.trim().isEmpty()) {
+            // 显示错误提示
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("输入不完整");
+            alert.setHeaderText(null);
+            alert.setContentText("请先输入交易描述");
+            alert.showAndWait();
+            return;
+        }
+
+        openClassificationWindow(description);
     }
 }
