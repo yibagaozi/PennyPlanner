@@ -20,28 +20,28 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import javafx.scene.layout.StackPane;
 
-
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * HomeController负责展示应用的主页，包括用户欢迎信息、支出趋势折线图、支出分布饼图等。
+ * 该控制器通过ChartService和ChartViewService来渲染图表，并通过TransactionAdapter从数据库获取用户交易数据。
+ */
 @Controller
 public class HomeController {
+    
     @FXML
     private Label usernameLabel; // 必须与fx:id完全一致
 
     @FXML
     private SplitPane splitPane;
 
-//    @FXML
-//    private LineChart<String, Number> expenseTrendChart; // 支出趋势折线图
     @FXML
     private StackPane expenseTrendChartContainer; // 替换原来的LineChart
 
-//    @FXML
-//    private PieChart expenseDistributionChart; // 支出分布饼图
     @FXML
     private StackPane expenseDistributionChartContainer; // 替换原来的PieChart
 
@@ -50,15 +50,24 @@ public class HomeController {
     @Autowired
     private ChartViewService chartViewService;
 
-
-    //数据持久化相关
+    // 数据持久化相关
     private static TransactionAdapter transactionAdapter;
     private static AuthService authService;
 
+    /**
+     * 设置TransactionAdapter实例，用于获取用户交易数据。
+     * 
+     * @param adapter TransactionAdapter实例
+     */
     public static void setTransactionAdapter(TransactionAdapter adapter) {
         transactionAdapter = adapter;
     }
 
+    /**
+     * 设置AuthService实例，用于获取当前用户信息。
+     * 
+     * @param service AuthService实例
+     */
     public static void setAuthService(AuthService service) {
         authService = service;
     }
@@ -66,14 +75,27 @@ public class HomeController {
     private static ChartService staticChartService;
     private static ChartViewService staticChartViewService;
 
+    /**
+     * 设置ChartService实例，用于处理图表相关业务。
+     * 
+     * @param service ChartService实例
+     */
     public static void setChartService(ChartService service) {
         staticChartService = service;
     }
 
+    /**
+     * 设置ChartViewService实例，用于生成图表视图。
+     * 
+     * @param service ChartViewService实例
+     */
     public static void setChartViewService(ChartViewService service) {
         staticChartViewService = service;
     }
 
+    /**
+     * 初始化方法，设置用户名并初始化图表。
+     */
     @FXML
     private void initialize() {
         // 1. 设置用户名
@@ -102,41 +124,75 @@ public class HomeController {
         // 3. 初始化支出分布饼图
         setupExpenseDistributionChart();
 
-
         // 禁用分割线的拖动
         splitPane.getDividers().forEach(divider -> divider.positionProperty().addListener((observable, oldValue, newValue) -> {
             divider.setPosition(0.1); // 固定分割线位置为 10%
         }));
-
-
     }
+
+    /**
+     * 转到主页。
+     * 
+     * @throws IOException 如果页面加载失败
+     */
     @FXML
     private void turntoHome() throws IOException {
-        //System.out.println("转到home页面");
         MainApp.showHome();
     }
+
+    /**
+     * 转到报告页面。
+     * 
+     * @throws IOException 如果页面加载失败
+     */
     @FXML
     private void turntoReport() throws IOException {
-       // System.out.println("转到home页面");
         MainApp.showReport();
-    }@FXML
+    }
+
+    /**
+     * 转到历史页面。
+     * 
+     * @throws IOException 如果页面加载失败
+     */
+    @FXML
     private void turntoHistory() throws IOException {
-       // System.out.println("转到home页面");
         MainApp.showhistory();
-    }@FXML
+    }
+
+    /**
+     * 转到管理页面。
+     * 
+     * @throws IOException 如果页面加载失败
+     */
+    @FXML
     private void turntoManagement() throws IOException {
-       // System.out.println("转到home页面");
         MainApp.showmanagement();
-    }@FXML
+    }
+
+    /**
+     * 转到用户页面。
+     * 
+     * @throws IOException 如果页面加载失败
+     */
+    @FXML
     private void turntoUser() throws IOException {
-      //  System.out.println("转到home页面");
         MainApp.showuser();
     }
+
+    /**
+     * 转到登录页面。
+     * 
+     * @throws IOException 如果页面加载失败
+     */
     @FXML
     private void turntoLogin() throws IOException {
-        System.out.println("Login");
         MainApp.showLogin();
     }
+
+    /**
+     * 初始化支出趋势折线图。
+     */
     private void setupExpenseTrendChart() {
         // 清除现有内容
         expenseTrendChartContainer.getChildren().clear();
@@ -169,44 +225,11 @@ public class HomeController {
         // 设置图表占满容器空间
         lineChart.prefWidthProperty().bind(expenseTrendChartContainer.widthProperty());
         lineChart.prefHeightProperty().bind(expenseTrendChartContainer.heightProperty());
-//        // 创建数据系列
-//        XYChart.Series<String, Number> series = new XYChart.Series<>();
-//        series.setName("Daily Expense");
-//
-//        if (transactionAdapter != null) {
-//            // 获取最近30天的支出数据
-//            List<TransactionAdapter.DateSum> dailyExpenses = transactionAdapter.getDailyExpenseSummary(30);
-//
-//            // 转换为图表数据点
-//            for (TransactionAdapter.DateSum dateSum : dailyExpenses) {
-//                series.getData().add(new XYChart.Data<>(dateSum.getDate(), dateSum.getAmount()));
-//            }
-//        } else{
-//            // 添加示例数据
-//            series.getData().add(new XYChart.Data<>("23 Mar", 5000));
-//            series.getData().add(new XYChart.Data<>("24", 8000));
-//            series.getData().add(new XYChart.Data<>("25", 12000));
-//            series.getData().add(new XYChart.Data<>("26", 15000));
-//            series.getData().add(new XYChart.Data<>("27", 18000));
-//            series.getData().add(new XYChart.Data<>("28", 22000));
-//            series.getData().add(new XYChart.Data<>("29", 26000));
-//            series.getData().add(new XYChart.Data<>("30", 30000));
-//        }
-//
-//
-//
-//        // 将系列添加到折线图
-//        expenseTrendChart.getData().add(series);
-//
-//        // 设置图表样式
-//        expenseTrendChart.setLegendVisible(false);
-//
-//        // 设置线条颜色为黑色(与图片一致)
-//        for (XYChart.Data<String, Number> data : series.getData()) {
-//            data.getNode().setStyle("-fx-background-color: black, white;");
-//        }
     }
 
+    /**
+     * 初始化支出分布饼图。
+     */
     private void setupExpenseDistributionChart() {
         // 清除现有内容
         expenseDistributionChartContainer.getChildren().clear();
@@ -238,7 +261,12 @@ public class HomeController {
         pieChart.prefHeightProperty().bind(expenseDistributionChartContainer.heightProperty());
     }
 
-    // 从tableModel转换为Transaction对象
+    /**
+     * 将tableModel对象转换为Transaction对象。
+     * 
+     * @param model tableModel对象
+     * @return 转换后的Transaction对象
+     */
     private Transaction convertToTransaction(tableModel model) {
         Transaction tx = new Transaction();
         tx.setDescription(model.getDescription());
@@ -258,7 +286,11 @@ public class HomeController {
         return tx;
     }
 
-    // 创建示例交易数据
+    /**
+     * 创建示例交易数据。
+     * 
+     * @return 示例交易数据列表
+     */
     private List<Transaction> createSampleTransactions() {
         List<Transaction> samples = new ArrayList<>();
 
@@ -289,8 +321,15 @@ public class HomeController {
         return samples;
     }
 
-
-    // 创建单个交易记录帮助方法
+    /**
+     * 创建单个交易记录帮助方法。
+     * 
+     * @param description 交易描述
+     * @param amount 交易金额
+     * @param category 交易类别
+     * @param date 交易日期
+     * @return 创建的Transaction对象
+     */
     private Transaction createTransaction(String description, double amount, String category, LocalDate date) {
         Transaction tx = new Transaction();
         tx.setDescription(description);
@@ -300,7 +339,11 @@ public class HomeController {
         return tx;
     }
 
-
+    /**
+     * 获取默认的饼图数据。
+     * 
+     * @return 默认的饼图数据
+     */
     private ObservableList<PieChart.Data> getDefaultPieChartData() {
         return FXCollections.observableArrayList(
                 new PieChart.Data("Food", 237),
@@ -311,3 +354,4 @@ public class HomeController {
         );
     }
 }
+
