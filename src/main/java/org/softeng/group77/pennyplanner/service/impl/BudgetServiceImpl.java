@@ -20,11 +20,28 @@ public class BudgetServiceImpl implements BudgetService {
     private final BudgetRepository budgetRepository;
     private final AuthService authService;
 
+    /**
+     * Constructor to initialize the BudgetServiceImpl instance through dependency injection.
+     *
+     * @param budgetRepository The BudgetRepository instance used for accessing budget data.
+     * @param authService The AuthService instance used for authentication-related operations.
+     */
     public BudgetServiceImpl(BudgetRepository budgetRepository, AuthService authService) {
         this.budgetRepository = budgetRepository;
         this.authService = authService;
     }
 
+    /**
+     * Saves a new budget entry after validating user login state, amount, and date.
+     * Ensures the user is logged in, the amount is non-negative, and the date is valid
+     * (not in the past, not after 2030-12-31). Creates and persists a new Budget object.
+     *
+     * @param amount The amount of the budget.
+     * @param date The date for which the budget is set.
+     * @return The newly created and saved Budget object.
+     * @throws BudgetProcessingException If validation fails (user not logged in, invalid amount/date)
+     *                                   or if an error occurs during the saving process.
+     */
     @Override
     public Budget saveBudget(double amount, LocalDate date) {
         try {
@@ -72,6 +89,14 @@ public class BudgetServiceImpl implements BudgetService {
         }
     }
 
+    /**
+     * Retrieves the budget for a specific date.
+     * Validates the input date and searches the repository for a matching budget entry.
+     *
+     * @param date The date for which to retrieve the budget.
+     * @return The Budget object for the specified date.
+     * @throws Exception If the date is null, no budget is found for the date, or if any other error occurs during retrieval.
+     */
     @Override
     public Budget getBudgetByDate(LocalDate date) throws Exception {
         try {
@@ -103,6 +128,14 @@ public class BudgetServiceImpl implements BudgetService {
         }
     }
 
+    /**
+     * Retrieves the latest budget entry for the current month and year.
+     * Iterates through all budgets to find the one with the latest date within the current month.
+     *
+     * @return The most recent Budget object for the current month and year.
+     * @throws BudgetNotFoundException If no budget is found for the current month and year.
+     * @throws BudgetProcessingException If an error occurs during the retrieval process.
+     */
     @Override
     public Budget getCurrentBudget() throws BudgetNotFoundException, BudgetProcessingException {
         Budget latestBudget = null;
@@ -138,6 +171,14 @@ public class BudgetServiceImpl implements BudgetService {
         return latestBudget;
     }
 
+    /**
+     * Retrieves the latest budget entry for the specified year and month.
+     * Iterates through all budgets to find the one with the latest date within the given year-month.
+     *
+     * @param yearMonth The year and month for which to retrieve the budget.
+     * @return The most recent Budget object for the specified year and month, or null if no budget is found for that period.
+     * @throws BudgetProcessingException If the yearMonth is null or if an error occurs during the retrieval process.
+     */
     @Override
     public Budget getBudgetByYearMonth(YearMonth yearMonth) {
         try {
