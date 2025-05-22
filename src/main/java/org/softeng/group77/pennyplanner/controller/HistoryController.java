@@ -7,81 +7,130 @@ import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-
 import java.io.IOException;
 import java.util.function.Predicate;
 
+/**
+ * Controller class for handling transaction history view.
+ * Manages display and filtering of transaction records in a TableView with
+ * filtering capabilities by year, month and category.
+ */
 public class HistoryController {
+    
+    /** Label displaying current month/year header */
     @FXML private Label date;
+    
+    /** ComboBox for selecting filter year */
     @FXML private ComboBox<Integer> Year;
+    
+    /** ComboBox for selecting filter month */
     @FXML private ComboBox<String> Month;
+    
+    /** ComboBox for selecting filter category */
     @FXML private ComboBox<String> category;
+    
+    /** TableView displaying transaction records */
     @FXML private TableView<tableModel> transactionTable;
+    
+    /** Column displaying transaction sequence number */
     @FXML private TableColumn<tableModel, String> transactionidColumn;
+    
+    /** Column displaying transaction date */
     @FXML private TableColumn<tableModel, String> dateColumn;
+    
+    /** Column displaying transaction description */
     @FXML private TableColumn<tableModel, String> descriptionColumn;
+    
+    /** Column displaying transaction amount with color coding */
     @FXML private TableColumn<tableModel, Double> amountColumn;
+    
+    /** Column displaying transaction category */
     @FXML private TableColumn<tableModel, String> categoryColumn;
+    
+    /** Column displaying payment method */
     @FXML private TableColumn<tableModel, String> methodColumn;
+    
+    /** SplitPane container for the view */
+    @FXML private SplitPane splitPane;
 
-    // 数据存储结构：原始数据 + 动态过滤列表
-    //private final ObservableList<tableModel> transactionData = FXCollections.observableArrayList();
+    /**
+     * The master list of all transactions (shared across application)
+     */
     private final ObservableList<tableModel> transactionData = SharedDataModel.getTransactionData();
+    
+    /**
+     * Filtered view of transaction data based on user selections
+     */
     private FilteredList<tableModel> filteredData = new FilteredList<>(transactionData);
 
-    @FXML
-    private SplitPane splitPane;
-
+    /**
+     * Initializes the controller after FXML loading. Sets up:
+     * - ComboBox options for year/month/category filters
+     * - TableView column bindings and formatting
+     * - Dynamic filtering logic
+     * - Special cell renderers for ID and amount columns
+     */
     @FXML
     private void initialize() {
-        // 首先刷新数据，确保显示最新的交易记录
-        //SharedDataModel.refreshTransactionData();
-
-        // 创建FilteredList包装SharedDataModel的数据
-        //filteredData = new FilteredList<>(SharedDataModel.getTransactionData());
-
-        // 初始化日期标题（固定显示 March 2025）
-        //date.setText("April 2025");
-
+        // Initialize year selection options
         Year.setItems(FXCollections.observableArrayList(
-                null, // 空选项
+                null, // Null option for no filter
                 2022, 2023, 2024, 2025
         ));
 
-        // 月份选择框 (1-12月)
+        // Initialize month selection options
         Month.setItems(FXCollections.observableArrayList(
-                null, // 空选项
+                null, // Null option for no filter  
                 "01", "02", "03", "04", "05", "06",
                 "07", "08", "09", "10", "11", "12"
         ));
 
-
-        // 初始化分类选择框
+        // Initialize category selection options
         ObservableList<String> categories = FXCollections.observableArrayList(
-                null, "Food", "Salary", "Living Bill", "Entertainment", "Transportation", "Education", "Clothes", "Others"
+                null, "Food", "Salary", "Living Bill", 
+                "Entertainment", "Transportation", "Education", 
+                "Clothes", "Others"
         );
         category.setItems(categories);
 
-        // 绑定表格列与模型属性
+        // Bind table columns to model properties
+        configureTableColumns();
+        
+        // Set default sorting by date descending
+        dateColumn.setSortType(TableColumn.SortType.DESCENDING);
+        transactionTable.getSortOrder().add(dateColumn);
+
+        // Configure amount column styling
+        setupAmountColumnFormatter();
+        
+        // Configure dynamic row numbering
+        setupRowNumbering();
+        
+        // Lock split pane divider position
+        lockSplitPane();
+        
+        // Set up filter listeners
+        setupFilterListeners();
+    }
+
+    /**
+     * Binds table columns to corresponding model properties
+     */
+    private void configureTableColumns() {
         transactionidColumn.setCellValueFactory(cellData -> cellData.getValue().displayIdProperty());
         dateColumn.setCellValueFactory(cellData -> cellData.getValue().dateProperty());
         descriptionColumn.setCellValueFactory(cellData -> cellData.getValue().descriptionProperty());
         amountColumn.setCellValueFactory(cellData -> cellData.getValue().amountProperty().asObject());
         categoryColumn.setCellValueFactory(cellData -> cellData.getValue().categoryProperty());
         methodColumn.setCellValueFactory(cellData -> cellData.getValue().methodProperty());
-        // 设置默认按日期降序
-        dateColumn.setSortType(TableColumn.SortType.DESCENDING);
-        transactionTable.getSortOrder().add(dateColumn);
+    }
 
-        // 设置动态过滤列表为表格数据源
-        transactionTable.setItems(filteredData);
-
-        // 加载示例数据（仅加载一次）
-        if (transactionData.isEmpty()) {
-            //addSampleData();
-        }
-
-        // 配置金额列显示格式
+    /**
+     * Configures special formatting for amount column:
+     * - Displays values with $ prefix and 2 decimal places
+     * - Colors negative amounts red, positive green
+     */
+    private void setupAmountColumnFormatter() {
         amountColumn.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(Double amount, boolean empty) {
@@ -95,60 +144,67 @@ public class HistoryController {
                 }
             }
         });
+    }
 
-        // 绑定筛选条件监听器
-        Year.valueProperty().addListener((obs, oldVal, newVal) -> updateFilter());
-        Month.valueProperty().addListener((obs, oldVal, newVal) -> updateFilter());
-        category.valueProperty().addListener((obs, oldVal, newVal) -> updateFilter());
-
-        // Initial filter application might be needed if default filters are set
-        updateFilter();
-
-        // 为编号列设置一个特殊的cellFactory，动态生成序号
+    /**
+     * Configures dynamic row numbering for the first column
+     */
+    private void setupRowNumbering() {
         transactionidColumn.setCellFactory(column -> new TableCell<tableModel, String>() {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty) {
-                    setText(null);
-                } else {
-                    // 使用当前行索引+1作为编号
-                    setText(String.valueOf(getIndex() + 1));
-                }
+                setText(empty ? null : String.valueOf(getIndex() + 1));
             }
         });
-        // 不再需要使用model中的displayId作为值
-        transactionidColumn.setCellValueFactory(new PropertyValueFactory<>("id")); // 任意属性，实际不会使用
-//        // 不再需要从模型中获取displayId
-//        transactionidColumn.setCellValueFactory(cellData ->
-//                new SimpleStringProperty(String.valueOf(filteredData.indexOf(cellData.getValue()) + 1)));
-
-
-        // 禁用分割线的拖动
-        splitPane.getDividers().forEach(divider -> divider.positionProperty().addListener((observable, oldValue, newValue) -> {
-            divider.setPosition(0.1); // 固定分割线位置为 10%
-        }));
+        transactionidColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
     }
 
-    // 统一筛选逻辑（核心修复）
+    /**
+     * Locks the split pane divider at 10% position
+     */
+    private void lockSplitPane() {
+        splitPane.getDividers().forEach(divider -> 
+            divider.positionProperty().addListener((obs, oldVal, newVal) -> 
+                divider.setPosition(0.1)
+            )
+        );
+    }
+
+    /**
+     * Sets up listeners for filter controls that trigger updateFilter()
+     */
+    private void setupFilterListeners() {
+        Year.valueProperty().addListener((obs, oldVal, newVal) -> updateFilter());
+        Month.valueProperty().addListener((obs, oldVal, newVal) -> updateFilter());
+        category.valueProperty().addListener((obs, oldVal, newVal) -> updateFilter());
+    }
+
+    /**
+     * Updates the table filter based on current selections in:
+     * - Year ComboBox
+     * - Month ComboBox  
+     * - Category ComboBox
+     * 
+     * Applies conjunctive (AND) filtering across all active filters
+     */
     private void updateFilter() {
         Predicate<tableModel> predicate = transaction -> {
-            // 日期条件处理
+            // Date filtering logic
             boolean dateMatch = true;
             if (Year.getValue() != null || Month.getValue() != null) {
                 String[] dateParts = transaction.getDate().split("-");
                 int year = Integer.parseInt(dateParts[0]);
                 int month = Integer.parseInt(dateParts[1]);
 
-                // 处理未选择年份/月份的情况
                 int selectedYear = Year.getValue() != null ? Year.getValue() : year;
                 int selectedMonth = Month.getValue() != null ?
-                        Integer.parseInt(Month.getValue().replace("月", "")) : month;
+                        Integer.parseInt(Month.getValue()) : month;
 
                 dateMatch = (year == selectedYear) && (month == selectedMonth);
             }
 
-            // 分类条件处理
+            // Category filtering logic
             boolean categoryMatch = category.getValue() == null ||
                     category.getValue().isEmpty() ||
                     transaction.getCategory().equals(category.getValue());
@@ -159,39 +215,65 @@ public class HistoryController {
         filteredData.setPredicate(predicate);
     }
 
-    // 示例数据初始化（与截图完全一致）
-//    private void addSampleData() {
-//        transactionData.add(new tableModel("1", "2023-06-15", "超市购物", -125.50, "Food", "信用卡"));
-//        transactionData.add(new tableModel("2", "2023-06-16", "工资收入", 5000.00, "Salary", "银行转账"));
-//        transactionData.add(new tableModel("3", "2023-06-17", "水电费", -230.75, "Living Bill", "自动扣款"));
-//    }
-
+    /**
+     * Refreshes transaction data from shared model
+     */
     @FXML
     public void refreshData() {
         SharedDataModel.refreshTransactionData();
-        // 重新初始化过滤数据
-        //filteredData = new FilteredList<>(SharedDataModel.getTransactionData());
-        //transactionTable.setItems(filteredData);
     }
 
-    // 以下导航方法保持不变
+    // Navigation methods
+    
+    /**
+     * Navigates to Home view
+     * @throws IOException if FXML loading fails
+     */
     @FXML
     private void turntoHome() throws IOException {
         MainApp.showHome();
     }
+    
+    /**
+     * Navigates to Reports view
+     * @throws IOException if FXML loading fails
+     */
     @FXML
     private void turntoReport() throws IOException {
         MainApp.showReport();
-    }@FXML
+    }
+    
+    /**
+     * Navigates to History view (reloads current view)
+     * @throws IOException if FXML loading fails
+     */
+    @FXML
     private void turntoHistory() throws IOException {
         MainApp.showhistory();
-    }@FXML
+    }
+    
+    /**
+     * Navigates to Management view
+     * @throws IOException if FXML loading fails
+     */
+    @FXML
     private void turntoManagement() throws IOException {
         MainApp.showmanagement();
-    }@FXML
+    }
+    
+    /**
+     * Navigates to User profile view
+     * @throws IOException if FXML loading fails
+     */
+    @FXML
     private void turntoUser() throws IOException {
         MainApp.showuser();
     }
+    
+    /**
+     * Navigates to Login view
+     * @throws IOException if FXML loading fails
+     */
     @FXML
     private void turntoLogin() throws IOException {
         System.out.println("Login");
