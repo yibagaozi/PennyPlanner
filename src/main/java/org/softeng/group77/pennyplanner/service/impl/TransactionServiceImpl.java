@@ -246,6 +246,44 @@ public class TransactionServiceImpl implements TransactionService {
         }
     }
 
+        @Override
+    @RequiresAuthentication
+    public List<Transaction> filterTransactionByDateForAnalysis(LocalDate startDate, LocalDate endDate) {
+        try {
+            String userId = authService.getCurrentUser().getId();
+
+            List<Transaction> transactions = transactionRepository.findByUserId(userId);
+
+            if (transactions.isEmpty()) {
+                log.info("No transactions found for user: {} in the specified date range", authService.getCurrentUser().getUsername());
+                return List.of();
+            }
+
+            List<Transaction> filteredTransactions = transactions.stream()
+                    .filter(transaction -> {
+                        LocalDate transactionDate = transaction.getTransactionDateTime().toLocalDate();
+                        return (startDate == null || !transactionDate.isBefore(startDate)) &&
+                               (endDate == null || !transactionDate.isAfter(endDate));
+                    })
+                    .toList();
+
+            if (filteredTransactions.isEmpty()) {
+                log.info("No transactions found for user: {} in the specified date range", authService.getCurrentUser().getUsername());
+                return List.of();
+            } else {
+                log.info("Found {} transactions for user: {} in the specified date range", filteredTransactions.size(), authService.getCurrentUser().getUsername());
+                return filteredTransactions;
+            }
+
+        } catch (IOException e) {
+            log.error("File error while filtering transactions by date", e);
+            throw new TransactionProcessingException("Failed to filter transactions by date", e);
+        } catch (Exception e) {
+            log.error("Unexpected error filtering transactions by date", e);
+            throw new TransactionProcessingException("An unexpected error occurred", e);
+        }
+    }
+
     @Override
     @RequiresAuthentication
     public List<TransactionDetail> filterTransactionByCategory(String category) {
