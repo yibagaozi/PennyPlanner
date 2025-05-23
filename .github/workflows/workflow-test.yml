@@ -15,15 +15,16 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Set up Liberica JDK
-      uses: sdkman/sdkman-action@master
+    - name: Set up Liberica JDK 21 Full (with JavaFX)
+      uses: actions/setup-java@v3
       with:
-        candidate: java
-        version: 21.0.2-librca
+        distribution: 'liberica'
+        java-version: '21'
+        cache: maven
 
     - name: Build Jar
-      run: mvn clean package -DskipTests
-
+      run: mvn -B clean package --file pom.xml -DskipTests
+      
     - name: Upload Jar
       uses: actions/upload-artifact@v4
       with:
