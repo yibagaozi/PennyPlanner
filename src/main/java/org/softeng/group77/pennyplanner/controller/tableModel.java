@@ -5,7 +5,10 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-
+/**
+ * tableModel 用于表示一条交易记录的实体类，包含了交易的各个属性（如日期、描述、金额、类别、支付方式等）。
+ * 该类与 TableView 控件绑定，使得用户界面能够显示和操作交易记录的数据。
+ */
 public class tableModel {
     private final StringProperty id;
     private final StringProperty date;       // 对应Date列
