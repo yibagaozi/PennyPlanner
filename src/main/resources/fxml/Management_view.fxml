@@ -11,7 +11,7 @@
             <Label styleClass="nav-title" text="PennyPlanner" />
             <Button onAction="#turntoHome" styleClass="nav-button" text="Home" />
             <Button onAction="#turntoReport" styleClass="nav-button" text="Report &amp; Forecast" />
-            <Button onAction="#turntoFinancialAssistant" style="-fx-font-weight: bold;" styleClass="nav-button" text="AI AST" fx:id="financialAssistantButton"/>
+            <Button fx:id="financialAssistantButton" onAction="#turntoFinancialAssistant" style="-fx-font-weight: bold;" styleClass="nav-button" text="AI AST" />
             <Button onAction="#turntoHistory" styleClass="nav-button" text="History" />
             <Button onAction="#turntoManagement" styleClass="nav-button" text="Management" />
             <Button onAction="#turntoUser" styleClass="nav-button" text="User Profile" />
@@ -63,7 +63,7 @@
                       <ComboBox fx:id="categoryComboBox" layoutX="46.0" layoutY="238.0" prefWidth="150.0" />
                       <Button fx:id="classifyButton" layoutX="45.0" layoutY="275.0" text="AI-Classification" />
                       <!-- 在描述字段的HBox后面添加新的HBox -->
-                      <HBox alignment="CENTER_LEFT" layoutX="22.0" layoutY="308.0" prefHeight="53.0" prefWidth="205.0" spacing="10.0">
+                      <HBox alignment="CENTER_LEFT" layoutX="22.0" layoutY="324.0" prefHeight="28.0" prefWidth="205.0" spacing="10.0">
                           <children>
                               <Label fx:id="classificationStatusLabel" prefHeight="43.0" prefWidth="153.0" style="-fx-font-weight: bold;" text="Status" />
                               <ProgressIndicator fx:id="classifyProgress" prefHeight="43.0" prefWidth="38.0" visible="false" />

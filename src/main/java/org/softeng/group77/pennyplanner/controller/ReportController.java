@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
 @Controller
@@ -44,6 +45,7 @@ public class ReportController {
 
     @FXML
     private void initialize() {
+        Locale.setDefault(Locale.ENGLISH);
         // 设置初始文本
         String text="Choose date range and click the button to generate a report";
         myTextArea.setText(text);

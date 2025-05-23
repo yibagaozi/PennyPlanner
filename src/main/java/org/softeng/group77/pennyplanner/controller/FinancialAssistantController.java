@@ -17,10 +17,7 @@ import org.springframework.stereotype.Controller;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 @Slf4j
@@ -50,7 +47,7 @@ public class FinancialAssistantController {
     private ApplicationContext applicationContext;
 
     private List<Map<String, String>> conversationHistory = new ArrayList<>();
-    private static final String WELCOME_MESSAGE = "您好！我是PennyPlanner财务助手。请选择日期范围，让我帮您分析财务状况并回答您的问题。";
+    private static final String WELCOME_MESSAGE = "Hello! I'm PennyPlanner, your finance assistant. Please select a date range and let me help you analyze your finances and answer your questions.";
 
     // 聊天消息的内部类，用于保存聊天记录
     private static class ChatMessage {
@@ -69,6 +66,7 @@ public class FinancialAssistantController {
 
     @FXML
     private void initialize() {
+        Locale.setDefault(Locale.ENGLISH);
         // 初始化日期选择为之前保存的日期或当前月份
         LocalDate now = LocalDate.now();
         LocalDate firstDayOfMonth = now.withDayOfMonth(1);
