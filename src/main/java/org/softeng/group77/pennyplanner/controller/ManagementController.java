@@ -36,6 +36,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
+/**
+ * ManagementController 负责管理交易记录的增删改查，包括交易记录的保存、取消、文件上传及其他相关功能。
+ * 该控制器提供界面上的用户输入、数据校验及与 SharedDataModel 的交互。
+ */
 @Controller
 public class ManagementController {
     // 字段绑定
@@ -85,7 +89,10 @@ public class ManagementController {
         this.applicationContext = applicationContext;
     }
 
-    // 在initialize方法中初始化分类和支付方式
+    /**
+     * 初始化方法，用于初始化类别和支付方式选择框，并设置默认选项。
+     * 同时禁用分割线的拖动。
+     */
     public void initialize() {
         Locale.setDefault(Locale.ENGLISH);
 
@@ -289,7 +296,9 @@ public class ManagementController {
 
 
 
-    // "Save"按钮处理方法
+    /**
+     * 处理保存按钮点击事件，进行输入数据校验、交易记录创建并保存到共享数据中。
+     */
     @FXML
     private void handleSave() {
         try {
@@ -340,24 +349,34 @@ public class ManagementController {
         }
     }
 
+    /**
+     * 处理取消按钮点击事件，清空所有输入框。
+     */
     @FXML
     private void handleCancel() {
         // 清空输入框
         clearForm();
     }
 
-    // 新增类型选择处理方法
+    /**
+     * 设置交易类型为支出。
+     */
     @FXML
     private void handleExpense() {
         isExpense = true;
     }
 
+    /**
+     * 设置交易类型为收入。
+     */
     @FXML
     private void handleIncome() {
         isExpense = false;
     }
 
-
+    /**
+     * 清空所有输入框和选择框。
+     */
     private void clearForm() {
         // 重置DatePicker为当前日期
         dateField.setValue(LocalDate.now());
@@ -368,6 +387,11 @@ public class ManagementController {
         methodComboBox.getSelectionModel().selectFirst();
     }
 
+    /**
+     * 显示错误信息弹窗。
+     * 
+     * @param message 错误消息
+     */
     private void showAlert(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("输入错误");
@@ -384,7 +408,11 @@ public class ManagementController {
         alert.showAndWait();
     }
 
-    // 获取当前Stage的两种方式（任选其一）
+    /**
+     * 获取当前窗口（Stage）。
+     * 
+     * @return 当前窗口的Stage
+     */
     private Stage getCurrentStage() {
         // 方式1：通过任意界面元素获取（比如上传按钮）
         return (Stage) uploadButton.getScene().getWindow();
