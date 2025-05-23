@@ -93,7 +93,6 @@ public class ManagementController {
      * 初始化方法，用于初始化类别和支付方式选择框，并设置默认选项。
      * 同时禁用分割线的拖动。
      */
-    public
     public void initialize() {
         Locale.setDefault(Locale.ENGLISH);
 
