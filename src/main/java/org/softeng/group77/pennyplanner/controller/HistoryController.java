@@ -23,6 +23,11 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+/**
+ * Controller class for handling transaction history view.
+ * Manages display and filtering of transaction records in a TableView with
+ * filtering capabilities by year, month and category.
+ */
 @Controller
 public class HistoryController {
     @FXML private Label date;
@@ -66,6 +71,13 @@ public class HistoryController {
         this.applicationContext = applicationContext;
     }
 
+    /**
+     * Initializes the controller after FXML loading. Sets up:
+     * - ComboBox options for year/month/category filters
+     * - TableView column bindings and formatting
+     * - Dynamic filtering logic
+     * - Special cell renderers for ID and amount columns
+     */
     @FXML
     private void initialize() {
         Year.setPromptText("Year");
