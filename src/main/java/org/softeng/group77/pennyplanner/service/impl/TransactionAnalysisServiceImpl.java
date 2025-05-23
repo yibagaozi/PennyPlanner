@@ -259,18 +259,32 @@ public class TransactionAnalysisServiceImpl implements TransactionAnalysisServic
                     transactionContext = prepareTransactionContext(startDate, endDate);
                 }
 
+//                if (history.isEmpty() || !"system".equals(history.get(0).get("role"))) {
+//                    Map<String, String> systemEntry = new HashMap<>();
+//                    systemEntry.put("role", "system");
+//                    systemEntry.put("content", systemPrompt);
+//                    history.add(0, systemEntry);
+//                }
+//
+//                if (!transactionContext.isEmpty()) {
+//                    Map<String, String> contextEntry = new HashMap<>();
+//                    contextEntry.put("role", "system");
+//                    contextEntry.put("content", "Here is the user's transaction data for analysis:\n" + transactionContext);
+//                    history.add(1, contextEntry);
+//                }
+
                 if (history.isEmpty() || !"system".equals(history.get(0).get("role"))) {
+                    StringBuilder combinedSystemContent = new StringBuilder(systemPrompt);
+
+                    if (!transactionContext.isEmpty()) {
+                        combinedSystemContent.append("\n\nHere is the user's transaction data for analysis:\n")
+                                .append(transactionContext);
+                    }
+
                     Map<String, String> systemEntry = new HashMap<>();
                     systemEntry.put("role", "system");
-                    systemEntry.put("content", systemPrompt);
+                    systemEntry.put("content", combinedSystemContent.toString());
                     history.add(0, systemEntry);
-                }
-
-                if (!transactionContext.isEmpty()) {
-                    Map<String, String> contextEntry = new HashMap<>();
-                    contextEntry.put("role", "system");
-                    contextEntry.put("content", "Here is the user's transaction data for analysis:\n" + transactionContext);
-                    history.add(1, contextEntry);
                 }
 
                 List<Message> messages = history.stream()
