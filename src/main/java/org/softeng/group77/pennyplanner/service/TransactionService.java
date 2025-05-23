@@ -7,7 +7,9 @@ import org.springframework.stereotype.Component;
 import javax.naming.AuthenticationException;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public interface TransactionService {
@@ -26,6 +28,14 @@ public interface TransactionService {
 
     List<TransactionDetail> filterTransactionByDate(LocalDate startDate, LocalDate endDate);
 
+    List<Transaction> filterTransactionByDateForAnalysis(LocalDate startDate, LocalDate endDate);
+
     List<TransactionDetail> filterTransactionByCategory(String category);
+    Map<String, Double> getDefaultSummary( LocalDateTime endTime) throws IOException;
+
+    Map<String, Double> getSummaryByDateRange(LocalDate startDate, LocalDate endDate) throws IOException;
+
+    List<TransactionDetail> filterTransactionByMethod(String method);
 
 }
+    

@@ -16,12 +16,11 @@ public interface TransactionRepository {
     Optional<Transaction> findById(String id) throws IOException;
 
     List<Transaction> findByUserId(String userId) throws IOException;
-
     List<Transaction> findByUserIdAndDescription(String userId, String description) throws IOException;
-     List<Transaction> findByUserIdAndTransactionDateTimeBetween(
-            String userId,
-            LocalDateTime start,
-            LocalDateTime end
-    );
+    List<Transaction> findByUserIdAndTransactionDateTimeBetween(
+        String userId,
+        LocalDateTime start,
+        LocalDateTime end
+) throws IOException;
 
 }

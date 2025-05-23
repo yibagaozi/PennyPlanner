@@ -6,15 +6,18 @@ import javafx.fxml.FXML;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.Label;
-import javafx.scene.control.SplitPane;
+import javafx.scene.control.*;
+import lombok.extern.slf4j.Slf4j;
 import org.softeng.group77.pennyplanner.adapter.TransactionAdapter;
+import org.softeng.group77.pennyplanner.exception.BudgetNotFoundException;
 import org.softeng.group77.pennyplanner.service.AuthService;
 import org.softeng.group77.pennyplanner.model.*;
+import org.softeng.group77.pennyplanner.service.BudgetService;
 import org.softeng.group77.pennyplanner.service.ChartService;
 import org.softeng.group77.pennyplanner.service.ChartViewService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import java.time.YearMonth;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -31,6 +34,7 @@ import java.util.stream.Collectors;
  * 该控制器通过ChartService和ChartViewService来渲染图表，并通过TransactionAdapter从数据库获取用户交易数据。
  */
 @Controller
+@Slf4j
 public class HomeController {
     
     @FXML
@@ -45,6 +49,24 @@ public class HomeController {
     @FXML
     private StackPane expenseDistributionChartContainer; // 替换原来的PieChart
 
+    @FXML
+    private Label totalBalanceLabel; // 总余额显示标签
+
+    @FXML
+    private Label incomeAmountLabel; // 收入金额显示标签
+
+    @FXML
+    private Label expenseAmountLabel; // 支出金额显示标签
+
+    @FXML
+    private TextField budgetField; // 预算输入框
+
+    @FXML
+    private Button saveBudgetButton; // 保存预算按钮
+
+    @FXML // 新增 ProgressBar 字段
+    private ProgressBar budgetProgressBar;
+
     @Autowired
     private ChartService chartService;
     @Autowired
@@ -54,11 +76,17 @@ public class HomeController {
     private static TransactionAdapter transactionAdapter;
     private static AuthService authService;
 
+    @Autowired
+    private BudgetService budgetService;
+
+    // 用于存储当月财务摘要，避免重复计算
+    private MonthlyFinancialSummary currentMonthlySummary;
+  
     /**
      * 设置TransactionAdapter实例，用于获取用户交易数据。
      * 
      * @param adapter TransactionAdapter实例
-     */
+     */  
     public static void setTransactionAdapter(TransactionAdapter adapter) {
         transactionAdapter = adapter;
     }
@@ -97,7 +125,7 @@ public class HomeController {
      * 初始化方法，设置用户名并初始化图表。
      */
     @FXML
-    private void initialize() {
+    private void initialize() throws Exception {
         // 1. 设置用户名
         String username = "Guest";
         if (authService != null) {
@@ -124,17 +152,131 @@ public class HomeController {
         // 3. 初始化支出分布饼图
         setupExpenseDistributionChart();
 
+        //4. 初始化预算服务
+//        setBudgetService(budgetService);
+        budgetService = budgetService;
+        System.out.println("BudgetService auto-wired successfully");
+
+        // 5. 更新卡片显示
+        updateCardInfo();
+
+        // 5. 加载预算信息
+        if (budgetService != null) {
+            loadBudgetInfo();
+        };
+
+        // 6. 设置预算保存按钮事件
+        setupSaveBudgetButton();
+
+        // 7. 更新预算进度条
+        updateBudgetProgressBar();
+
+
         // 禁用分割线的拖动
         splitPane.getDividers().forEach(divider -> divider.positionProperty().addListener((observable, oldValue, newValue) -> {
-            divider.setPosition(0.1); // 固定分割线位置为 10%
+            divider.setPosition(0.12); // 固定分割线位置为 10%
         }));
     }
 
-    /**
-     * 转到主页。
-     * 
-     * @throws IOException 如果页面加载失败
-     */
+    // 设置保存预算的按钮事件
+    private void setupSaveBudgetButton() {
+        saveBudgetButton.setOnAction(e -> saveBudget());
+    }
+
+    // 保存预算
+    @FXML
+    private void saveBudget() {
+        try {
+            String budgetText = budgetField.getText();
+            if (budgetText != null && !budgetText.isEmpty()) {
+                double budgetAmount = Double.parseDouble(budgetText);
+                if (budgetService != null) {
+                    budgetService.saveBudget(budgetAmount, LocalDate.now());
+                    System.out.println("Budget saved: " + budgetAmount);
+                    updateBudgetProgressBar();
+                } else {
+                    System.out.println("BudgetService is not initialized");
+                }
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid budget amount: " + e.getMessage());
+        } catch (IOException e) {
+            System.out.println("An I/O error occurred: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("An unexpected error occurred: " + e.getMessage());
+            throw new RuntimeException("Error while saving budget", e);
+        }
+    }
+
+    // 加载预算信息
+    private void loadBudgetInfo() throws Exception {
+        try {
+            if (budgetService != null) {
+                Budget currentBudget = budgetService.getCurrentBudget();
+                if (currentBudget != null) {
+                    budgetField.setText(String.format("%.2f", currentBudget.getAmount()));
+                }
+            }
+        } catch (BudgetNotFoundException e) {
+        log.info("No budget found for current month. Displaying default values.");
+        //budgetField.setText("No budget set");
+    }
+    }
+
+    // 更新卡片信息
+    private void updateCardInfo() {
+        // 获取当月的收入和支出数据
+        MonthlyFinancialSummary summary = calculateMonthlyFinancials();
+
+        // 更新卡片显示
+        totalBalanceLabel.setText(String.format("%.2f", summary.getTotalBalance()));
+        incomeAmountLabel.setText(String.format("%.2f", summary.getTotalIncome()));
+        expenseAmountLabel.setText(String.format("%.2f", Math.abs(summary.getTotalExpense())));
+    }
+
+    // 计算当月财务摘要
+    private MonthlyFinancialSummary calculateMonthlyFinancials() {
+        double totalIncome = 0;
+        double totalExpense = 0;
+
+        // 获取当前年月
+        YearMonth currentMonth = YearMonth.now();
+        LocalDate startOfMonth = currentMonth.atDay(1); // 当月第一天
+        LocalDate endOfMonth = currentMonth.atEndOfMonth(); // 当月最后一天
+
+        // 获取交易数据
+        List<Transaction> transactions = new ArrayList<>();
+        if (transactionAdapter != null) {
+            // 使用getUserTransactions方法获取数据，并转换为Transaction对象
+            ObservableList<tableModel> models = transactionAdapter.getUserTransactions();
+            transactions = models.stream()
+                    .map(this::convertToTransaction)
+                    .collect(Collectors.toList());
+        } else {
+            // 模拟数据
+            transactions = createSampleTransactions();
+        }
+
+        // 筛选当月交易并计算总收入和总支出
+        for (Transaction tx : transactions) {
+            LocalDate txDate = tx.getTransactionDateTime().toLocalDate();
+
+            // 检查交易是否在当前月内
+            if (!txDate.isBefore(startOfMonth) && !txDate.isAfter(endOfMonth)) {
+                double amount = tx.getAmountAsDouble();
+                if (amount > 0) {
+                    totalIncome += amount;
+                } else if (amount < 0) {
+                    totalExpense += amount; // 支出是负数
+                }
+            }
+        }
+
+        double totalBalance = totalIncome + totalExpense; // 总余额 = 收入 + 支出(负数)
+
+        return new MonthlyFinancialSummary(totalIncome, totalExpense, totalBalance);
+    }
+
     @FXML
     private void turntoHome() throws IOException {
         MainApp.showHome();
@@ -190,6 +332,11 @@ public class HomeController {
         MainApp.showLogin();
     }
 
+    @FXML
+    private void turntoFinancialAssistant() throws IOException {
+        MainApp.showFinancialAssistant();
+    }
+  
     /**
      * 初始化支出趋势折线图。
      */
@@ -286,11 +433,6 @@ public class HomeController {
         return tx;
     }
 
-    /**
-     * 创建示例交易数据。
-     * 
-     * @return 示例交易数据列表
-     */
     private List<Transaction> createSampleTransactions() {
         List<Transaction> samples = new ArrayList<>();
 
@@ -353,5 +495,91 @@ public class HomeController {
                 new PieChart.Data("Others", 608)
         );
     }
+
+    // 月度财务summary内部类
+    private static class MonthlyFinancialSummary {
+        private final double totalIncome;
+        private final double totalExpense;
+        private final double totalBalance;
+
+        public MonthlyFinancialSummary(double totalIncome, double totalExpense, double totalBalance) {
+            this.totalIncome = totalIncome;
+            this.totalExpense = totalExpense;
+            this.totalBalance = totalBalance;
+        }
+
+        public double getTotalIncome() {
+            return totalIncome;
+        }
+
+        public double getTotalExpense() {
+            return totalExpense;
+        }
+
+        public double getTotalBalance() {
+            return totalBalance;
+        }
+    }
+
+    // 更新预算进度条
+    private void updateBudgetProgressBar() {
+        if (budgetProgressBar == null) {
+            log.warn("budgetProgressBar is null. Cannot update progress.");
+            return;
+        }
+
+        double budgetAmount = 0.0;
+        boolean budgetSet = false;
+
+        try {
+            if (budgetService != null) {
+                Budget currentBudget = budgetService.getCurrentBudget(); // 从服务获取最新预算
+                if (currentBudget != null) {
+                    budgetAmount = currentBudget.getAmount();
+                    budgetSet = true;
+                }
+            }
+        } catch (BudgetNotFoundException e) {
+            // 这是正常情况，表示用户未设置预算
+            budgetSet = false;
+        } catch (Exception e) {
+            log.error("Error fetching budget for progress bar: {}", e.getMessage(), e);
+            budgetSet = false; // 如果获取预算出错，也视为未设置
+        }
+
+        // 如果未设置预算或预算金额无效 (小于等于0)
+        if (!budgetSet || budgetAmount <= 0) {
+            budgetProgressBar.setProgress(0.0);
+            return;
+        }
+
+        // 获取当月支出
+        double currentMonthExpenses = 0.0;
+        MonthlyFinancialSummary summary_1 = calculateMonthlyFinancials();
+        if (summary_1 != null) {
+            currentMonthExpenses = Math.abs(summary_1.getTotalExpense());
+        } else {
+            // 如果 currentMonthlySummary 尚未计算（理论上不应发生，因为 updateCardInfo 应该先调用）
+            // 或者计算失败，则支出视为0，进度条将显示全部预算剩余。
+            // 更健壮的做法是确保 currentMonthlySummary 总是有值，或者在这里重新计算（但可能效率低）。
+            log.warn("summary_1 is null when updating progress bar. Expenses assumed to be 0 for progress calculation.");
+        }
+
+        double remainingBudget = budgetAmount - currentMonthExpenses;
+        double progress;
+
+        if (remainingBudget > 0) {
+            progress = remainingBudget / budgetAmount;
+        } else {
+            // 支出已达到或超过预算
+            progress = 0.0;
+        }
+
+        // 确保进度值在0到1之间
+        progress = Math.max(0.0, Math.min(1.0, progress));
+
+        budgetProgressBar.setProgress(progress);
+    }
+
 }
 

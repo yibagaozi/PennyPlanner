@@ -63,7 +63,7 @@ public class LoginController {
      * @throws IOException 如果页面跳转失败
      */
     @FXML
-    private void turntoHome() throws IOException {
+    private void turntoHome() {
         String email = emailField.getText();
         String password = passwordField.getText();
 
@@ -74,7 +74,7 @@ public class LoginController {
 
         // 禁用登录按钮，显示加载状态
         continueButton.setDisable(true);
-        errorLabel.setText("登录中...");
+        errorLabel.setText("Logging in...");
 
         // 使用 Task 进行异步登录（避免阻塞 UI）
         Task<Void> loginTask = new Task<>() {
@@ -88,7 +88,11 @@ public class LoginController {
                             SharedDataModel.refreshTransactionData();
                             MainApp.showHome(); // 登录成功，跳转主页
                         } catch (IOException e) {
-                            Platform.runLater(() -> errorLabel.setText("无法跳转到主页: " + e.getMessage()));
+                            String errorMsg = "跳转主页失败: " + e.getMessage();
+                            System.err.println(errorMsg);
+                            e.printStackTrace();
+                            throw new RuntimeException("跳转主页失败: " + e.getMessage());
+                            //Platform.runLater(() -> errorLabel.setText("无法跳转到主页: " + e.getMessage()));
                         }
                     });
                 } catch (AuthenticationException e) {

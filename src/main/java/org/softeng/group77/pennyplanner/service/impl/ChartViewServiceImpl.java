@@ -21,6 +21,15 @@ import java.util.Map;
 @Slf4j
 public class ChartViewServiceImpl implements ChartViewService {
 
+    /**
+     * Creates a JavaFX PieChart instance based on the provided PieChartData.
+     * Converts data points from the PieChartData to JavaFX PieChart.Data, sets chart properties
+     * like title, labels visibility, legend visibility, and animation. It also applies
+     * custom colors and adds tooltips to each pie slice based on the data points.
+     *
+     * @param pieChartData The PieChartData object containing the data and configuration for the pie chart.
+     * @return A configured JavaFX PieChart object ready to be displayed.
+     */
     @Override
     public PieChart createPieChart(PieChartData pieChartData) {
 
@@ -54,6 +63,14 @@ public class ChartViewServiceImpl implements ChartViewService {
         return pieChart;
     }
 
+    /**
+     * Creates a JavaFX LineChart instance based on the provided TimeSeriesData.
+     * Configures the chart's axes, title, animation, and legend. Adds data series
+     * from the TimeSeriesData to the chart, where each series represents a trend over time.
+     *
+     * @param timeSeriesData The TimeSeriesData object containing the data and configuration for the time series chart.
+     * @return A configured JavaFX LineChart object ready to be displayed.
+     */
     @Override
     public LineChart<String, Number> createLineChart(TimeSeriesData timeSeriesData) {
 
@@ -83,6 +100,14 @@ public class ChartViewServiceImpl implements ChartViewService {
         return lineChart;
     }
 
+    /**
+     * Creates a JavaFX BarChart instance based on the provided TimeSeriesData.
+     * Configures the chart's axes, title, animation, legend, and bar/category gaps.
+     * Adds data series from the TimeSeriesData to the chart, where each series represents a set of bars over time or categories.
+     *
+     * @param timeSeriesData The TimeSeriesData object containing the data and configuration for the bar chart.
+     * @return A configured JavaFX BarChart object ready to be displayed.
+     */
     @Override
     public BarChart<String, Number> createBarChart(TimeSeriesData timeSeriesData) {
 
@@ -115,7 +140,16 @@ public class ChartViewServiceImpl implements ChartViewService {
         return barChart;
     }
 
-    
+    /**
+     * Creates a JavaFX BarChart instance based on the provided CategoryChartData.
+     * Configures the chart's axes, title, animation, legend, and bar/category gaps.
+     * Sets the categories for the X-axis. Adds data series from the CategoryChartData,
+     * where each series represents a set of bars for different categories. Applies custom
+     * colors to the bars and adds tooltips to each bar.
+     *
+     * @param categoryChartData The CategoryChartData object containing the data and configuration for the category bar chart.
+     * @return A configured JavaFX BarChart object ready to be displayed.
+     */
     @Override
     public BarChart<String, Number> createCategoryBarChart(CategoryChartData categoryChartData) {
 
@@ -173,6 +207,15 @@ public class ChartViewServiceImpl implements ChartViewService {
         return barChart;
     }
 
+    /**
+     * Creates a JavaFX StackedBarChart instance based on the provided TimeSeriesData.
+     * Configures the chart's axes, title, animation, and legend. Adds data series
+     * from the TimeSeriesData to the chart, where each series represents a stack of bars over time or categories.
+     * Applies colors to the bars based on the series configuration and adds tooltips to each bar displaying series name, category, and formatted value.
+     *
+     * @param timeSeriesData The TimeSeriesData object containing the data and configuration for the stacked bar chart.
+     * @return A configured JavaFX StackedBarChart object ready to be displayed.
+     */
     @Override
     public StackedBarChart<String, Number> createStackedBarChart(TimeSeriesData timeSeriesData) {
 

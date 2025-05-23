@@ -148,6 +148,7 @@ public class TransactionServiceImplTest {
         updateDetail.setDescription("Updated Transaction");
         updateDetail.setCategory("Shopping");
         updateDetail.setTransactionDateTime(LocalDateTime.now());
+        updateDetail.setMethod("Cash");
 
         TransactionDetail result = transactionService.updateTransaction(updateDetail);
 
@@ -155,6 +156,7 @@ public class TransactionServiceImplTest {
         assertEquals(updateDetail.getAmount(), result.getAmount());
         assertEquals(updateDetail.getDescription(), result.getDescription());
         assertEquals(updateDetail.getCategory(), result.getCategory());
+        assertEquals(updateDetail.getMethod(), result.getMethod());
 
         List<Transaction> savedTransactions = ((JsonTransactionRepositoryImpl)transactionRepository).loadAll();
         assertEquals(1, savedTransactions.size());
@@ -291,6 +293,7 @@ public class TransactionServiceImplTest {
         detail.setDescription("Test Transaction");
         detail.setCategory("Food");
         detail.setTransactionDateTime(LocalDateTime.now());
+        detail.setMethod("Credit Card");
         return detail;
     }
 
@@ -300,6 +303,7 @@ public class TransactionServiceImplTest {
         transaction.setDescription("Test Transaction");
         transaction.setCategory("Food");
         transaction.setTransactionDateTime(LocalDateTime.now());
+        transaction.setMethod("Credit Card");
         return transaction;
     }
 
@@ -308,7 +312,7 @@ public class TransactionServiceImplTest {
         return transactionRepository.save(transaction);
     }
     
-    public Map<String, Double> getDefaultSummary(@RequestParam(required = false) LocalDateTime endTime) {
+    public Map<String, Double> getDefaultSummary(@RequestParam(required = false) LocalDateTime endTime) throws IOException {
         String userId = authService.getCurrentUser().getId();
     
         // 获取当前月份的第一天
@@ -328,7 +332,7 @@ public class TransactionServiceImplTest {
         return calculateSummary(transactions);
     }//这个方法是如果用户没有输入开始结束日期就返回该月1号到当前时间的那三个数值
     
-    public Map<String, Double> getSummaryByDateRange(LocalDate startDate, LocalDate endDate) {
+    public Map<String, Double> getSummaryByDateRange(LocalDate startDate, LocalDate endDate) throws IOException {
         // 1. 验证日期范围
         if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
             throw new IllegalArgumentException("End date must be after start date");

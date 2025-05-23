@@ -22,10 +22,31 @@ public class ChartServiceImpl implements ChartService {
         "#46BDC6", "#7BAAF7", "#F6AEA9", "#FDE293", "#AEDCB7"
     );
 
+    /**
+     * Generates data for a pie chart showing the distribution of expenses by category for the current month.
+     * Filters the provided list of transactions to include only expenses from the current month,
+     * groups them by category, calculates the total expense for each category, and prepares data points
+     * with labels, absolute values, and assigned colors for the pie chart.
+     *
+     * @param transactions A list of Transaction objects to analyze.
+     * @param title The title for the pie chart. If null, a default title "Expense Distribution" is used.
+     * @return A PieChartData object containing the data points for the category distribution pie chart.
+     */
     @Override
     public PieChartData generateCategoryDistributionPieChart(List<Transaction> transactions, String title) {
+        // 获取当前月份的起始和结束时间
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startOfMonth = now.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime endOfMonth = startOfMonth.plusMonths(1);
+
         Map<String, Double> categoryTotals = transactions.stream()
             .filter(tx -> tx.getCategory() != null && !tx.getCategory().isEmpty())
+
+                // 筛选条件2: 只包含当前月份的交易
+                .filter(tx -> !tx.getTransactionDateTime().isBefore(startOfMonth) && tx.getTransactionDateTime().isBefore(endOfMonth))
+                // 筛选条件3: 只包含支出（金额小于0）
+                .filter(tx -> tx.getAmountAsDouble() < 0)
+
             .collect(Collectors.groupingBy(
                 Transaction::getCategory,
                 Collectors.summingDouble(Transaction::getAmountAsDouble)
@@ -57,13 +78,28 @@ public class ChartServiceImpl implements ChartService {
             .build();
     }
 
+    /**
+     * Generates data for a time series line chart showing the monthly expense trend for a specific year.
+     * Filters the provided list of transactions to include only expenses from the given year,
+     * groups them by month, calculates the total expense for each month, and prepares data points
+     * for the line chart.
+     *
+     * @param transactions A list of Transaction objects to analyze.
+     * @param year The year for which to generate the monthly expense chart.
+     * @param title The title for the time series line chart. If null, a default title based on the year is used.
+     * @return A TimeSeriesData object containing the data points for the monthly expense trend line chart.
+     */
     @Override
     public TimeSeriesData generateMonthlyExpenseLineChart(List<Transaction> transactions, int year, String title) {
         DateTimeFormatter monthFormatter = DateTimeFormatter.ofPattern("MM月");
 
         Map<String, List<Transaction>> monthlyTransactions = transactions.stream()
             .filter(tx -> tx.getTransactionDateTime().getYear() == year)
-            .collect(Collectors.groupingBy(tx ->
+
+                // 重要筛选：只包含支出（金额小于0）
+                .filter(tx -> tx.getAmountAsDouble() < 0)
+
+                .collect(Collectors.groupingBy(tx ->
                 monthFormatter.format(tx.getTransactionDateTime())
             ));
 
@@ -98,6 +134,17 @@ public class ChartServiceImpl implements ChartService {
             .build();
     }
 
+    /**
+     * Generates data for a category comparison bar chart based on the provided transactions and categories.
+     * If a list of categories is not provided, it extracts distinct categories from the transactions.
+     * Groups transactions by category, calculates the total amount for each category, and prepares data points
+     * for the bar chart using the absolute values of the totals.
+     *
+     * @param transactions A list of Transaction objects to analyze.
+     * @param categories An optional list of categories to include in the chart. If null or empty, distinct categories from transactions will be used.
+     * @param title The title for the category comparison bar chart. If null, a default title "Category Comparison" is used.
+     * @return A CategoryChartData object containing the data points for the category comparison bar chart.
+     */
     @Override
     public CategoryChartData generateCategoryComparisonBarChart(List<Transaction> transactions, List<String> categories, String title) {
         if (categories == null || categories.isEmpty()) {
@@ -140,6 +187,17 @@ public class ChartServiceImpl implements ChartService {
             .build();
     }
 
+    /**
+     * Generates time series data for charting expense trends within a specified date range and period.
+     * Filters transactions by the given start and end dates, then groups and sums expenses
+     * according to the specified chart period (DAILY, WEEKLY, MONTHLY, YEARLY).
+     *
+     * @param transactions A list of Transaction objects to analyze.
+     * @param startDate The start date (inclusive) of the date range.
+     * @param endDate The end date (inclusive) of the date range.
+     * @param period The time period for grouping the data (DAILY, WEEKLY, MONTHLY, YEARLY).
+     * @return A TimeSeriesData object containing the data points for the expense trend chart.
+     */
     @Override
     public TimeSeriesData generateDateRangeExpenseChart(List<Transaction> transactions, LocalDate startDate, LocalDate endDate, TimeSeriesData.ChartPeriod period) {
         LocalDateTime startDateTime = startDate.atStartOfDay();
@@ -188,6 +246,17 @@ public class ChartServiceImpl implements ChartService {
             .build();
     }
 
+    /**
+     * Generates time series data for charting monthly expense trends across multiple categories for a specific year.
+     * Filters transactions by the given year and groups them by category and month to calculate monthly totals for each category.
+     * Prepares data points for a multi-series line chart, where each series represents a category.
+     * If a list of categories is not provided, it extracts distinct categories from the transactions.
+     *
+     * @param transactions A list of Transaction objects to analyze.
+     * @param year The year for which to generate the monthly expense trend chart by category.
+     * @param categories An optional list of categories to include in the chart. If null or empty, distinct categories from transactions will be used.
+     * @return A TimeSeriesData object containing the data points and series for the multi-category monthly expense trend chart.
+     */
     @Override
     public TimeSeriesData generateMultiCategoryTimeSeriesChart(List<Transaction> transactions, int year, List<String> categories) {
         if (categories == null || categories.isEmpty()) {
