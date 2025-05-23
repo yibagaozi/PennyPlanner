@@ -16,6 +16,10 @@ import org.springframework.stereotype.Controller;
 import javax.naming.AuthenticationException;
 import java.io.IOException;
 
+/**
+ * LoginController 负责处理用户登录逻辑，包括验证用户凭据，显示错误信息和跳转页面。
+ * 该控制器使用 AuthService 进行身份验证，并处理登录过程中的 UI 更新。
+ */
 @Controller // 让 Spring 管理这个控制器
 public class LoginController {
     @FXML private TextField emailField;
@@ -27,6 +31,10 @@ public class LoginController {
     @Autowired  // 确保authService被正确注入
     private AuthService authService;
 
+    /**
+     * 初始化方法，设置界面上的事件处理器。
+     * 包括绑定注册页面跳转、登录按钮点击等行为。
+     */
     @FXML
     private void initialize() {
 
@@ -47,7 +55,13 @@ public class LoginController {
         });
     }
 
-    //登陆后跳转主页面
+    /**
+     * 处理用户登录逻辑，验证用户名和密码是否为空，调用 AuthService 进行登录。
+     * 登录过程是异步的，通过 Task 来避免阻塞 UI 线程。
+     * 如果登录成功，跳转到主页；如果失败，显示相应的错误信息。
+     * 
+     * @throws IOException 如果页面跳转失败
+     */
     @FXML
     private void turntoHome() {
         String email = emailField.getText();
@@ -60,7 +74,7 @@ public class LoginController {
 
         // 禁用登录按钮，显示加载状态
         continueButton.setDisable(true);
-        errorLabel.setText("登录中...");
+        errorLabel.setText("Logging in...");
 
         // 使用 Task 进行异步登录（避免阻塞 UI）
         Task<Void> loginTask = new Task<>() {
@@ -97,12 +111,21 @@ public class LoginController {
         new Thread(loginTask).start(); // 启动后台任务
     }
 
-
+    /**
+     * 跳转到创建账户页面。
+     * 
+     * @throws IOException 如果页面跳转失败
+     */
     private void handleCreateAccount() throws IOException {
         System.out.println("跳转注册页面");
         MainApp.showSignup();
     }
 
+    /**
+     * 显示错误信息。
+     * 
+     * @param message 错误信息
+     */
     private void showError(String message) {
         Platform.runLater(() -> errorLabel.setText(message));
     }

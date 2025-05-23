@@ -37,6 +37,12 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private User currentUser;
 
+    /**
+     * Constructor to initialize the AuthServiceImpl instance through dependency injection.
+     *
+     * @param userRepository The UserRepository instance used for accessing user data.
+     * @param passwordEncoder The PasswordEncoder instance used for handling password encoding.
+     */
     @Autowired
     public AuthServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
@@ -44,6 +50,15 @@ public class AuthServiceImpl implements AuthService {
         this.currentUser = null;
     }
 
+    /**
+     * Handles user login by verifying the username and password.
+     * Updates the last login time and caches the user information upon successful authentication.
+     *
+     * @param username The username or email of the user attempting to log in.
+     * @param password The password of the user.
+     * @return The UserInfo object of the successfully logged-in user.
+     * @throws AuthenticationException If the username or password is empty, invalid, or if an error occurs during the login process.
+     */
     @Override
     public UserInfo login(String username, String password) throws AuthenticationException {
 
@@ -83,6 +98,18 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
+    /**
+     * Registers a new user with the provided details after performing various validations.
+     * Validates that all required fields are not empty, checks for existing username and email,
+     * validates email and phone number formats, and saves the new user to the repository.
+     *
+     * @param username The desired username for the new user.
+     * @param password The password for the new user.
+     * @param email The email address for the new user.
+     * @param phone The phone number for the new user.
+     * @return The UserInfo object of the newly registered user.
+     * @throws IOException If an I/O error occurs during the registration process.
+     */
     @Override
     public UserInfo register(String username, String password, String email, String phone) throws IOException {
 
@@ -123,6 +150,12 @@ public class AuthServiceImpl implements AuthService {
         return UserMapper.toUserInfo(newUser);
     }
 
+    /**
+     * Retrieves the currently cached user information if the cache is valid.
+     * If the cache is invalid, it clears the cache and returns null.
+     *
+     * @return The cached UserInfo object if valid, otherwise null.
+     */
     @Override
     public UserInfo getCurrentUser() {
         if (isUserCacheValid()) {
@@ -134,6 +167,17 @@ public class AuthServiceImpl implements AuthService {
         return null;
     }
 
+    /**
+     * Updates the information of a user specified by their ID with the provided updated details.
+     * Finds the user by ID, validates and updates username, email, and phone number if provided in the updated information.
+     * Saves the changes to the repository and returns the updated user information.
+     *
+     * @param userId The ID of the user whose information is to be updated.
+     * @param updatedInfo A UserInfo object containing the potentially updated details (username, email, phone).
+     * @return The updated UserInfo object if the update was successful, or the current UserInfo if no changes were made. Returns null if the userId is blank, updatedInfo is null, or the user is not found. May also return null in case of a saving error.
+     * @throws RegistrationException If there are validation errors such as invalid email/phone format or if the updated username/email is already taken by another user.
+     * @throws IOException If an I/O error occurs during the process (as declared in the method signature).
+     */
     @Override
     public UserInfo updateUserInfo(String userId, UserInfo updatedInfo) throws RegistrationException, IOException {
         if (StringUtils.isBlank(userId) || updatedInfo == null) {
@@ -219,6 +263,21 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
+    /**
+     * Allows the currently logged-in user to change their password.
+     * Verifies the old password against the stored password hash, updates the password to the new one,
+     * saves the changes to the repository, and updates the user cache.
+     * <p>
+     * Note: This method currently uses the ID of the cached user obtained via {@code getCurrentUser()},
+     * not the {@code userId} parameter directly.
+     *
+     * @param userId The ID of the user whose password is to be changed (Note: implementation uses the cached user's ID).
+     * @param oldPassword The user's current password.
+     * @param newPassword The new password the user wants to set.
+     * @return The updated UserInfo object after the password has been successfully changed.
+     * @throws AuthenticationException If the user is not logged in, the old password is incorrect,
+     *                                 the user is not found (based on cached ID), or an error occurs during the process.
+     */
     @Override
     public UserInfo changePassword(String userId, String oldPassword, String newPassword) throws AuthenticationException {
         UserInfo currentUserInfo = getCurrentUser();
@@ -257,11 +316,19 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
+    /**
+     * Logs out the current user by clearing the cached user information.
+     */
     public void logout(){
         log.info("User {} logged out successfully.", cachedUser.getUsername());
         clearUserCache();
     }
 
+    /**
+     * Checks if a user is currently logged in by verifying the validity of the user cache.
+     *
+     * @return True if the user cache is valid, indicating a logged-in user; false otherwise.
+     */
     public boolean isLoggedIn(){
         return isUserCacheValid();
     }

@@ -23,6 +23,10 @@ import java.net.URL;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 
+/**
+ * MainApp 负责管理应用程序的生命周期，包括初始化 Spring 应用上下文、加载 FXML 页面、
+ * 管理窗口的展示及跳转、清理文件夹等任务。它是整个应用的入口类。
+ */
 @Controller
 public class MainApp extends Application {
     private static Stage primaryStage;
@@ -32,6 +36,10 @@ public class MainApp extends Application {
     // 添加当前视图跟踪变量，用于刷新数据时确定当前页面
     private static String currentView = "login";
 
+    /**
+     * 初始化 Spring 应用上下文。
+     * 在启动时加载 Spring 配置并运行应用程序。
+     */
     @Override
     public void init() {
 
@@ -39,6 +47,10 @@ public class MainApp extends Application {
                 .run();
     }
 
+    /**
+     * 停止应用时关闭 Spring 上下文，并清理相关数据。
+     * 退出应用前注销用户并清除 UI 数据。
+     */
     @Override
     public void stop() {
         applicationContext.close();
@@ -55,14 +67,24 @@ public class MainApp extends Application {
         // 在启动方法中添加
     }
 
+    /**
+     * 启动应用程序，初始化 Spring 上下文并显示登录页面。
+     * 
+     * @param primaryStage 主窗口
+     * @throws Exception 启动过程中发生的任何异常
+     */
     @Override
     public void start(Stage primaryStage) throws Exception {
         MainApp.primaryStage = primaryStage;
-
-        //applicationContext = new AnnotationConfigApplicationContext("org.softeng.group77.pennyplanner");
+        primaryStage.setResizable(false);
         showLogin();
     }
 
+    /**
+     * 显示注册页面。
+     * 
+     * @throws IOException 如果加载 FXML 文件失败
+     */
     public static void showSignup() throws IOException {
         URL fxmlUrl = MainApp.class.getResource("/fxml/Signup_view.fxml");
         if (fxmlUrl == null) {
@@ -82,7 +104,11 @@ public class MainApp extends Application {
         primaryStage.show();
     }
 
-
+    /**
+     * 显示登录页面。
+     * 
+     * @throws IOException 如果加载 FXML 文件失败
+     */
     public static void showLogin() throws IOException {
         URL fxmlUrl = MainApp.class.getResource("/fxml/Login_view.fxml");
         if (fxmlUrl == null) {
@@ -100,8 +126,13 @@ public class MainApp extends Application {
         SharedDataModel.refreshTransactionData();
     }
 
-
+    /**
+     * 显示主页页面。
+     * 
+     * @throws IOException 如果加载 FXML 文件失败
+     */
     public static void showHome() throws IOException {
+        currentView = "home";
         FXMLLoader loader = new FXMLLoader(
                 MainApp.class.getResource("/fxml/home_view.fxml")
         );
@@ -115,7 +146,14 @@ public class MainApp extends Application {
         primaryStage.show();
     }
 
+    /**
+     * 显示历史记录页面。
+     * 刷新交易数据并展示历史记录。
+     * 
+     * @throws IOException 如果加载 FXML 文件失败
+     */
     public static void showhistory() throws IOException {
+        currentView = "history";
         // 刷新交易数据
         SharedDataModel.refreshTransactionData();
 
@@ -133,10 +171,17 @@ public class MainApp extends Application {
         primaryStage.show();
     }
 
+    /**
+     * 显示管理页面。
+     * 
+     * @throws IOException 如果加载 FXML 文件失败
+     */
     public static void showmanagement() throws IOException {
+        currentView = "management";
         FXMLLoader loader = new FXMLLoader(
                 MainApp.class.getResource("/fxml/Management_view.fxml")
         );
+        loader.setControllerFactory(applicationContext::getBean);
         Parent root = loader.load();
 
         Scene scene = new Scene(root,800,500);
@@ -146,7 +191,13 @@ public class MainApp extends Application {
         primaryStage.show();
     }
 
+    /**
+     * 显示用户页面。
+     * 
+     * @throws IOException 如果加载 FXML 文件失败
+     */
     public static void showuser() throws IOException {
+        currentView = "user";
         FXMLLoader loader = new FXMLLoader(
                 MainApp.class.getResource("/fxml/User.fxml")
         );
@@ -161,11 +212,18 @@ public class MainApp extends Application {
         primaryStage.show();
     }
 
-
+    /**
+     * 显示报告页面。
+     * 
+     * @throws IOException 如果加载 FXML 文件失败
+     */
     public static void showReport() throws IOException {
+        currentView = "report";
         FXMLLoader loader = new FXMLLoader(
                 MainApp.class.getResource("/fxml/Report_view.fxml")
         );
+
+        loader.setControllerFactory(applicationContext::getBean);
         Parent root = loader.load();
 
         Scene scene = new Scene(root,800,500);
@@ -174,6 +232,28 @@ public class MainApp extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
     }
+
+    public static void showFinancialAssistant() throws IOException {
+        //记录来源页面（上一页面）
+        FinancialAssistantController.setPreviousView(currentView);
+        FXMLLoader loader = new FXMLLoader(
+                MainApp.class.getResource("/fxml/fin_ast_view.fxml")
+        );
+        loader.setControllerFactory(applicationContext::getBean);
+        Parent root = loader.load();
+
+        Scene scene = new Scene(root);
+        primaryStage.setScene(scene);
+        primaryStage.setTitle("PennyPlanner");
+        primaryStage.show();
+    }
+
+    /**
+     * 清理指定目录中的文件。
+     * 通过遍历目录删除所有文件和子目录。
+     * 
+     * @param directoryPath 需要清理的目录路径
+     */
     private void clearFilesInDirectory(String directoryPath) {
         Path dirPath = Paths.get(directoryPath);
 
@@ -197,6 +277,13 @@ public class MainApp extends Application {
         }
     }
 
+    /**
+     * 设置服务，包括事务服务和认证服务。
+     * 通过依赖注入将事务服务和认证服务传递到 MainApp 中。
+     * 
+     * @param transactionService 事务服务
+     * @param authService 认证服务
+     */
     @Autowired
     public void setServices(TransactionService transactionService, AuthService authService) {
         this.transactionAdapter = new TransactionAdapter(transactionService, authService);
