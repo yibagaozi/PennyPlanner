@@ -1,6 +1,7 @@
 package org.softeng.group77.pennyplanner.service;
 
 import org.softeng.group77.pennyplanner.dto.UserInfo;
+import org.softeng.group77.pennyplanner.exception.RegistrationException;
 import org.softeng.group77.pennyplanner.model.User;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +17,7 @@ public interface AuthService {
 
     UserInfo getCurrentUser();
 
-    UserInfo updateUserInfo(String userId, UserInfo updatedInfo);
+    UserInfo updateUserInfo(String userId, UserInfo updatedInfo) throws RegistrationException, IOException;
 
     UserInfo changePassword(String userId, String oldPassword, String newPassword) throws AuthenticationException;
 

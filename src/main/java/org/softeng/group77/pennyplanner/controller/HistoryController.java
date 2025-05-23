@@ -4,13 +4,26 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import org.springframework.context.ApplicationContext;
+import org.softeng.group77.pennyplanner.adapter.TransactionAdapter;
+import org.softeng.group77.pennyplanner.service.AuthService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.function.Predicate;
 
+@Controller
 public class HistoryController {
     @FXML private Label date;
     @FXML private ComboBox<Integer> Year;
@@ -25,27 +38,47 @@ public class HistoryController {
     @FXML private TableColumn<tableModel, String> methodColumn;
 
     // 数据存储结构：原始数据 + 动态过滤列表
-    //private final ObservableList<tableModel> transactionData = FXCollections.observableArrayList();
     private final ObservableList<tableModel> transactionData = SharedDataModel.getTransactionData();
     private FilteredList<tableModel> filteredData = new FilteredList<>(transactionData);
 
     @FXML
     private SplitPane splitPane;
 
+    private TransactionAdapter transactionAdapter;
+    private AuthService authService; // 添加AuthService
+
+    @Autowired
+    public void setTransactionAdapter(TransactionAdapter transactionAdapter) {
+        this.transactionAdapter = transactionAdapter;
+    }
+
+    @Autowired
+    public void setAuthService(AuthService authService) {
+        this.authService = authService;
+    }
+
+    @FXML
+    private Button classifyButton;
+
+    private final ApplicationContext applicationContext;
+
+    public HistoryController(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
+
     @FXML
     private void initialize() {
-        // 首先刷新数据，确保显示最新的交易记录
-        //SharedDataModel.refreshTransactionData();
+        Year.setPromptText("Year");
+        Month.setPromptText("Month");
+        category.setPromptText("Category");
 
-        // 创建FilteredList包装SharedDataModel的数据
-        //filteredData = new FilteredList<>(SharedDataModel.getTransactionData());
-
-        // 初始化日期标题（固定显示 March 2025）
-        //date.setText("April 2025");
+        // 确保在页面初始化时就刷新数据
+        SharedDataModel.refreshTransactionData();
 
         Year.setItems(FXCollections.observableArrayList(
                 null, // 空选项
-                2022, 2023, 2024, 2025
+                2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021,
+                2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030
         ));
 
         // 月份选择框 (1-12月)
@@ -96,6 +129,55 @@ public class HistoryController {
             }
         });
 
+        // 为日期列添加格式化
+        dateColumn.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(String date, boolean empty) {
+                super.updateItem(date, empty);
+                if (empty || date == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(date);
+                    setStyle("-fx-alignment: CENTER;"); // 居中对齐
+                }
+            }
+        });
+
+        // 为类别列添加格式化和emoji
+        categoryColumn.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(String category, boolean empty) {
+                super.updateItem(category, empty);
+                if (empty || category == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    // 根据类别添加emoji
+                    String emoji = getEmojiForCategory(category);
+                    setText(emoji + " " + category);
+                    setStyle("-fx-alignment: CENTER-LEFT; -fx-padding: 0 0 0 10px;");
+                }
+            }
+        });
+
+        // 为支付方式列添加格式化和emoji (这是新增的关键部分)
+        methodColumn.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(String method, boolean empty) {
+                super.updateItem(method, empty);
+                if (empty || method == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    // 根据支付方式添加emoji
+                    String emoji = getEmojiForMethod(method);
+                    setText(emoji + " " + method);
+                    setStyle("-fx-alignment: CENTER-LEFT; -fx-padding: 0 0 0 10px;");
+                }
+            }
+        });
+
         // 绑定筛选条件监听器
         Year.valueProperty().addListener((obs, oldVal, newVal) -> updateFilter());
         Month.valueProperty().addListener((obs, oldVal, newVal) -> updateFilter());
@@ -119,15 +201,21 @@ public class HistoryController {
         });
         // 不再需要使用model中的displayId作为值
         transactionidColumn.setCellValueFactory(new PropertyValueFactory<>("id")); // 任意属性，实际不会使用
-//        // 不再需要从模型中获取displayId
-//        transactionidColumn.setCellValueFactory(cellData ->
-//                new SimpleStringProperty(String.valueOf(filteredData.indexOf(cellData.getValue()) + 1)));
 
 
         // 禁用分割线的拖动
         splitPane.getDividers().forEach(divider -> divider.positionProperty().addListener((observable, oldValue, newValue) -> {
             divider.setPosition(0.1); // 固定分割线位置为 10%
         }));
+
+        // 重新应用过滤条件并刷新表格
+        updateFilter();
+        transactionTable.refresh();
+
+        // 分类按钮 -- 事件处理
+        if (classifyButton != null) {
+            classifyButton.setOnAction(e -> openClassificationWindow());
+        }
     }
 
     // 统一筛选逻辑（核心修复）
@@ -159,19 +247,216 @@ public class HistoryController {
         filteredData.setPredicate(predicate);
     }
 
-    // 示例数据初始化（与截图完全一致）
-//    private void addSampleData() {
-//        transactionData.add(new tableModel("1", "2023-06-15", "超市购物", -125.50, "Food", "信用卡"));
-//        transactionData.add(new tableModel("2", "2023-06-16", "工资收入", 5000.00, "Salary", "银行转账"));
-//        transactionData.add(new tableModel("3", "2023-06-17", "水电费", -230.75, "Living Bill", "自动扣款"));
-//    }
 
     @FXML
     public void refreshData() {
         SharedDataModel.refreshTransactionData();
-        // 重新初始化过滤数据
-        //filteredData = new FilteredList<>(SharedDataModel.getTransactionData());
-        //transactionTable.setItems(filteredData);
+        // 重新应用过滤条件
+        updateFilter();
+        // 刷新表格显示
+        transactionTable.refresh();
+    }
+
+    // 为类别和支付方式列添加emoji和样式
+    private void styleColumnWithEmoji(TableColumn<tableModel, String> column) {
+        column.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    // 根据类别或支付方式添加emoji
+                    String emoji = getEmojiForCategory(item);
+                    setText(emoji + " " + item);
+                    setStyle("-fx-alignment: CENTER-LEFT; -fx-padding: 0 0 0 10px;");
+                }
+            }
+        });
+    }
+
+    // 根据类别返回对应的emoji
+    private String getEmojiForCategory(String category) {
+        if (category == null) return "";
+
+        switch (category) {
+            case "Food": return "🍔";
+            case "Salary": return "💰";
+            case "Living Bill": return "🏠";
+            case "Entertainment": return "🎬";
+            case "Transportation": return "🚗";
+            case "Education": return "🎓";
+            case "Clothes": return "👕";
+            default: return "🔖";
+        }
+    }
+
+    // 根据支付方式返回对应的emoji
+    private String getEmojiForMethod(String method) {
+        if (method == null) return "❓";
+
+        switch (method) {
+            case "Credit Card": return "💳";
+            case "Bank Transfer": return "🏦";
+            case "Auto-Payment": return "\uD83E\uDD16";
+            case "Cash": return "💵";
+            case "E-Payment": return "📱";
+            default: return "💲";
+        }
+    }
+
+    /**
+     * 处理编辑按钮点击事件
+     */
+    @FXML
+    public void handleEdit() {
+        // 首先检查用户是否已登录
+        try {
+            if (authService.getCurrentUser() == null) {
+                showAlert("未登录", "您需要登录才能编辑交易记录", Alert.AlertType.WARNING);
+                return;
+            }
+        } catch (Exception e) {
+            showAlert("认证错误", "无法验证用户状态: " + e.getMessage(), Alert.AlertType.ERROR);
+            return;
+        }
+
+        tableModel selectedTransaction = transactionTable.getSelectionModel().getSelectedItem();
+        if (selectedTransaction != null) {
+            try {
+                // 加载编辑对话框
+                FXMLLoader loader = new FXMLLoader();
+                loader.setLocation(getClass().getClassLoader().getResource("fxml/Edit_Transaction_view.fxml"));
+                loader.setControllerFactory(this.applicationContext::getBean);
+                Parent root = loader.load();
+
+                EditTransactionController controller = loader.getController();
+
+                // 创建交易记录的深拷贝，避免直接修改表格中的对象
+                tableModel transactionCopy = new tableModel(
+                        selectedTransaction.getId(),
+                        selectedTransaction.getDate(),
+                        selectedTransaction.getDescription(),
+                        selectedTransaction.getAmount(),
+                        selectedTransaction.getCategory(),
+                        selectedTransaction.getMethod()
+                );
+
+                controller.setTransaction(transactionCopy);
+
+                Stage dialogStage = new Stage();
+                dialogStage.setTitle("Edit Transaction Entry");
+                dialogStage.initModality(Modality.WINDOW_MODAL);
+                dialogStage.initOwner(transactionTable.getScene().getWindow());
+                dialogStage.setScene(new Scene(root));
+
+                // 显示对话框并等待用户关闭
+                dialogStage.showAndWait();
+
+                // 如果用户点击了"保存"按钮，则更新记录
+                if (controller.isSaveClicked()) {
+                    try {
+                        // 将修改后的数据复制回原始对象
+                        selectedTransaction.setDate(transactionCopy.getDate());
+                        selectedTransaction.setDescription(transactionCopy.getDescription());
+                        selectedTransaction.setAmount(transactionCopy.getAmount());
+                        selectedTransaction.setCategory(transactionCopy.getCategory());
+                        selectedTransaction.setMethod(transactionCopy.getMethod());
+
+                        boolean success = SharedDataModel.updateTransaction(selectedTransaction);
+                        if (success) {
+                            showAlert("Success", "Updated Successfully", Alert.AlertType.INFORMATION);
+                            refreshData(); // 刷新表格数据
+                        } else {
+                            showAlert("更新失败", "无法更新交易记录。可能是因为您没有权限修改该记录或者用户会话已过期。", Alert.AlertType.ERROR);
+                            // 回滚UI显示
+                            refreshData();
+                        }
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        showAlert("错误", "更新交易记录失败: " + ex.getMessage(), Alert.AlertType.ERROR);
+                        // 回滚UI显示
+                        refreshData();
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                showAlert("错误", "打开编辑对话框失败: " + e.getMessage(), Alert.AlertType.ERROR);
+            }
+        }
+    }
+
+    /**
+     * 处理删除按钮点击事件
+     */
+    @FXML
+    public void handleDelete() {
+        tableModel selectedTransaction = transactionTable.getSelectionModel().getSelectedItem();
+        if (selectedTransaction != null) {
+            // 确认删除
+            Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmAlert.setTitle("Delete");
+            confirmAlert.setHeaderText("Delete this entry?");
+            confirmAlert.setContentText("Description " + selectedTransaction.getDescription() +
+                    "\n金额: " + String.format("$%.2f", selectedTransaction.getAmount()) +
+                    "\n日期: " + selectedTransaction.getDate());
+
+            Optional<ButtonType> result = confirmAlert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                // 用户确认删除
+                boolean success = SharedDataModel.deleteTransaction(selectedTransaction.getId());
+                if (success) {
+                    showAlert("Success", "Deleted Successfully", Alert.AlertType.INFORMATION);
+                    refreshData(); // 刷新表格数据
+                } else {
+                    showAlert("Error", "Failed to delete", Alert.AlertType.ERROR);
+                }
+            }
+        }
+    }
+
+    /**
+     * 显示提示对话框
+     */
+    private void showAlert(String title, String message, Alert.AlertType alertType) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    private void openClassificationWindow() {
+        try {
+            // 创建FXML加载器
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/classification_window_view.fxml"));
+            loader.setControllerFactory(applicationContext::getBean);
+
+            // 加载布局
+            Scene scene = new Scene(loader.load());
+
+            // 设置窗口
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("AI-Classification");
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.setScene(scene);
+
+            // 显示窗口并等待关闭
+            dialogStage.showAndWait();
+
+            // 获取控制器
+            ClassificationWindowController controller = loader.getController();
+            if (controller.isConfirmClicked()) {
+                // 如果用户确认使用分类结果，可以在这里处理
+                String category = controller.getClassificationResult();
+                // 可以用于预填充新增交易的分类字段或其他用途
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            // 显示错误对话框
+        }
     }
 
     // 以下导航方法保持不变
@@ -197,4 +482,5 @@ public class HistoryController {
         System.out.println("Login");
         MainApp.showLogin();
     }
+
 }

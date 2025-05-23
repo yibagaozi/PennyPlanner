@@ -36,6 +36,9 @@ public class Transaction {
     private final LocalDateTime createdAt;
 
     @Setter
+    private String method;
+
+    @Setter
     private LocalDateTime updatedAt;
 
     public Transaction() {
@@ -43,7 +46,8 @@ public class Transaction {
         this.createdAt = LocalDateTime.now();
     }
 
-    public Transaction(String description, String category, BigDecimal amount, LocalDateTime transactionDateTime, String userId) {
+    public Transaction(String description, String category, BigDecimal amount, String method,
+                       LocalDateTime transactionDateTime, String userId) {
         this.id = UUID.randomUUID().toString();
         this.description = description;
         this.category = category;
@@ -52,6 +56,7 @@ public class Transaction {
         this.userId = userId;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
+        this.method = method;
     }
 
     public Transaction(String userId) {

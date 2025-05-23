@@ -11,6 +11,8 @@ import org.springframework.stereotype.Repository;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.Optional;
 
 /**
@@ -76,8 +78,17 @@ public class BudgetRepositoryImpl extends JsonDataManager<Budget> implements Bud
      * @throws IOException if an I/O error occurs while reading the data
      */
     @Override
-    public List<Budget> findAll() throws IOException {
-        return loadAll();
+
+    public Map<LocalDate, Budget> findAll() throws IOException {
+        List<Budget> budgets = loadAll();
+
+        // 将List<Budget>转换为Map<LocalDate, Budget>
+        return budgets.stream()
+            .collect(Collectors.toMap(
+                Budget::getDate,  // 使用日期作为键
+                budget -> budget, // 值就是预算对象本身
+                (existing, replacement) -> replacement // 如果有重复，保留后者
+            ));
     }
 
     /**

@@ -9,6 +9,7 @@ import javafx.stage.Stage;
 import org.softeng.group77.pennyplanner.PennyPlannerApplication;
 import org.softeng.group77.pennyplanner.adapter.TransactionAdapter;
 import org.softeng.group77.pennyplanner.service.AuthService;
+import org.softeng.group77.pennyplanner.service.BudgetService;
 import org.softeng.group77.pennyplanner.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -28,6 +29,8 @@ public class MainApp extends Application {
     private static ConfigurableApplicationContext applicationContext;
     private static TransactionAdapter transactionAdapter;
     private static AuthService authService;
+    // 添加当前视图跟踪变量，用于刷新数据时确定当前页面
+    private static String currentView = "login";
 
     @Override
     public void init() {
@@ -41,7 +44,7 @@ public class MainApp extends Application {
         applicationContext.close();
         //clearFilesInDirectory("data");
 
-        SharedDataModel.clearUIData(); // 只清除UI上的数据，不清除存储的数据
+        //SharedDataModel.clearUIData(); // 只清除UI上的数据，不清除存储的数据
         authService.logout();
 
         Platform.exit();
@@ -51,12 +54,11 @@ public class MainApp extends Application {
         launch(args);
         // 在启动方法中添加
     }
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         MainApp.primaryStage = primaryStage;
-
-        applicationContext = new AnnotationConfigApplicationContext("org.softeng.group77.pennyplanner");
-        //clearFilesInDirectory("data");
+        primaryStage.setResizable(false);
         showLogin();
     }
 
@@ -113,12 +115,14 @@ public class MainApp extends Application {
     }
 
     public static void showhistory() throws IOException {
-        // 刷新交易数据 —— ensure 强制刷新
+        // 刷新交易数据
         SharedDataModel.refreshTransactionData();
 
         FXMLLoader loader = new FXMLLoader(
                 MainApp.class.getResource("/fxml/History_view.fxml")
         );
+
+        loader.setControllerFactory(applicationContext::getBean);
         Parent root = loader.load();
 
         Scene scene = new Scene(root,800,500);
@@ -132,6 +136,7 @@ public class MainApp extends Application {
         FXMLLoader loader = new FXMLLoader(
                 MainApp.class.getResource("/fxml/Management_view.fxml")
         );
+        loader.setControllerFactory(applicationContext::getBean);
         Parent root = loader.load();
 
         Scene scene = new Scene(root,800,500);
@@ -143,9 +148,11 @@ public class MainApp extends Application {
 
     public static void showuser() throws IOException {
         FXMLLoader loader = new FXMLLoader(
-                MainApp.class.getResource("/fxml/User_view.fxml")
+                MainApp.class.getResource("/fxml/User.fxml")
         );
+        loader.setControllerFactory(applicationContext::getBean);
         Parent root = loader.load();
+
 
         Scene scene = new Scene(root,800,500);
         scene.getStylesheets().add(MainApp.class.getResource("/css/style-User.css").toExternalForm());
@@ -159,6 +166,8 @@ public class MainApp extends Application {
         FXMLLoader loader = new FXMLLoader(
                 MainApp.class.getResource("/fxml/Report_view.fxml")
         );
+
+        loader.setControllerFactory(applicationContext::getBean);
         Parent root = loader.load();
 
         Scene scene = new Scene(root,800,500);
@@ -192,12 +201,72 @@ public class MainApp extends Application {
 
     @Autowired
     public void setServices(TransactionService transactionService, AuthService authService) {
-        this.transactionAdapter = new TransactionAdapter(transactionService);
+        this.transactionAdapter = new TransactionAdapter(transactionService, authService);
         this.authService = authService;
 
         // 设置适配器到共享模型
-        SharedDataModel.setTransactionAdapter(transactionAdapter);
+        //SharedDataModel.setTransactionAdapter(transactionAdapter);
         HomeController.setTransactionAdapter(transactionAdapter);
         HomeController.setAuthService(authService);
     }
+
+    /**
+     * 获取TransactionAdapter实例
+     * 该方法供CSV导入等功能使用
+     */
+    public static TransactionAdapter getTransactionAdapter() {
+        return transactionAdapter;
+    }
+
+    /**
+     * 获取当前Stage实例
+     */
+    public static Stage getPrimaryStage() {
+        return primaryStage;
+    }
+
+    /**
+     * 刷新所有数据显示
+     * 在导入CSV等数据变更后调用此方法以更新UI
+     */
+    public static void refreshData() {
+        // 首先刷新共享数据模型
+        SharedDataModel.refreshTransactionData();
+
+        // 根据当前视图刷新对应页面
+        try {
+            switch (currentView) {
+                case "home":
+                    showHome();
+                    break;
+                case "history":
+                    showhistory();
+                    break;
+                case "report":
+                    showReport();
+                    break;
+                case "management":
+                    // 管理页面通常不需要刷新，但如果需要也可以添加
+                    break;
+                case "user":
+                    showuser();
+                    break;
+                default:
+                    // 默认情况下不做任何操作
+                    break;
+            }
+        } catch (IOException e) {
+            System.err.println("刷新数据时出错: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 获取当前视图名称
+     */
+    public static String getCurrentView() {
+        return currentView;
+    }
+
+
 }
