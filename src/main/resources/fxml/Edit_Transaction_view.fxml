@@ -59,7 +59,7 @@
                     <children>
                         <Label prefWidth="100.0" text="Category:" />
                         <ComboBox fx:id="categoryComboBox" prefHeight="25.0" prefWidth="200.0" promptText="Select Category" />
-                        <Button fx:id="suggestCategoryButton" text="AI Suggestion" />
+                        <Button fx:id="suggestCategoryButton" text="AI Suggestion" style="-fx-background-color: linear-gradient(to right, #4b6cb7, #718cb7); -fx-text-fill: white; -fx-font-weight: bold;"/>
                     </children>
                     <padding>
                         <Insets bottom="5.0" top="5.0" />
@@ -76,8 +76,8 @@
                 </HBox>
                 <HBox alignment="CENTER_RIGHT" spacing="10.0">
                     <children>
-                        <Button fx:id="cancelButton" mnemonicParsing="false" onAction="#handleCancel" prefHeight="30.0" prefWidth="90.0" text="Cancel" />
-                        <Button fx:id="saveButton" mnemonicParsing="false" onAction="#handleSave" prefHeight="30.0" prefWidth="90.0" text="Save" />
+                        <Button fx:id="cancelButton" mnemonicParsing="false" onAction="#handleCancel" prefHeight="30.0" prefWidth="90.0" text="Cancel" style="-fx-background-color: linear-gradient(to right, #4b6cb7, #718cb7); -fx-text-fill: white; -fx-font-weight: bold;"/>
+                        <Button fx:id="saveButton" mnemonicParsing="false" onAction="#handleSave" prefHeight="30.0" prefWidth="90.0" text="Save" style="-fx-background-color: linear-gradient(to right, #4b6cb7, #718cb7); -fx-text-fill: white; -fx-font-weight: bold;"/>
                     </children>
                     <padding>
                         <Insets bottom="5.0" right="10.0" top="15.0" />

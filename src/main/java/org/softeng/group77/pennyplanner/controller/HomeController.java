@@ -137,7 +137,7 @@ public class HomeController {
 
         // 禁用分割线的拖动
         splitPane.getDividers().forEach(divider -> divider.positionProperty().addListener((observable, oldValue, newValue) -> {
-            divider.setPosition(0.1); // 固定分割线位置为 10%
+            divider.setPosition(0.12); // 固定分割线位置为 10%
         }));
     }
 
@@ -156,6 +156,7 @@ public class HomeController {
                 if (budgetService != null) {
                     budgetService.saveBudget(budgetAmount, LocalDate.now());
                     System.out.println("Budget saved: " + budgetAmount);
+                    updateBudgetProgressBar();
                 } else {
                     System.out.println("BudgetService is not initialized");
                 }
@@ -262,6 +263,11 @@ public class HomeController {
     private void turntoLogin() throws IOException {
         System.out.println("Login");
         MainApp.showLogin();
+    }
+
+    @FXML
+    private void turntoFinancialAssistant() throws IOException {
+        MainApp.showFinancialAssistant();
     }
 
     //收入趋势图

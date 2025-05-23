@@ -10,7 +10,7 @@
             <Label styleClass="nav-title" text="PennyPlanner" />
             <Button onAction="#turntoHome" styleClass="nav-button" text="Home" />
             <Button onAction="#turntoReport" styleClass="nav-button" text="Report &amp; Forecast" />
-            <Button style="-fx-font-weight: bold;" styleClass="nav-button" text="Track Spend!" />
+            <Button fx:id="financialAssistantButton" onAction="#turntoFinancialAssistant" style="-fx-font-weight: bold;" styleClass="nav-button" text="AI Assistant" />
             <Button onAction="#turntoHistory" styleClass="nav-button" text="History" />
             <Button onAction="#turntoManagement" styleClass="nav-button" text="Management" />
             <Button onAction="#turntoUser" styleClass="nav-button" text="User Profile" />
@@ -18,14 +18,14 @@
     </left>
     <right>
         <SplitPane orientation="VERTICAL" styleClass="right-split">
-            <SplitPane fx:id="splitPane" dividerPositions="0.1" layoutX="179.0" layoutY="1.0" orientation="VERTICAL" prefHeight="500.0" prefWidth="418.0">
+            <SplitPane fx:id="splitPane" dividerPositions="0.12" layoutX="179.0" layoutY="1.0" orientation="VERTICAL" prefHeight="500.0" prefWidth="418.0">
                 <items>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                         <children>
-                            <Button layoutX="450.0" layoutY="7.0" mnemonicParsing="false" onAction="#turntoLogin" text="Log out" />
-                            <Label layoutX="14.0" layoutY="11.0" style="-fx-font-weight: bold;" text="History">
+                            <Button layoutX="450.0" layoutY="21.0" mnemonicParsing="false" onAction="#turntoLogin" styleClass="action-button" text="Log out" />
+                            <Label layoutX="14.0" layoutY="19.0" style="-fx-font-weight: bold;" text="History">
                                 <font>
-                                    <Font size="17.0" />
+                                    <Font size="23.0" />
                                 </font></Label>
                         </children>
                     </AnchorPane>
@@ -41,8 +41,8 @@
                                     <ComboBox fx:id="Year" onAction="#initialize" prefHeight="23.0" prefWidth="105.0" />
                                     <ComboBox fx:id="Month" prefHeight="23.0" prefWidth="98.0" />
                                     <ComboBox fx:id="category" prefHeight="23.0" prefWidth="107.0" />
-                                    <Button mnemonicParsing="false" onAction="#turntoManagement" prefHeight="23.0" prefWidth="80.0" text="Add items" />
-                                    <Button mnemonicParsing="false" onAction="#refreshData" prefHeight="23.0" prefWidth="80.0" text="Refresh" />
+                                    <Button mnemonicParsing="false" onAction="#turntoManagement" prefHeight="28.0" prefWidth="95.0" styleClass="action-button" text="Add items" />
+                                    <Button mnemonicParsing="false" onAction="#refreshData" prefHeight="23.0" prefWidth="80.0" styleClass="action-button" text="Refresh" />
                                 </children></HBox>
                             <TableView fx:id="transactionTable" layoutX="13.0" layoutY="108.0" prefHeight="257.0" prefWidth="572.0">
                                 <columns>
@@ -58,9 +58,9 @@
                                 </columnResizePolicy>
                             </TableView>
                             <HBox layoutX="11.0" layoutY="420.0" spacing="10.0" />
-                            <Button fx:id="editButton" layoutX="427.0" layoutY="376.0" onAction="#handleEdit" prefHeight="9.0" prefWidth="61.0" text="Edit" />
-                            <Button fx:id="deleteButton" layoutX="523.0" layoutY="376.0" onAction="#handleDelete" prefHeight="9.0" prefWidth="62.0" text="Delete" />
-                            <Button fx:id="classifyButton" layoutX="269.0" layoutY="376.0" prefHeight="25.0" prefWidth="119.0" text="AI-Classification" />
+                            <Button fx:id="editButton" layoutX="416.0" layoutY="376.0" onAction="#handleEdit" prefHeight="28.0" prefWidth="72.0" styleClass="action-button" text="Edit" />
+                            <Button fx:id="deleteButton" layoutX="506.0" layoutY="376.0" onAction="#handleDelete" prefHeight="28.0" prefWidth="79.0" styleClass="action-button" text="Delete" />
+                            <Button fx:id="classifyButton" layoutX="257.0" layoutY="376.0" prefHeight="28.0" prefWidth="139.0" styleClass="action-button" text="AI-Classification" />
 
                         </children>
                     </AnchorPane>

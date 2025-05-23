@@ -205,7 +205,7 @@ public class HistoryController {
 
         // 禁用分割线的拖动
         splitPane.getDividers().forEach(divider -> divider.positionProperty().addListener((observable, oldValue, newValue) -> {
-            divider.setPosition(0.1); // 固定分割线位置为 10%
+            divider.setPosition(0.12); // 固定分割线位置为 10%
         }));
 
         // 重新应用过滤条件并刷新表格
@@ -399,8 +399,8 @@ public class HistoryController {
             confirmAlert.setTitle("Delete");
             confirmAlert.setHeaderText("Delete this entry?");
             confirmAlert.setContentText("Description " + selectedTransaction.getDescription() +
-                    "\n金额: " + String.format("$%.2f", selectedTransaction.getAmount()) +
-                    "\n日期: " + selectedTransaction.getDate());
+                    "\nAmount: " + String.format("$%.2f", selectedTransaction.getAmount()) +
+                    "\nDate: " + selectedTransaction.getDate());
 
             Optional<ButtonType> result = confirmAlert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
@@ -481,6 +481,10 @@ public class HistoryController {
     private void turntoLogin() throws IOException {
         System.out.println("Login");
         MainApp.showLogin();
+    }
+    @FXML
+    private void turntoFinancialAssistant() throws IOException {
+        MainApp.showFinancialAssistant();
     }
 
 }

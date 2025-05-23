@@ -52,7 +52,7 @@ public class UserController {
     private void initialize() {
         // 禁用分割线的拖动
         splitPane.getDividers().forEach(divider -> divider.positionProperty().addListener((observable, oldValue, newValue) -> {
-            divider.setPosition(0.1); // 固定分割线位置为 10%
+            divider.setPosition(0.12); // 固定分割线位置为 10%
         }));
         loadUserData();
         System.out.println("AuthService in UserController: " + authService);
@@ -94,13 +94,28 @@ public class UserController {
                     avatarDir.mkdirs();
                 }
 
-                File avatarFile = new File(currentAvatarPath);
-                boolean isRenamed = selectedFile.renameTo(avatarFile);
-
-                if (!isRenamed) {
-                    showAlert(Alert.AlertType.ERROR, "Error", "Failed to save the avatar. Please try again.");
+                // 获取当前用户ID
+                UserInfo currentUser = authService.getCurrentUser();
+                if (currentUser == null) {
+                    showAlert(Alert.AlertType.ERROR, "错误", "未找到当前用户信息");
                     return;
                 }
+
+                // 目标文件路径
+                currentAvatarPath = avatarFolderPath + currentUser.getId() + ".png";
+                File avatarFile = new File(currentAvatarPath);
+
+                // 如果目标文件已存在则先删除
+                if (avatarFile.exists()) {
+                    avatarFile.delete();
+                }
+
+                // 使用Files.copy替代renameTo
+                java.nio.file.Files.copy(
+                        selectedFile.toPath(),
+                        avatarFile.toPath(),
+                        java.nio.file.StandardCopyOption.REPLACE_EXISTING
+                );
                 // Update avatar display - it's good to clear the cache for the image if using URLs
                 // To ensure JavaFX reloads the image from the file system and not its cache:
                 Image newImage = new Image(avatarFile.toURI().toString(), false); // false means don't use cache
@@ -191,5 +206,9 @@ public class UserController {
     private void turntoLogin() throws IOException {
         System.out.println("Login");
         MainApp.showLogin();
+    }
+    @FXML
+    private void turntoFinancialAssistant() throws IOException {
+        MainApp.showFinancialAssistant();
     }
 }

@@ -60,7 +60,7 @@ public class LoginController {
 
         // 禁用登录按钮，显示加载状态
         continueButton.setDisable(true);
-        errorLabel.setText("登录中...");
+        errorLabel.setText("Logging in...");
 
         // 使用 Task 进行异步登录（避免阻塞 UI）
         Task<Void> loginTask = new Task<>() {

@@ -36,7 +36,7 @@
     -fx-pref-height: 40px;
     -fx-pref-width: 300px;
     -fx-font-size: 14px;
-    -fx-background-color: #000000;
+    /*-fx-background-color: linear-gradient(to bottom, #4b6cb7, #718cb7);*/
     -fx-text-fill: white;
     -fx-background-radius: 5px;
 }
