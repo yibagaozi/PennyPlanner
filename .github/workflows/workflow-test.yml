@@ -1,0 +1,53 @@
+name: Main Branch Release
+
+on:
+  push:
+    branches: [ workflow-test ]
+  pull_request:
+    branches: [ workflow-test ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+  checks: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Set up Liberica JDK 21 Full (with JavaFX)
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'liberica'
+        java-version: '21'
+        cache: maven
+
+    - name: Install jpackage dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y fakeroot libfreetype6-dev libasound2-dev
+
+    - name: Get version from pom.xml
+      id: get-version
+      run: |
+        VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "Detected version: $VERSION"
+
+    - name: Build with Maven
+      run: mvn -B clean package --file pom.xml -DskipTests
+
+    - name: Run tests
+      run: mvn test
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: PennyPlanner-build
+        path: target/*.jar
