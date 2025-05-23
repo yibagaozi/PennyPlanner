@@ -137,7 +137,7 @@ public class HomeController {
 
         // 禁用分割线的拖动
         splitPane.getDividers().forEach(divider -> divider.positionProperty().addListener((observable, oldValue, newValue) -> {
-            divider.setPosition(0.1); // 固定分割线位置为 10%
+            divider.setPosition(0.12); // 固定分割线位置为 10%
         }));
     }
 

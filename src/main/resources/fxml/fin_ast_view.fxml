@@ -13,7 +13,7 @@
                 <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
             </padding>
             <HBox alignment="CENTER_LEFT" spacing="5.0">
-                <Button fx:id="backButton" onAction="#goBack" text="Back" />
+                <Button fx:id="backButton" onAction="#goBack" text="Back" style="-fx-background-color: linear-gradient(to right, #4b6cb7, #718cb7); -fx-text-fill: white; -fx-font-weight: bold;"/>
                 <Label style="-fx-font-size: 17px; -fx-font-weight: bold;" text="AI Financial Assistant">
                <font>
                   <Font size="17.0" />
@@ -48,7 +48,7 @@
             <HBox alignment="CENTER_LEFT" spacing="10.0">
                 <TextField fx:id="messageField" promptText="Type your question.." HBox.hgrow="ALWAYS" />
                 <ProgressIndicator fx:id="loadingIndicator" prefHeight="24.0" prefWidth="24.0" visible="false" />
-                <Button fx:id="sendButton" defaultButton="true" text="Send" />
+                <Button fx:id="sendButton" defaultButton="true" text="Send" style="-fx-background-color: linear-gradient(to right, #4b6cb7, #718cb7); -fx-text-fill: white; -fx-font-weight: bold;" />
             </HBox>
         </VBox>
     </bottom>
