@@ -17,12 +17,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
     - name: Set up Liberica JDK 21 Full (with JavaFX)
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         distribution: 'liberica'
         java-version: '21'
@@ -47,7 +47,7 @@ jobs:
       run: mvn test
 
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: PennyPlanner-build
         path: target/*.jar
