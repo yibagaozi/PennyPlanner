@@ -36,6 +36,13 @@ public class FinancialAssistantController {
 
     private static String previousView = "";
 
+    // 静态变量保存聊天记录和对话历史
+    private static List<Map<String, String>> savedConversationHistory = new ArrayList<>();
+    private static List<ChatMessage> savedChatMessages = new ArrayList<>();
+    private static LocalDate savedStartDate;
+    private static LocalDate savedEndDate;
+    private static boolean hasInitialized = false;
+
     @Autowired
     private TransactionAnalysisService transactionAnalysisService;
 
@@ -43,18 +50,36 @@ public class FinancialAssistantController {
     private ApplicationContext applicationContext;
 
     private List<Map<String, String>> conversationHistory = new ArrayList<>();
-    private static final String WELCOME_MESSAGE = "Hello! I'm a PennyPlanner Finance Assistant. Please select a date range and let me help you analyze your finances and answer your questions。";
+    private static final String WELCOME_MESSAGE = "您好！我是PennyPlanner财务助手。请选择日期范围，让我帮您分析财务状况并回答您的问题。";
+
+    // 聊天消息的内部类，用于保存聊天记录
+    private static class ChatMessage {
+        String content;
+        String type; // "user", "assistant", "system"
+
+        ChatMessage(String content, String type) {
+            this.content = content;
+            this.type = type;
+        }
+    }
+
     public static void setPreviousView(String viewName) {
         previousView = viewName;
     }
 
     @FXML
     private void initialize() {
-        // 初始化日期选择为当前月份
+        // 初始化日期选择为之前保存的日期或当前月份
         LocalDate now = LocalDate.now();
         LocalDate firstDayOfMonth = now.withDayOfMonth(1);
-        startDatePicker.setValue(firstDayOfMonth);
-        endDatePicker.setValue(now);
+
+        if (savedStartDate != null && savedEndDate != null) {
+            startDatePicker.setValue(savedStartDate);
+            endDatePicker.setValue(savedEndDate);
+        } else {
+            startDatePicker.setValue(firstDayOfMonth);
+            endDatePicker.setValue(now);
+        }
 
         // 设置按钮事件
         sendButton.setOnAction(e -> sendMessage());
@@ -65,19 +90,53 @@ public class FinancialAssistantController {
         // 添加常用问题按钮
         setupQuickQuestions();
 
-        // 显示欢迎消息
+        // 恢复或显示聊天记录
         Platform.runLater(() -> {
-            addAssistantMessage(WELCOME_MESSAGE);
+            if (!savedChatMessages.isEmpty()) {
+                // 恢复之前的聊天记录
+                restoreChatMessages();
+                conversationHistory = new ArrayList<>(savedConversationHistory);
+            } else if (!hasInitialized) {
+                // 首次加载显示欢迎消息
+                addAssistantMessage(WELCOME_MESSAGE);
+                hasInitialized = true;
+            }
         });
+
+        // 监听日期选择器变化
+        startDatePicker.valueProperty().addListener((obs, oldVal, newVal) -> {
+            savedStartDate = newVal;
+        });
+
+        endDatePicker.valueProperty().addListener((obs, oldVal, newVal) -> {
+            savedEndDate = newVal;
+        });
+    }
+
+    // 恢复聊天记录
+    private void restoreChatMessages() {
+        chatContainer.getChildren().clear();
+        for (ChatMessage message : savedChatMessages) {
+            switch (message.type) {
+                case "user":
+                    addUserMessage(message.content);
+                    break;
+                case "assistant":
+                    addAssistantMessage(message.content);
+                    break;
+                case "system":
+                    addSystemMessage(message.content);
+                    break;
+            }
+        }
     }
 
     private void setupQuickQuestions() {
         String[] questions = {
-                "我的月度支出分布如何？",
-                "哪个类别花费最多？",
-                "如何优化我的预算？",
-                "我的收支趋势如何？",
-                "如何提高我的储蓄率？"
+                "Give advice on possible upcoming spending spikes",
+                "Analyse the trend of my income and expenditure",
+                "Analyze my spending behavior and give suggestions",
+                "How can I increase my savings rate?"
         };
 
         for (String question : questions) {
@@ -101,6 +160,9 @@ public class FinancialAssistantController {
         // 显示用户消息
         addUserMessage(message);
 
+        // 保存用户消息到静态记录
+        savedChatMessages.add(new ChatMessage(message, "user"));
+
         // 清空输入框
         messageField.clear();
 
@@ -122,12 +184,19 @@ public class FinancialAssistantController {
                             String aiResponse = (String) response.get("response");
                             addAssistantMessage(aiResponse);
 
+                            // 保存助手回复到静态记录
+                            savedChatMessages.add(new ChatMessage(aiResponse, "assistant"));
+
                             // 更新对话历史
                             conversationHistory = (List<Map<String, String>>) response.get("history");
+                            savedConversationHistory = new ArrayList<>(conversationHistory);
                         } else {
                             // 显示错误信息
                             String errorMsg = (String) response.get("error");
                             addSystemMessage("发生错误: " + errorMsg);
+
+                            // 保存错误信息到静态记录
+                            savedChatMessages.add(new ChatMessage("发生错误: " + errorMsg, "system"));
                         }
                     });
                 })
@@ -135,6 +204,9 @@ public class FinancialAssistantController {
                     Platform.runLater(() -> {
                         toggleLoading(false);
                         addSystemMessage("请求失败: " + ex.getMessage());
+
+                        // 保存错误信息到静态记录
+                        savedChatMessages.add(new ChatMessage("请求失败: " + ex.getMessage(), "system"));
                     });
                     return null;
                 });
@@ -212,6 +284,13 @@ public class FinancialAssistantController {
                 scrollPane.setVvalue(1.0);
             }
         });
+    }
+
+    // 清除聊天记录
+    public static void clearChat() {
+        savedChatMessages.clear();
+        savedConversationHistory.clear();
+        hasInitialized = false;
     }
 
     // 返回前一个页面

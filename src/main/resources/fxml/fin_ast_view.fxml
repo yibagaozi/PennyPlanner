@@ -18,10 +18,9 @@
                <font>
                   <Font size="17.0" />
                </font></Label>
-                <Region HBox.hgrow="ALWAYS" />
-                <DatePicker fx:id="startDatePicker" promptText="开始日期" />
-                <Label text="至" />
-                <DatePicker fx:id="endDatePicker" promptText="结束日期" />
+                <Region prefWidth="60.0" HBox.hgrow="ALWAYS" />
+                <DatePicker fx:id="startDatePicker" promptText="Start Date" />
+                <DatePicker fx:id="endDatePicker" promptText="End Date" />
             </HBox>
             <Separator />
             <FlowPane fx:id="quickQuestionsPane" hgap="10" vgap="5">
@@ -47,9 +46,9 @@
                 <Insets bottom="15.0" left="15.0" right="15.0" top="10.0" />
             </padding>
             <HBox alignment="CENTER_LEFT" spacing="10.0">
-                <TextField fx:id="messageField" promptText="输入您的问题..." HBox.hgrow="ALWAYS" />
+                <TextField fx:id="messageField" promptText="Type your question.." HBox.hgrow="ALWAYS" />
                 <ProgressIndicator fx:id="loadingIndicator" prefHeight="24.0" prefWidth="24.0" visible="false" />
-                <Button fx:id="sendButton" defaultButton="true" text="发送" />
+                <Button fx:id="sendButton" defaultButton="true" text="Send" />
             </HBox>
         </VBox>
     </bottom>
