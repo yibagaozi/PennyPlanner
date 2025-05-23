@@ -1,53 +1,126 @@
-name: Main Branch Release
+name: Build & Package JavaFX App
 
 on:
+  workflow_dispatch:
   push:
     branches: [ workflow-test ]
-  pull_request:
-    branches: [ workflow-test ]
-  workflow_dispatch:
-
-permissions:
-  contents: write
-  packages: write
-  checks: write
 
 jobs:
-  build-and-release:
+  build-common:
+    name: Build JAR
     runs-on: ubuntu-latest
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+    outputs:
+      jar-name: ${{ steps.set-output.outputs.jar-name }}
 
-    - name: Set up Liberica JDK 21 Full (with JavaFX)
-      uses: actions/setup-java@v4
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Liberica JDK
+      uses: sdkman/sdkman-action@master
       with:
-        distribution: 'liberica'
-        java-version: '21'
-        cache: maven
+        candidate: java
+        version: 21.0.2-librca
+
+    - name: Build Jar
+      run: mvn clean package -DskipTests
+
+    - name: Upload Jar
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-jar
+        path: target/PennyPlanner-2.0.0-PreRelease.jar
+
+  build-linux:
+    name: Package for Linux (.deb)
+    needs: build-common
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/download-artifact@v4
+      with:
+        name: app-jar
+        path: target
 
     - name: Install jpackage dependencies
       run: |
-        sudo apt update
-        sudo apt install -y fakeroot libfreetype6-dev libasound2-dev
+        sudo apt-get update
+        sudo apt-get install -y fakeroot libfuse2
 
-    - name: Get version from pom.xml
-      id: get-version
+    - name: Package .deb
       run: |
-        VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-        echo "version=$VERSION" >> $GITHUB_OUTPUT
-        echo "Detected version: $VERSION"
+        mkdir dist
+        jpackage \
+          --type deb \
+          --name PennyPlanner \
+          --input target \
+          --main-jar PennyPlanner-2.0.0-PreRelease.jar \
+          --main-class org.softeng.group77.pennyplanner.controller.MainApp \
+          --icon src/main/resources/icon.png \
+          --dest dist \
+          --app-version 2.0.0
 
-    - name: Build with Maven
-      run: mvn -B clean package --file pom.xml -DskipTests
-
-    - name: Run tests
-      run: mvn test
-
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v4
       with:
-        name: PennyPlanner-build
-        path: target/*.jar
+        name: installer-deb
+        path: dist/*.deb
+
+  build-windows:
+    name: Package for Windows (.msi)
+    needs: build-common
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/download-artifact@v4
+      with:
+        name: app-jar
+        path: target
+
+    - name: Package .msi
+      run: |
+        mkdir dist
+        jpackage ^
+          --type msi ^
+          --name PennyPlanner ^
+          --input target ^
+          --main-jar PennyPlanner-2.0.0-PreRelease.jar ^
+          --main-class org.softeng.group77.pennyplanner.controller.MainApp ^
+          --icon src/main/resources/icon.png ^
+          --dest dist ^
+          --app-version 2.0.0
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: installer-msi
+        path: dist/*.msi
+
+  build-macos:
+    name: Package for macOS (.dmg)
+    needs: build-common
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/download-artifact@v4
+      with:
+        name: app-jar
+        path: target
+
+    - name: Package .dmg
+      run: |
+        mkdir dist
+        jpackage \
+          --type dmg \
+          --name PennyPlanner \
+          --input target \
+          --main-jar PennyPlanner-2.0.0-PreRelease.jar \
+          --main-class org.softeng.group77.pennyplanner.controller.MainApp \
+          --icon src/main/resources/icon.png \
+          --dest dist \
+          --app-version 2.0.0
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: installer-dmg
+        path: dist/*.dmg
