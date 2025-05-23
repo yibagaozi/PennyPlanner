@@ -149,6 +149,15 @@
 						<option>javafx.controls,javafx.fxml</option>
 					</options>
 				</configuration>
+				<executions>
+					<execution>
+						<id>create-runtime</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jlink</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 
 		</plugins>
