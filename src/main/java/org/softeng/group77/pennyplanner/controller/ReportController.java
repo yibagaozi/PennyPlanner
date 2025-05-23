@@ -87,6 +87,11 @@ public class ReportController {
         MainApp.showLogin();
     }
     @FXML
+    private void turntoFinancialAssistant() throws IOException {
+        MainApp.showFinancialAssistant();
+    }
+
+    @FXML
     private void useAI() throws IOException {
         System.out.println("Call API for AI-generated content");
         // 检查日期是否有效

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.softeng.group77.pennyplanner.controller.FinancialAssistantController">
+
+    <top>
+        <VBox spacing="10.0">
+            <padding>
+                <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+            </padding>
+            <HBox alignment="CENTER_LEFT" spacing="5.0">
+                <Button fx:id="backButton" onAction="#goBack" text="Back" />
+                <Label style="-fx-font-size: 17px; -fx-font-weight: bold;" text="AI Financial Assistant">
+               <font>
+                  <Font size="17.0" />
+               </font></Label>
+                <Region HBox.hgrow="ALWAYS" />
+                <DatePicker fx:id="startDatePicker" promptText="开始日期" />
+                <Label text="至" />
+                <DatePicker fx:id="endDatePicker" promptText="结束日期" />
+            </HBox>
+            <Separator />
+            <FlowPane fx:id="quickQuestionsPane" hgap="10" vgap="5">
+                <!-- 快捷问题按钮会在控制器中动态添加 -->
+            </FlowPane>
+            <Separator />
+        </VBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToHeight="true" fitToWidth="true">
+            <VBox fx:id="chatContainer" spacing="10.0" style="-fx-background-color: #f4f4f4;">
+                <padding>
+                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                </padding>
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    <bottom>
+        <VBox spacing="10.0">
+            <padding>
+                <Insets bottom="15.0" left="15.0" right="15.0" top="10.0" />
+            </padding>
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                <TextField fx:id="messageField" promptText="输入您的问题..." HBox.hgrow="ALWAYS" />
+                <ProgressIndicator fx:id="loadingIndicator" prefHeight="24.0" prefWidth="24.0" visible="false" />
+                <Button fx:id="sendButton" defaultButton="true" text="发送" />
+            </HBox>
+        </VBox>
+    </bottom>
+</BorderPane>

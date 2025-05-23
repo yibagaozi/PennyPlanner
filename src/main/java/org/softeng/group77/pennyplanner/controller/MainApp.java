@@ -101,6 +101,7 @@ public class MainApp extends Application {
 
 
     public static void showHome() throws IOException {
+        currentView = "home";
         FXMLLoader loader = new FXMLLoader(
                 MainApp.class.getResource("/fxml/home_view.fxml")
         );
@@ -115,6 +116,7 @@ public class MainApp extends Application {
     }
 
     public static void showhistory() throws IOException {
+        currentView = "history";
         // 刷新交易数据
         SharedDataModel.refreshTransactionData();
 
@@ -133,6 +135,7 @@ public class MainApp extends Application {
     }
 
     public static void showmanagement() throws IOException {
+        currentView = "management";
         FXMLLoader loader = new FXMLLoader(
                 MainApp.class.getResource("/fxml/Management_view.fxml")
         );
@@ -147,6 +150,7 @@ public class MainApp extends Application {
     }
 
     public static void showuser() throws IOException {
+        currentView = "user";
         FXMLLoader loader = new FXMLLoader(
                 MainApp.class.getResource("/fxml/User.fxml")
         );
@@ -163,6 +167,7 @@ public class MainApp extends Application {
 
 
     public static void showReport() throws IOException {
+        currentView = "report";
         FXMLLoader loader = new FXMLLoader(
                 MainApp.class.getResource("/fxml/Report_view.fxml")
         );
@@ -176,6 +181,22 @@ public class MainApp extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
     }
+
+    public static void showFinancialAssistant() throws IOException {
+        //记录来源页面（上一页面）
+        FinancialAssistantController.setPreviousView(currentView);
+        FXMLLoader loader = new FXMLLoader(
+                MainApp.class.getResource("/fxml/fin_ast_view.fxml")
+        );
+        loader.setControllerFactory(applicationContext::getBean);
+        Parent root = loader.load();
+
+        Scene scene = new Scene(root);
+        primaryStage.setScene(scene);
+        primaryStage.setTitle("PennyPlanner");
+        primaryStage.show();
+    }
+
     private void clearFilesInDirectory(String directoryPath) {
         Path dirPath = Paths.get(directoryPath);
 

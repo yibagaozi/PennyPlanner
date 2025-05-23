@@ -207,4 +207,8 @@ public class UserController {
         System.out.println("Login");
         MainApp.showLogin();
     }
+    @FXML
+    private void turntoFinancialAssistant() throws IOException {
+        MainApp.showFinancialAssistant();
+    }
 }

@@ -10,7 +10,7 @@
             <Label styleClass="nav-title" text="PennyPlanner" />
             <Button onAction="#turntoHome" styleClass="nav-button" text="Home" />
             <Button onAction="#turntoReport" styleClass="nav-button" text="Report &amp; Forecast" />
-            <Button prefHeight="35.0" prefWidth="184.0" style="-fx-font-weight: bold;" styleClass="nav-button" text="Track Spend!" />
+            <Button onAction="#turntoFinancialAssistant" prefHeight="35.0" prefWidth="184.0" style="-fx-font-weight: bold;" styleClass="nav-button" text="AI AST" fx:id="financialAssistantButton" />
             <Button onAction="#turntoHistory" styleClass="nav-button" text="History" />
             <Button onAction="#turntoManagement" styleClass="nav-button" text="Management" />
             <Button onAction="#turntoUser" styleClass="nav-button" text="User Profile" />

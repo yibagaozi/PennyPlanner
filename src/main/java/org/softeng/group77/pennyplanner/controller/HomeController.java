@@ -265,6 +265,11 @@ public class HomeController {
         MainApp.showLogin();
     }
 
+    @FXML
+    private void turntoFinancialAssistant() throws IOException {
+        MainApp.showFinancialAssistant();
+    }
+
     //收入趋势图
     private void setupExpenseTrendChart() {
         // 清除现有内容

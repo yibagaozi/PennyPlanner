@@ -668,8 +668,11 @@ public class ManagementController {
     }
     @FXML
     private void turntoLogin() throws IOException {
-        System.out.println("Login");
         MainApp.showLogin();
+    }
+    @FXML
+    private void turntoFinancialAssistant() throws IOException {
+        MainApp.showFinancialAssistant();
     }
     @FXML
     private void useAI() throws IOException {
