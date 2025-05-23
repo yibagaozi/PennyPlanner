@@ -30,6 +30,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * HomeController负责展示应用的主页，包括用户欢迎信息、支出趋势折线图、支出分布饼图等。
+ * 该控制器通过ChartService和ChartViewService来渲染图表，并通过TransactionAdapter从数据库获取用户交易数据。
+ */
 @Controller
 @Slf4j
 public class HomeController {
@@ -76,10 +80,20 @@ public class HomeController {
     // 用于存储当月财务摘要，避免重复计算
     private MonthlyFinancialSummary currentMonthlySummary;
 
+    /**
+     * 设置TransactionAdapter实例，用于获取用户交易数据。
+     * 
+     * @param adapter TransactionAdapter实例
+     */
     public static void setTransactionAdapter(TransactionAdapter adapter) {
         transactionAdapter = adapter;
     }
 
+    /**
+     * 设置AuthService实例，用于获取当前用户信息。
+     * 
+     * @param service AuthService实例
+     */
     public static void setAuthService(AuthService service) {
         authService = service;
     }
@@ -87,6 +101,9 @@ public class HomeController {
     private static ChartService staticChartService;
     private static ChartViewService staticChartViewService;
 
+    /**
+     * 初始化方法，设置用户名并初始化图表。
+     */
     @FXML
     private void initialize() throws Exception {
         // 1. 设置用户名
@@ -270,7 +287,9 @@ public class HomeController {
         MainApp.showFinancialAssistant();
     }
 
-    //收入趋势图
+    /**
+     * 初始化支出趋势折线图。
+     */
     private void setupExpenseTrendChart() {
         // 清除现有内容
         expenseTrendChartContainer.getChildren().clear();
@@ -305,7 +324,9 @@ public class HomeController {
         lineChart.prefHeightProperty().bind(expenseTrendChartContainer.heightProperty());
     }
 
-    // 收入分布--饼图
+    /**
+     * 初始化支出分布饼图。
+     */
     private void setupExpenseDistributionChart() {
         // 清除现有内容
         expenseDistributionChartContainer.getChildren().clear();
@@ -338,7 +359,12 @@ public class HomeController {
     }
 
 
-    // 从tableModel转换为Transaction对象
+    /**
+     * 将tableModel对象转换为Transaction对象。
+     * 
+     * @param model tableModel对象
+     * @return 转换后的Transaction对象
+     */
     private Transaction convertToTransaction(tableModel model) {
         Transaction tx = new Transaction();
         tx.setDescription(model.getDescription());
@@ -359,7 +385,11 @@ public class HomeController {
     }
 
 
-    // 创建示例交易数据
+    /**
+     * 创建示例交易数据。
+     * 
+     * @return 示例交易数据列表
+     */
     private List<Transaction> createSampleTransactions() {
         List<Transaction> samples = new ArrayList<>();
 
@@ -391,7 +421,15 @@ public class HomeController {
     }
 
 
-    // 创建单个交易记录帮助方法
+    /**
+     * 创建单个交易记录帮助方法。
+     * 
+     * @param description 交易描述
+     * @param amount 交易金额
+     * @param category 交易类别
+     * @param date 交易日期
+     * @return 创建的Transaction对象
+     */
     private Transaction createTransaction(String description, double amount, String category, LocalDate date) {
         Transaction tx = new Transaction();
         tx.setDescription(description);
@@ -401,7 +439,11 @@ public class HomeController {
         return tx;
     }
 
-
+    /**
+     * 获取默认的饼图数据。
+     * 
+     * @return 默认的饼图数据
+     */
     private ObservableList<PieChart.Data> getDefaultPieChartData() {
         return FXCollections.observableArrayList(
                 new PieChart.Data("Food", 237),
