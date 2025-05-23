@@ -6,122 +6,142 @@ on:
     branches: [ workflow-test ]
 
 jobs:
-  build-common:
-    name: Build JAR
-    runs-on: ubuntu-latest
-    outputs:
-      jar-name: ${{ steps.set-output.outputs.jar-name }}
-
-    steps:
-    - uses: actions/checkout@v3
-
-    - name: Set up Liberica JDK 21 Full (with JavaFX)
-      uses: actions/setup-java@v3
-      with:
-        distribution: 'liberica'
-        java-version: '21'
-        cache: maven
-
-    - name: Build Jar
-      run: mvn -B clean package --file pom.xml -DskipTests
-      
-    - name: Upload Jar
-      uses: actions/upload-artifact@v4
-      with:
-        name: app-jar
-        path: target/PennyPlanner-2.0.0-PreRelease.jar
-
   build-linux:
-    name: Package for Linux (.deb)
-    needs: build-common
+    name: Build on Linux (deb + jar)
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/download-artifact@v4
-      with:
-        name: app-jar
-        path: target
+      - name: Checkout
+        uses: actions/checkout@v3
 
-    - name: Install jpackage dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y fakeroot libfuse2
+      - name: Set up Liberica JDK 21 Full (with JavaFX)
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'liberica'
+          java-version: '21'
+          cache: maven
 
-    - name: Package .deb
-      run: |
-        mkdir dist
-        jpackage \
-          --type deb \
-          --name PennyPlanner \
-          --input target \
-          --main-jar PennyPlanner-2.0.0-PreRelease.jar \
-          --main-class org.softeng.group77.pennyplanner.controller.MainApp \
-          --icon src/main/resources/icon.png \
-          --dest dist \
-          --app-version 2.0.0
+      - name: Set JAVA_HOME
+        run: echo "JAVA_HOME=$SDKMAN_CANDIDATES_DIR/java/current" >> $GITHUB_ENV
 
-    - uses: actions/upload-artifact@v4
-      with:
-        name: installer-deb
-        path: dist/*.deb
+      - name: Build Jar
+        run: mvn clean package -DskipTests
+
+      - name: Create jlink runtime
+        run: |
+          $JAVA_HOME/bin/jlink \
+            --add-modules java.base,java.desktop,javafx.controls,javafx.fxml \
+            --output runtime \
+            --strip-debug --no-header-files --no-man-pages --compress=2
+
+      - name: Create dist folder
+        run: mkdir dist
+
+      - name: Package as .deb
+        run: |
+          $JAVA_HOME/bin/jpackage \
+            --type deb \
+            --name PennyPlanner \
+            --input target \
+            --main-jar PennyPlanner-*.jar \
+            --main-class org.softeng.group77.pennyplanner.controller.MainApp \
+            --icon src/main/resources/icon.png \
+            --runtime-image runtime \
+            --dest dist \
+            --app-version 2.0.0
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-dist
+          path: |
+            dist/*.deb
+            target/*.jar
 
   build-windows:
-    name: Package for Windows (.msi)
-    needs: build-common
+    name: Build on Windows (msi + jar)
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/download-artifact@v4
-      with:
-        name: app-jar
-        path: target
+      - name: Checkout
+        uses: actions/checkout@v3
 
-    - name: Package .msi
-      run: |
-        mkdir dist
-        jpackage ^
-          --type msi ^
-          --name PennyPlanner ^
-          --input target ^
-          --main-jar PennyPlanner-2.0.0-PreRelease.jar ^
-          --main-class org.softeng.group77.pennyplanner.controller.MainApp ^
-          --icon src/main/resources/icon.png ^
-          --dest dist ^
-          --app-version 2.0.0
+      - name: Set up Liberica JDK 21 Full (with JavaFX)
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'liberica'
+          java-version: '21'
+          cache: maven
 
-    - uses: actions/upload-artifact@v4
-      with:
-        name: installer-msi
-        path: dist/*.msi
+      - name: Build Jar
+        run: mvn clean package -DskipTests
+
+      - name: Create jlink runtime
+        run: |
+          jlink ^
+            --add-modules java.base,java.desktop,javafx.controls,javafx.fxml ^
+            --output runtime ^
+            --strip-debug --no-header-files --no-man-pages --compress=2
+
+      - name: Create dist folder
+        run: mkdir dist
+
+      - name: Package as .msi
+        run: jpackage --type msi --name PennyPlanner --input target --main-jar PennyPlanner-*.jar --main-class org.softeng.group77.pennyplanner.controller.MainApp --icon src\main\resources\icon.ico --runtime-image runtime --dest dist --app-version 2.0.0
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-dist
+          path: |
+            dist\*.msi
+            target\*.jar
 
   build-macos:
-    name: Package for macOS (.dmg)
-    needs: build-common
+    name: Build on macOS (dmg + jar)
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/download-artifact@v4
-      with:
-        name: app-jar
-        path: target
+      - name: Checkout
+        uses: actions/checkout@v3
 
-    - name: Package .dmg
-      run: |
-        mkdir dist
-        jpackage \
-          --type dmg \
-          --name PennyPlanner \
-          --input target \
-          --main-jar PennyPlanner-2.0.0-PreRelease.jar \
-          --main-class org.softeng.group77.pennyplanner.controller.MainApp \
-          --icon src/main/resources/icon.png \
-          --dest dist \
-          --app-version 2.0.0
+      - name: Set up Liberica JDK 21 Full (with JavaFX)
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'liberica'
+          java-version: '21'
+          cache: maven
 
-    - uses: actions/upload-artifact@v4
-      with:
-        name: installer-dmg
-        path: dist/*.dmg
+      - name: Build Jar
+        run: mvn clean package -DskipTests
+
+      - name: Create jlink runtime
+        run: |
+          jlink \
+            --add-modules java.base,java.desktop,javafx.controls,javafx.fxml \
+            --output runtime \
+            --strip-debug --no-header-files --no-man-pages --compress=2
+
+      - name: Create dist folder
+        run: mkdir dist
+
+      - name: Package as .dmg
+        run: |
+          jpackage \
+            --type dmg \
+            --name PennyPlanner \
+            --input target \
+            --main-jar PennyPlanner-*.jar \
+            --main-class org.softeng.group77.pennyplanner.controller.MainApp \
+            --icon src/main/resources/icon.icns \
+            --runtime-image runtime \
+            --dest dist \
+            --app-version 2.0.0
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-dist
+          path: |
+            dist/*.dmg
+            target/*.jar
