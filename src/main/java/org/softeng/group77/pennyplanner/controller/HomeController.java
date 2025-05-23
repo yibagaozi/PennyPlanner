@@ -156,6 +156,7 @@ public class HomeController {
                 if (budgetService != null) {
                     budgetService.saveBudget(budgetAmount, LocalDate.now());
                     System.out.println("Budget saved: " + budgetAmount);
+                    updateBudgetProgressBar();
                 } else {
                     System.out.println("BudgetService is not initialized");
                 }
