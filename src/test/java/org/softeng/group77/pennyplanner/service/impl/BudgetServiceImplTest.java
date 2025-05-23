@@ -191,7 +191,7 @@ public class BudgetServiceImplTest {
     }
 
     @Test
-    void testGetCurrentBudgetForSameMonth() {
+    void testGetCurrentBudgetForSameMonth() throws Exception {
         LocalDate nextMonth = LocalDate.now().plusMonths(1);
 
         // 创建下个月的预算，确保当前月没有预算
@@ -199,11 +199,9 @@ public class BudgetServiceImplTest {
         budgetService.saveBudget(1500, nextMonth.withDayOfMonth(10));
         budgetService.saveBudget(2000, nextMonth.withDayOfMonth(15));
 
-        // 获取当前月预算（应为空）
-        Budget currentBudget = budgetService.getCurrentBudget();
-
-        // 当前月没有预算，断言应为 null
-        assertNull(currentBudget, "No budget should be returned for the current month");
+        assertThrows(BudgetNotFoundException.class, () -> {
+            budgetService.getCurrentBudget();
+        }, "No current budget for the same month");
 
     }
 
