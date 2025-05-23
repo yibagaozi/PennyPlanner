@@ -192,16 +192,18 @@ public class BudgetServiceImplTest {
 
     @Test
     void testGetCurrentBudgetForSameMonth() throws Exception {
-        // 保存多个预算，确保有不同日期的预算
-        budgetService.saveBudget(1000, LocalDate.of(2025, 6, 5));  // 5月5号的预算
-        budgetService.saveBudget(1500, LocalDate.of(2025, 6, 10)); // 5月10号的预算
-        budgetService.saveBudget(2000, LocalDate.of(2025, 6, 15)); // 5月15号的预算
+        LocalDate nextMonth = LocalDate.now().plusMonths(1);
+
+        // 创建下个月的预算，确保当前月没有预算
+        budgetService.saveBudget(1000, nextMonth.withDayOfMonth(5));
+        budgetService.saveBudget(1500, nextMonth.withDayOfMonth(10));
+        budgetService.saveBudget(2000, nextMonth.withDayOfMonth(15));
 
         assertThrows(BudgetNotFoundException.class, () -> {
-            budgetService.getCurrentBudget(); // 传递 null 会抛出异常
-        }, "Current budget is null");
-    }
+            budgetService.getCurrentBudget();
+        }, "No current budget for the same month");
 
+    }
 
     @Test
     void testSaveBudgetForPastDate() {
