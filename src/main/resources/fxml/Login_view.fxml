@@ -64,5 +64,5 @@
     <Hyperlink fx:id="createAccountLink" style="-fx-text-fill: #000000; -fx-border-color: transparent;" text="Create an account" />
 
     <!-- 条款提示 -->
-    <Label alignment="CENTER" style="-fx-text-fill: #999999; -fx-font-size: 12;" text="By clicking continue, you agree to our Terms of&#10;Service and Privacy Policy" />
+    <Label alignment="CENTER" style="-fx-text-fill: #999999; -fx-font-size: 12;" text="By clicking buttons to continue, you agree to our Terms of&#10;Service and Privacy Policy" />
 </VBox>
