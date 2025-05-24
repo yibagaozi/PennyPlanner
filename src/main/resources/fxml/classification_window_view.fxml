@@ -1,27 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.Insets?>
 
-<AnchorPane prefHeight="200.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/17"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.softeng.group77.pennyplanner.controller.ClassificationWindowController">
+<AnchorPane prefHeight="200.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.softeng.group77.pennyplanner.controller.ClassificationWindowController">
     <padding>
-        <Insets top="10" right="10" bottom="10" left="10"/>
+        <Insets bottom="10" left="10" right="10" top="10" />
     </padding>
-    <VBox spacing="15" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0"
-          AnchorPane.topAnchor="10.0" AnchorPane.bottomAnchor="10.0">
+    <VBox spacing="15" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
         <Label text="Transaction Description" />
-        <TextField fx:id="descriptionField" promptText="Type transaction description"/>
+        <TextField fx:id="descriptionField" promptText="Type transaction description" />
 
         <Label text="Classification Result:" />
-        <Label fx:id="resultLabel" wrapText="true" style="-fx-border-color: lightgray; -fx-padding: 5px;"
-               prefHeight="50.0" />
+        <Label fx:id="resultLabel" prefHeight="50.0" style="-fx-border-color: lightgray; -fx-padding: 5px;" wrapText="true" />
 
-        <HBox spacing="10" alignment="CENTER_RIGHT">
-            <Button fx:id="classifyButton" text="Analyse Categoty" onAction="#handleClassify" defaultButton="true" />
-            <Button fx:id="cancelButton" text="Cancel" onAction="#handleCancel" />
+        <HBox alignment="CENTER_RIGHT" spacing="10">
+            <Button fx:id="classifyButton" defaultButton="true" onAction="#handleClassify" style="-fx-background-color: linear-gradient(to right, #4b6cb7, #718cb7); -fx-font-weight: bold;" text="Analyse Categoty" textFill="WHITE" />
+            <Button fx:id="cancelButton" onAction="#handleCancel" style="-fx-background-color: linear-gradient(to right, #4b6cb7, #718cb7); -fx-font-weight: bold;" text="Cancel" textFill="WHITE" />
         </HBox>
     </VBox>
 </AnchorPane>
