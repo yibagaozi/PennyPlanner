@@ -18,7 +18,7 @@
         <PasswordField fx:id="passwordField" promptText="Password" styleClass="text-field" />
     </VBox>
 
-    <Button fx:id="signUpButton" onAction="#handleSignUp" style="-fx-background-color: linear-gradient(to right, #4b6cb7, #718cb7); -fx-text-fill: white; -fx-font-weight: bold;" styleClass="primary-button" text="Sign up with email" />
+    <Button fx:id="signUpButton" onAction="#handleSignUp" style="-fx-background-color: linear-gradient(to right, #4b6cb7, #718cb7); -fx-text-fill: white; -fx-font-weight: bold;" styleClass="primary-button" text="Sign up" />
     <Label fx:id="errorLabel" text="" />
 
     <HBox alignment="CENTER" spacing="5">
