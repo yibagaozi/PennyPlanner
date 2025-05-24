@@ -603,11 +603,17 @@ public class ManagementController {
         try {
             // 创建一个示例CSV内容
             String exampleCsvContent = "date,description,amount,category,method\n" +
-                    "2025-06-01,Grocery Shopping,-50.75,Food,Cash\n" +
-                    "2025-06-03,Salary Deposit,3000.00,Salary,Bank Transfer\n" +
-                    "2025-06-05,Electricity Bill,-120.35,Living Bill,Auto-Payment\n" +
-                    "2025-06-07,Movie Night,-25.50,Entertainment,Credit Card\n" +
-                    "2025-06-10,Bus Pass,-45.00,Transportation,E-Payment\n";
+                    "2025-05-01,Grocery Shopping,-50.75,Food,Cash\n" +
+                    "2025-05-07,Salary Deposit,3000.00,Salary,Bank Transfer\n" +
+                    "2025-05-13,Electricity Bill,-120.35,Living Bill,Auto-Payment\n" +
+                    "2025-05-19,Movie Night,-25.50,Entertainment,Credit Card\n" +
+                    "2025-05-25,Bus Pass,-45.00,Transportation,E-Payment\n"+
+                    "2025-06-05,Taxi,-43.00,Transportation,E-Payment\n"+
+                    "2025-06-10,Grocery,-100.00,Food,Cash\n" +
+                    "2025-06-13,ScholarShip,5000.00,Education,Bank Transfer\n" +
+                    "2025-06-13,Electricity Bill,-140.00,Living Bill,Auto-Payment\n" +
+                    "2025-06-19,Party,-300.00,Entertainment,Credit Card\n" +
+                    "2025-06-25,Bus Pass,-45.00,Transportation,E-Payment\n";
 
             // 让用户选择保存位置
             FileChooser fileChooser = new FileChooser();
