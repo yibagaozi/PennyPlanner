@@ -20,20 +20,50 @@ import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+/**
+ * Adapter class that serves as a bridge between the front-end table models and the back-end transaction service.
+ * This class converts between the presentation layer's tableModel and the service layer's TransactionDetail objects.
+ * It provides operations for managing financial transactions in the PennyPlanner application.
+ *
+ * @author CHAI Jiayang
+ * @version 2.0.0
+ */
 @Component
 public class TransactionAdapter {
 
+    /**
+     * Service responsible for transaction-related operations in the application.
+     */
     private final TransactionService transactionService;
+
+    /**
+     * Service responsible for authentication and user management operations.
+     */
     private final AuthService authService; // 添加AuthService
+
+    /**
+     * Date formatter for parsing and formatting dates in the "yyyy-MM-dd" pattern.
+     */
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
+    /**
+     * Constructs a new TransactionAdapter with the specified services.
+     *
+     * @param transactionService the service to handle transaction operations
+     * @param authService the service to handle authentication operations
+     */
     public TransactionAdapter(TransactionService transactionService, AuthService authService) {
         this.transactionService = transactionService;
         this.authService = authService;
     }
 
-
-    //将前端tableModel转换为后端TransactionDetail
+    /**
+     * Converts a front-end tableModel object to a back-end TransactionDetail object.
+     * Sets the current user ID and handles date conversion.
+     *
+     * @param model the tableModel to convert
+     * @return the converted TransactionDetail object
+     */
     public TransactionDetail toTransactionDetail(tableModel model) {
         TransactionDetail detail = new TransactionDetail();
 
@@ -69,8 +99,12 @@ public class TransactionAdapter {
         return detail;
     }
 
-
-    //将后端TransactionDetail转换为前端tableModel
+    /**
+     * Converts TransactionDetail object to a JavaFX tableModel object.
+     *
+     * @param detail the TransactionDetail to convert
+     * @return the converted tableModel object
+     */
     public tableModel toTableModel(TransactionDetail detail) {
         String formattedDate = detail.getTransactionDateTime().format(DATE_FORMATTER);
         double amount = detail.getAmount().doubleValue();
@@ -85,8 +119,11 @@ public class TransactionAdapter {
         );
     }
 
-
-    //获取用户的所有交易记录
+    /**
+     * Retrieves all transactions for the current user, sorted by date in descending order.
+     *
+     * @return an ObservableList of tableModel objects representing the user's transactions
+     */
     public ObservableList<tableModel> getUserTransactions() {
         try {
             List<TransactionDetail> details = transactionService.getUserTransactions()
@@ -110,8 +147,12 @@ public class TransactionAdapter {
         }
     }
 
-
-    //保存新交易记录
+    /**
+     * Saves a new transaction to the database.
+     *
+     * @param model the tableModel representing the transaction to save
+     * @return true if the operation was successful, false otherwise
+     */
     public boolean saveTransaction(tableModel model) {
         try {
             TransactionDetail detail = toTransactionDetail(model);
@@ -123,8 +164,12 @@ public class TransactionAdapter {
         }
     }
 
-
-    //更新交易记录
+    /**
+     * Updates an existing transaction in the database.
+     *
+     * @param model the tableModel representing the transaction to update
+     * @return true if the operation was successful, false otherwise
+     */
     public boolean updateTransaction(tableModel model) {
         try {
             TransactionDetail detail = toTransactionDetail(model);
@@ -136,8 +181,12 @@ public class TransactionAdapter {
         }
     }
 
-
-    //删除交易记录
+    /**
+     * Deletes a transaction from the database.
+     *
+     * @param transactionId the ID of the transaction to delete
+     * @return true if the operation was successful, false otherwise
+     */
     public boolean deleteTransaction(String transactionId) {
         try {
             return transactionService.deleteTransaction(transactionId);
@@ -147,8 +196,13 @@ public class TransactionAdapter {
         }
     }
 
-
-    //按日期范围筛选交易
+    /**
+     * Retrieves transactions within the specified date range.
+     *
+     * @param startDate the start date of the range (inclusive)
+     * @param endDate the end date of the range (inclusive)
+     * @return an ObservableList of tableModel objects representing the filtered transactions
+     */
     public ObservableList<tableModel> getTransactionsByDateRange(LocalDate startDate, LocalDate endDate) {
         try {
             List<TransactionDetail> details = transactionService.filterTransactionByDate(startDate, endDate);
@@ -162,9 +216,12 @@ public class TransactionAdapter {
         }
     }
 
-
-
-    //按类别筛选交易
+    /**
+     * Retrieves transactions of the specified category.
+     *
+     * @param category the category to filter by
+     * @return an ObservableList of tableModel objects representing the filtered transactions
+     */
     public ObservableList<tableModel> getTransactionsByCategory(String category) {
         try {
             List<TransactionDetail> details = transactionService.filterTransactionByCategory(category);
@@ -178,8 +235,11 @@ public class TransactionAdapter {
         }
     }
 
-
-    //获取各类别的支出总和
+    /**
+     * Calculates the sum of expenses for each category.
+     *
+     * @return a list of CategorySum objects containing category names and their total expense amounts
+     */
     public List<CategorySum> getCategorySummary() {
         ObservableList<tableModel> transactions = getUserTransactions();
         return transactions.stream()
@@ -193,8 +253,12 @@ public class TransactionAdapter {
                 .collect(Collectors.toList());
     }
 
-
-     //按日期获取每日支出总和
+    /**
+     * Calculates the daily expense summary for the specified number of recent days.
+     *
+     * @param daysCount the number of days to include in the summary
+     * @return a list of DateSum objects containing dates and their total expense amounts
+     */
     public List<DateSum> getDailyExpenseSummary(int daysCount) {
         LocalDate endDate = LocalDate.now();
         LocalDate startDate = endDate.minusDays(daysCount);
@@ -212,6 +276,12 @@ public class TransactionAdapter {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Retrieves transactions with the specified payment method.
+     *
+     * @param method the payment method to filter by
+     * @return an ObservableList of tableModel objects representing the filtered transactions
+     */
     public ObservableList<tableModel> getTransactionsByMethod(String method) {
         try {
             List<TransactionDetail> details = transactionService.filterTransactionByMethod(method);
@@ -225,14 +295,19 @@ public class TransactionAdapter {
         }
     }
 
-
     /**
-     * 类别汇总数据结构
+     * Data structure for representing category summary information.
      */
     public static class CategorySum {
         private final String category;
         private final double amount;
 
+        /**
+         * Constructs a new CategorySum with the specified category and amount.
+         *
+         * @param category the expense category
+         * @param amount the total amount for the category
+         */
         public CategorySum(String category, double amount) {
             this.category = category;
             this.amount = amount;
@@ -243,12 +318,18 @@ public class TransactionAdapter {
     }
 
     /**
-     * 日期汇总数据结构
+     * Data structure for representing daily expense summary information.
      */
     public static class DateSum {
         private final String date;
         private final double amount;
 
+        /**
+         * Constructs a new DateSum with the specified date and amount.
+         *
+         * @param date the date string in "yyyy-MM-dd" format
+         * @param amount the total amount for the date
+         */
         public DateSum(String date, double amount) {
             this.date = date;
             this.amount = amount;
