@@ -17,15 +17,16 @@
  *   <li>{@link org.softeng.group77.pennyplanner.service.AuthService} - User authentication and management</li>
  *   <li>{@link org.softeng.group77.pennyplanner.service.TransactionService} - Financial transaction operations</li>
  *   <li>{@link org.softeng.group77.pennyplanner.service.BudgetService} - Budget planning and tracking</li>
- *   <li>{@link org.softeng.group77.pennyplanner.service.ChartService} - Financial data visualization</li>
+ *   <li>{@link org.softeng.group77.pennyplanner.service.ChartService} - Financial data point generate</li>
+ *   <li>{@link org.softeng.group77.pennyplanner.service.ChartViewService} - Data visualization</li>
  *   <li>{@link org.softeng.group77.pennyplanner.service.TransactionAnalysisService} - AI-powered financial analysis</li>
  * </ul>
  *
- * @since 2.0.0
  * @author MA Ruize
  * @author CHAI Yihang
  * @author JIANG Mengnan
  * @author XI Yu
  * @version 2.0.0
+ * @since 1.0.0
  */
 package org.softeng.group77.pennyplanner.service;
