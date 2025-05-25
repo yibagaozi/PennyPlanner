@@ -17,8 +17,15 @@ import javax.naming.AuthenticationException;
 import java.io.IOException;
 
 /**
- * LoginController 负责处理用户登录逻辑，包括验证用户凭据，显示错误信息和跳转页面。
- * 该控制器使用 AuthService 进行身份验证，并处理登录过程中的 UI 更新。
+ * Controller for the login screen in the PennyPlanner application.
+ * This controller manages the user authentication process, including:
+ * The controller uses Spring's dependency injection to obtain the
+ * authentication service and performs asynchronous login operations
+ * to maintain UI responsiveness.
+ *
+ * @author CHAI Jiayang
+ * @version 2.0.0
+ * @since 1.0.0
  */
 @Controller // 让 Spring 管理这个控制器
 public class LoginController {
@@ -32,8 +39,9 @@ public class LoginController {
     private AuthService authService;
 
     /**
-     * 初始化方法，设置界面上的事件处理器。
-     * 包括绑定注册页面跳转、登录按钮点击等行为。
+     * Initializes the controller after FXML elements are loaded.
+     * Sets up event handlers for UI components such as the login button
+     * and create account link.
      */
     @FXML
     private void initialize() {
@@ -56,11 +64,12 @@ public class LoginController {
     }
 
     /**
-     * 处理用户登录逻辑，验证用户名和密码是否为空，调用 AuthService 进行登录。
-     * 登录过程是异步的，通过 Task 来避免阻塞 UI 线程。
-     * 如果登录成功，跳转到主页；如果失败，显示相应的错误信息。
-     * 
-     * @throws IOException 如果页面跳转失败
+     * Handles the user login process.
+     * This method validates that username and password fields are not empty,
+     * then attempts to authenticate the user through the AuthService.
+     * The authentication process runs in a background thread to avoid blocking
+     * the UI thread. On successful login, the user is redirected to the home screen.
+     * On failure, an appropriate error message is displayed.
      */
     @FXML
     private void turntoHome() {
@@ -112,9 +121,9 @@ public class LoginController {
     }
 
     /**
-     * 跳转到创建账户页面。
-     * 
-     * @throws IOException 如果页面跳转失败
+     * Navigates to the account creation screen.
+     *
+     * @throws IOException if navigation to the signup screen fails
      */
     private void handleCreateAccount() throws IOException {
         System.out.println("跳转注册页面");
@@ -122,9 +131,9 @@ public class LoginController {
     }
 
     /**
-     * 显示错误信息。
-     * 
-     * @param message 错误信息
+     * Displays an error message in the UI.
+     *
+     * @param message the error message to display
      */
     private void showError(String message) {
         Platform.runLater(() -> errorLabel.setText(message));

@@ -15,6 +15,17 @@ import java.time.LocalDate;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Controller for the financial report generation view in the PennyPlanner application.
+ * This controller handles the generation of AI-powered financial reports based on
+ * user-selected date ranges.
+ * The controller uses the TransactionAnalysisService to process financial data
+ * and generate analytical reports.
+ *
+ * @author WANG Bingsong
+ * @version 2.0.0
+ * @since 1.2.0
+ */
 @Controller
 public class ReportController {
     @FXML
@@ -34,15 +45,23 @@ public class ReportController {
 
     private TransactionAnalysisService transactionAnalysisService;
 
+    /**
+     * Sets the transaction analysis service
+     *
+     * @param transactionAnalysisService the service for generating AI-powered reports
+     */
     @Autowired
     public void setTransactionAnalysisService(TransactionAnalysisService transactionAnalysisService) {
         this.transactionAnalysisService = transactionAnalysisService;
     }
 
-
     @FXML
     private SplitPane splitPane;
 
+    /**
+     * Initializes the controller after FXML elements are loaded.
+     * Sets up the UI with default values, date ranges, and layout constraints.
+     */
     @FXML
     private void initialize() {
         Locale.setDefault(Locale.ENGLISH);
@@ -66,33 +85,87 @@ public class ReportController {
         }
 
     }
+
+    /**
+     * Navigates to the home view
+     *
+     * @throws IOException if navigation fails
+     */
     @FXML
     private void turntoHome() throws IOException {
         MainApp.showHome();
     }
+
+    /**
+     * Navigates to the report view
+     *
+     * @throws IOException if navigation fails
+     */
     @FXML
     private void turntoReport() throws IOException {
         MainApp.showReport();
-    }@FXML
+    }
+
+    /**
+     * Navigates to the history view
+     *
+     * @throws IOException if navigation fails
+     */
+    @FXML
     private void turntoHistory() throws IOException {
         MainApp.showhistory();
-    }@FXML
+    }
+
+    /**
+     * Navigates to the management view
+     *
+     * @throws IOException if navigation fails
+     */
+    @FXML
     private void turntoManagement() throws IOException {
         MainApp.showmanagement();
-    }@FXML
+    }
+
+    /**
+     * Navigates to the user profile view
+     *
+     * @throws IOException if navigation fails
+     */
+    @FXML
     private void turntoUser() throws IOException {
         MainApp.showuser();
     }
+
+    /**
+     * Navigates to the login view
+     *
+     * @throws IOException if navigation fails
+     */
     @FXML
     private void turntoLogin() throws IOException {
         System.out.println("Login");
         MainApp.showLogin();
     }
+
+    /**
+     * Navigates to the financial assistant view
+     *
+     * @throws IOException if navigation fails
+     */
     @FXML
     private void turntoFinancialAssistant() throws IOException {
         MainApp.showFinancialAssistant();
     }
 
+    /**
+     * Generates an AI-powered financial report based on the selected date range.
+     * This method validates the date range, then asynchronously calls the
+     * TransactionAnalysisService to generate a detailed spending analysis report.
+     * During report generation, a progress indicator is displayed and the UI is
+     * updated when the report is complete.
+     *
+     * @throws IOException if there is an error during report generation
+     */
     @FXML
     private void useAI() throws IOException {
         System.out.println("Call API for AI-generated content");
@@ -136,6 +209,13 @@ public class ReportController {
         });
     }
 
+    /**
+     * Displays an alert dialog with the specified title, message, and type
+     *
+     * @param title the title of the alert
+     * @param message the message content
+     * @param alertType the type of alert to display
+     */
     private void showAlert(String title, String message, Alert.AlertType alertType) {
         Alert alert = new Alert(alertType);
         alert.setTitle(title);

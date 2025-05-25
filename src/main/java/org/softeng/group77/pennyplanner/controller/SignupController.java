@@ -13,6 +13,15 @@ import org.softeng.group77.pennyplanner.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
+/**
+ * Controller for the user registration screen in the PennyPlanner application.
+ * The controller works with a form that contains fields for username, email,
+ * phone number, and password, along with a signup button and error display area.
+ *
+ * @author CHAI Jiayang
+ * @version 2.0.0
+ * @since 1.0.0
+ */
 @Controller
 public class SignupController {
     @FXML
@@ -26,6 +35,10 @@ public class SignupController {
     @Autowired
     private AuthService authService;
 
+    /**
+     * Initializes the controller after FXML elements are loaded.
+     * Sets up action handlers for the signup button.
+     */
     @FXML
     private void initialize() {
         signUpButton.setOnAction(event -> {
@@ -33,6 +46,9 @@ public class SignupController {
         });
     }
 
+    /**
+     * Processes the user registration form submission.
+     */
     @FXML
     private void handleSignUp() {
         String username = usernameField.getText(); // 假设用户名为邮箱
@@ -57,6 +73,12 @@ public class SignupController {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Navigates to the login screen.
+     *
+     * @throws IOException if navigation to the login screen fails
+     */
     @FXML
     private void turntoLogin() throws IOException {
         System.out.println("Login");

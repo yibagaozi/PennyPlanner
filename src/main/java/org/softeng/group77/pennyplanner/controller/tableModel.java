@@ -6,8 +6,14 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 /**
- * tableModel 用于表示一条交易记录的实体类，包含了交易的各个属性（如日期、描述、金额、类别、支付方式等）。
- * 该类与 TableView 控件绑定，使得用户界面能够显示和操作交易记录的数据。
+ * Transaction model class for the PennyPlanner application.
+ * This class represents a financial transaction with properties for date,
+ * description, amount, category, and payment method. It uses JavaFX property
+ * binding to support direct integration with TableView controls in the UI.
+ *
+ * @author CHAI Jiayang
+ * @version 2.0.0
+ * @since 1.0.0
  */
 public class tableModel {
     private final StringProperty id;
@@ -18,7 +24,16 @@ public class tableModel {
     private final StringProperty method;     // 对应Method列
     private final SimpleStringProperty displayId;
 
-    // 构造函数
+    /**
+     * Creates a new transaction model with the specified properties
+     *
+     * @param id the unique identifier for the transaction
+     * @param date the transaction date in string format
+     * @param description the transaction description
+     * @param amount the transaction amount (positive for income, negative for expense)
+     * @param category the transaction category
+     * @param method the payment method used
+     */
     public tableModel(String id, String date, String description, double amount,
                       String category, String method) {
         this.id = new SimpleStringProperty(id); // 保留原始UUID

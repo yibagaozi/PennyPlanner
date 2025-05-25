@@ -18,6 +18,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
 
+/**
+ * Controller for the transaction editing view in the PennyPlanner application.
+ * Handles editing existing transaction details including type (income/expense),
+ * amount, date, description, category, and payment method.
+ *
+ * @author CHAI Jiayang
+ * @author WANG Bingsong
+ * @version 2.0.0
+ * @since 1.2.0
+ */
 @Controller
 public class EditTransactionController {
     @FXML private RadioButton expenseRadioButton;
@@ -38,13 +48,18 @@ public class EditTransactionController {
     @FXML private Button suggestCategoryButton;
     private ApplicationContext applicationContext;
 
+    /**
+     * Sets the Spring application context
+     *
+     * @param applicationContext the Spring application context
+     */
     @Autowired
     public void setApplicationContext(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }
 
     /**
-     * 初始化控制器
+     * Initializes the controller after FXML elements are loaded
      */
     @FXML
     private void initialize() {
@@ -65,7 +80,9 @@ public class EditTransactionController {
     }
 
     /**
-     * 设置要编辑的交易记录
+     * Sets the transaction to be edited and populates form fields
+     *
+     * @param transaction the transaction model to edit
      */
     public void setTransaction(tableModel transaction) {
         this.transaction = transaction;
@@ -97,7 +114,7 @@ public class EditTransactionController {
     }
 
     /**
-     * 处理"支出"单选按钮事件
+     * Handles the "Expense" radio button selection event
      */
     @FXML
     private void handleExpense() {
@@ -105,7 +122,7 @@ public class EditTransactionController {
     }
 
     /**
-     * 处理"收入"单选按钮事件
+     * Handles the "Income" radio button selection event
      */
     @FXML
     private void handleIncome() {
@@ -113,7 +130,8 @@ public class EditTransactionController {
     }
 
     /**
-     * 处理"保存"按钮事件
+     * Handles the "Save" button click event
+     * Validates input and updates the transaction model
      */
     @FXML
     private void handleSave() {
@@ -139,7 +157,7 @@ public class EditTransactionController {
     }
 
     /**
-     * 处理"取消"按钮事件
+     * Handles the "Cancel" button click event
      */
     @FXML
     private void handleCancel() {
@@ -148,7 +166,9 @@ public class EditTransactionController {
     }
 
     /**
-     * 检查输入是否有效
+     * Validates user input before saving
+     *
+     * @return true if all inputs are valid, false otherwise
      */
     private boolean isInputValid() {
         String errorMessage = "";
@@ -196,7 +216,7 @@ public class EditTransactionController {
     }
 
     /**
-     * 关闭对话框
+     * Closes the dialog window
      */
     private void closeDialog() {
         Stage stage = (Stage) saveButton.getScene().getWindow();
@@ -204,21 +224,27 @@ public class EditTransactionController {
     }
 
     /**
-     * 返回是否点击了"保存"按钮
+     * Returns whether the Save button was clicked
+     *
+     * @return true if Save was clicked, false otherwise
      */
     public boolean isSaveClicked() {
         return saveClicked;
     }
 
     /**
-     * 获取描述文本
+     * Gets the current description text
+     *
+     * @return the description text
      */
     public String getDescriptionText() {
         return descriptionField.getText();
     }
 
     /**
-     * 从AI设置分类
+     * Sets a category from AI suggestion
+     *
+     * @param category the suggested category
      */
     public void setCategoryFromAI(String category) {
         if (category != null && !category.isEmpty()) {
@@ -226,6 +252,10 @@ public class EditTransactionController {
         }
     }
 
+    /**
+     * Handles the suggest category button click
+     * Opens the AI classification window if description is provided
+     */
     @FXML
     private void handleSuggestCategory() {
         String description = descriptionField.getText();
@@ -242,6 +272,11 @@ public class EditTransactionController {
         openClassificationWindow(description);
     }
 
+    /**
+     * Opens the classification window with the provided description
+     *
+     * @param description the transaction description to classify
+     */
     private void openClassificationWindow(String description) {
         try {
             // 创建FXML加载器
