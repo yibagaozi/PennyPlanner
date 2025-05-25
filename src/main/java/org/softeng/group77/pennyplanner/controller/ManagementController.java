@@ -37,8 +37,15 @@ import java.util.Locale;
 import java.util.UUID;
 
 /**
- * ManagementController 负责管理交易记录的增删改查，包括交易记录的保存、取消、文件上传及其他相关功能。
- * 该控制器提供界面上的用户输入、数据校验及与 SharedDataModel 的交互。
+ * Controller for the transaction management view in the PennyPlanner application.
+ * This controller handles the creation, editing, and importing of financial transactions.
+ * The controller integrates with the SharedDataModel for persistent storage
+ * and the TransactionAnalysisService for AI-powered transaction classification.
+ *
+ * @author CHAI Jiayang
+ * @author WANG Bingsong
+ * @version 2.0.0
+ * @since 1.1.0
  */
 @Controller
 public class ManagementController {
@@ -84,14 +91,20 @@ public class ManagementController {
 
     private ApplicationContext applicationContext;
 
+    /**
+     * Sets the Spring application context for bean access
+     *
+     * @param applicationContext the Spring application context
+     */
     @Autowired
     public void setApplicationContext(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }
 
     /**
-     * 初始化方法，用于初始化类别和支付方式选择框，并设置默认选项。
-     * 同时禁用分割线的拖动。
+     * Initializes the controller after FXML elements are loaded.
+     * Sets up date picker, category and payment method combo boxes,
+     * and configures layout constraints.
      */
     public void initialize() {
         Locale.setDefault(Locale.ENGLISH);
@@ -149,7 +162,9 @@ public class ManagementController {
         }
     }
 
-
+    /**
+     * Sets up the category combo box with emoji icons
+     */
     private void setupCategoryComboBox() {
         // 将二维数组的第一列（类别名称）提取为一维数组
         String[] categoryNames = new String[CATEGORIES.length];
@@ -222,6 +237,9 @@ public class ManagementController {
         categoryComboBox.getSelectionModel().selectFirst();
     }
 
+    /**
+     * Sets up the payment method combo box with emoji icons
+     */
     private void setupMethodComboBox() {
         // 将二维数组的第一列（支付方式名称）提取为一维数组
         String[] methodNames = new String[PAYMENT_METHODS.length];
@@ -294,10 +312,10 @@ public class ManagementController {
         methodComboBox.getSelectionModel().selectFirst();
     }
 
-
-
     /**
-     * 处理保存按钮点击事件，进行输入数据校验、交易记录创建并保存到共享数据中。
+     * Handles the save button click event.
+     * Validates input data, creates a transaction record,
+     * and saves it to the shared data model.
      */
     @FXML
     private void handleSave() {
@@ -350,7 +368,8 @@ public class ManagementController {
     }
 
     /**
-     * 处理取消按钮点击事件，清空所有输入框。
+     * Handles the cancel button click event.
+     * Clears all input fields.
      */
     @FXML
     private void handleCancel() {
@@ -359,7 +378,7 @@ public class ManagementController {
     }
 
     /**
-     * 设置交易类型为支出。
+     * Sets the transaction type to expense
      */
     @FXML
     private void handleExpense() {
@@ -367,7 +386,7 @@ public class ManagementController {
     }
 
     /**
-     * 设置交易类型为收入。
+     * Sets the transaction type to income
      */
     @FXML
     private void handleIncome() {
@@ -375,7 +394,7 @@ public class ManagementController {
     }
 
     /**
-     * 清空所有输入框和选择框。
+     * Clears all input fields and resets to default values
      */
     private void clearForm() {
         // 重置DatePicker为当前日期
@@ -388,9 +407,9 @@ public class ManagementController {
     }
 
     /**
-     * 显示错误信息弹窗。
-     * 
-     * @param message 错误消息
+     * Displays an error alert dialog
+     *
+     * @param message the error message to display
      */
     private void showAlert(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -400,6 +419,11 @@ public class ManagementController {
         alert.showAndWait();
     }
 
+    /**
+     * Displays a success alert dialog
+     *
+     * @param message the success message to display
+     */
     private void showSuccessAlert(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Success");
@@ -409,9 +433,9 @@ public class ManagementController {
     }
 
     /**
-     * 获取当前窗口（Stage）。
-     * 
-     * @return 当前窗口的Stage
+     * Gets the current window (Stage)
+     *
+     * @return the current Stage
      */
     private Stage getCurrentStage() {
         // 方式1：通过任意界面元素获取（比如上传按钮）
@@ -422,7 +446,12 @@ public class ManagementController {
 
     @FXML
     private Button uploadButton; // 对应FXML中的上传按钮
-    // 文件上传核心方法
+
+    /**
+     * Handles file upload button click.
+     * Opens a file chooser for selecting CSV files,
+     * then processes and imports the selected file.
+     */
     @FXML
     private void handleFileUpload() {
         FileChooser fileChooser = new FileChooser();
@@ -499,7 +528,9 @@ public class ManagementController {
     }
 
     /**
-     * 保存错误日志到文件
+     * Saves error log to a file
+     *
+     * @param errors the list of error messages to save
      */
     private void saveErrorLog(List<String> errors) {
         try {
@@ -524,7 +555,11 @@ public class ManagementController {
     }
 
     /**
-     * 显示警告/信息对话框
+     * Displays an alert dialog with the specified type, title, and message
+     *
+     * @param alertType the type of alert to display
+     * @param title the title of the alert
+     * @param message the message content
      */
     private void showAlert(Alert.AlertType alertType, String title, String message) {
         Alert alert = new Alert(alertType);
@@ -545,6 +580,9 @@ public class ManagementController {
         alert.showAndWait();
     }
 
+    /**
+     * Shows help information for CSV import
+     */
     @FXML
     private void showImportHelp() {
         Alert helpDialog = new Alert(Alert.AlertType.INFORMATION);
@@ -597,7 +635,7 @@ public class ManagementController {
     }
 
     /**
-     * 下载示例CSV文件
+     * Downloads an example CSV file
      */
     private void downloadExampleCsv() {
         try {
@@ -634,6 +672,10 @@ public class ManagementController {
         }
     }
 
+    /**
+     * Opens the AI classification window to analyze transaction descriptions
+     * and recommend appropriate categories
+     */
     @FXML
     private void openClassificationWindow() {
         // 获取当前描述字段内容
@@ -677,37 +719,86 @@ public class ManagementController {
                 });
     }
 
-
+    /**
+     * Navigates to the home view
+     *
+     * @throws IOException if navigation fails
+     */
     @FXML
     private void turntoHome() throws IOException {
         System.out.println("转到home页面");
         MainApp.showHome();
     }
+
+    /**
+     * Navigates to the report view
+     *
+     * @throws IOException if navigation fails
+     */
     @FXML
     private void turntoReport() throws IOException {
         //System.out.println("转到home页面");
         MainApp.showReport();
-    }@FXML
+    }
+
+    /**
+     * Navigates to the history view
+     *
+     * @throws IOException if navigation fails
+     */
+    @FXML
     private void turntoHistory() throws IOException {
         //System.out.println("转到home页面");
         MainApp.showhistory();
-    }@FXML
+    }
+
+    /**
+     * Navigates to the management view
+     *
+     * @throws IOException if navigation fails
+     */
+    @FXML
     private void turntoManagement() throws IOException {
         //System.out.println("转到home页面");
         MainApp.showmanagement();
-    }@FXML
+    }
+
+    /**
+     * Navigates to the user profile view
+     *
+     * @throws IOException if navigation fails
+     */
+    @FXML
     private void turntoUser() throws IOException {
         //System.out.println("转到home页面");
         MainApp.showuser();
     }
+
+    /**
+     * Navigates to the login view
+     *
+     * @throws IOException if navigation fails
+     */
     @FXML
     private void turntoLogin() throws IOException {
         MainApp.showLogin();
     }
+
+    /**
+     * Navigates to the financial assistant view
+     *
+     * @throws IOException if navigation fails
+     */
     @FXML
     private void turntoFinancialAssistant() throws IOException {
         MainApp.showFinancialAssistant();
     }
+
+    /**
+     * Placeholder for AI functionality
+     *
+     * @throws IOException if operation fails
+     */
     @FXML
     private void useAI() throws IOException {
         System.out.println("调用api接口");

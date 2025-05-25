@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import javax.naming.AuthenticationException;
 import java.io.IOException;
 
+@Deprecated
 @Component
 public class TestDataGenerateUtil {
 

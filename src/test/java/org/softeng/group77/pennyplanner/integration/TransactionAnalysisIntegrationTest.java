@@ -23,6 +23,16 @@ import java.util.concurrent.TimeoutException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Integration tests for the AI-powered transaction analysis features.
+ * The tests use real AI service calls rather than mocks to ensure end-to-end
+ * functionality. Each test prepares sample transaction data and validates
+ * that the AI services return appropriate, non-empty responses.
+ *
+ * @author JIANG Mengnan
+ * @version 2.0.0
+ * @since 2.0.0
+ */
 @SpringBootTest
 public class TransactionAnalysisIntegrationTest {
 
@@ -37,6 +47,12 @@ public class TransactionAnalysisIntegrationTest {
 
     private final int TIMEOUT_SECONDS = 180;
 
+    /**
+     * Sets up the test environment before each test method.
+     * Creates a test user if none exists and ensures sufficient transaction data is available.
+     *
+     * @throws Exception if setup operations fail
+     */
     @BeforeEach
     public void setUp() throws Exception {
         TestContext.ensureAuthenticatedUser(authService);
@@ -44,7 +60,10 @@ public class TransactionAnalysisIntegrationTest {
     }
 
     /**
-     * 确保有足够的交易数据用于测试
+     * Ensures that sufficient transaction data exists for testing.
+     * creates sample transactions including income and various expense categories.
+     *
+     * @throws Exception if transaction creation fails
      */
     private void ensureTransactionData() throws Exception {
         List<TransactionDetail> transactions = transactionService.getUserTransactions();
@@ -64,6 +83,16 @@ public class TransactionAnalysisIntegrationTest {
         }
     }
 
+    /**
+     * Helper method to create a transaction record for testing.
+     *
+     * @param userId the user ID to associate with the transaction
+     * @param description the transaction description
+     * @param category the transaction category
+     * @param amount the transaction amount (positive for income, negative for expense)
+     * @param dateTime the transaction date and time
+     * @throws Exception if transaction creation fails
+     */
     private void createTransaction(String userId, String description, String category, double amount,
                                    LocalDateTime dateTime) throws Exception {
         TransactionDetail txDetail = new TransactionDetail();
@@ -78,12 +107,15 @@ public class TransactionAnalysisIntegrationTest {
     }
 
     /**
-     * 测试交易分类功能
-     * 直接调用真实AI服务进行分类
+     * Tests the transaction classification functionality.
+     *
+     * @throws ExecutionException if the classification operation fails
+     * @throws InterruptedException if the operation is interrupted
+     * @throws TimeoutException if the operation times out
      */
     @Test
     public void testTransactionClassification() throws ExecutionException, InterruptedException, TimeoutException {
-        System.out.println("======== 开始测试: 交易分类 (实际AI调用) ========");
+        System.out.println("======== Start test: Transaction Classification ========");
 
         // 准备测试的交易描述
         String[] descriptions = {
@@ -102,30 +134,33 @@ public class TransactionAnalysisIntegrationTest {
             String category = categoryFuture.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
 
             // 验证返回的分类结果
-            assertNotNull(category, "分类结果不应为空");
-            assertFalse(category.isEmpty(), "分类结果不应为空字符串");
-            System.out.println("交易描述 \"" + description + "\" 被分类为: " + category);
+            assertNotNull(category, "Classification result should not be null");
+            assertFalse(category.isEmpty(), "Classification result should not be empty");
+            System.out.println("Description \"" + description + "\" categorized: " + category);
 
             // 稍作延迟避免API速率限制
             Thread.sleep(1000);
         }
 
-        System.out.println("======== 交易分类测试完成 ========");
+        System.out.println("======== Classification Test Finished ========");
     }
 
     /**
-     * 测试支出分析报告生成功能
-     * 直接调用真实AI服务生成报告
+     * Tests the spending analysis report generation functionality.
+     *
+     * @throws ExecutionException if the report generation operation fails
+     * @throws InterruptedException if the operation is interrupted
+     * @throws TimeoutException if the operation times out
      */
     @Test
     public void testSpendingAnalysisReport() throws ExecutionException, InterruptedException, TimeoutException {
-        System.out.println("======== 开始测试: 支出分析报告 (实际AI调用) ========");
+        System.out.println("======== Start test: Report Generate ========");
 
         // 设置日期范围（过去一个月）
         LocalDate endDate = LocalDate.now();
         LocalDate startDate = endDate.minusMonths(1);
 
-        System.out.println("生成日期范围 " + startDate + " 到 " + endDate + " 的支出分析报告");
+        System.out.println("Generate report range from " + startDate + " to " + endDate);
 
         // 调用实际报告生成服务
         CompletableFuture<String> reportFuture = transactionAnalysisService.generateSpendingAnalysisReport(
@@ -135,20 +170,20 @@ public class TransactionAnalysisIntegrationTest {
         String report = reportFuture.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
 
         // 验证报告内容
-        assertNotNull(report, "报告不应为空");
-        assertFalse(report.isEmpty(), "报告不应为空字符串");
+        assertNotNull(report, "Generated report should not be null");
+        assertFalse(report.isEmpty(), "Generated report should not be empty");
 
         // 输出报告摘要
-        System.out.println("支出分析报告生成成功，报告摘要:");
+        System.out.println("Report generate finished:");
         String[] reportLines = report.split("\n");
-        for (int i = 0; i < Math.min(10, reportLines.length); i++) {
+        for (int i = 0; i < Math.min(20, reportLines.length); i++) {
             System.out.println(reportLines[i]);
         }
-        if (reportLines.length > 10) {
-            System.out.println("... [报告内容较长，已省略] ...");
+        if (reportLines.length > 20) {
+            System.out.println("... [Too long] ...");
         }
 
-        System.out.println("======== 支出分析报告测试完成 ========");
+        System.out.println("======== Report Generate Test Finished ========");
     }
 
 }

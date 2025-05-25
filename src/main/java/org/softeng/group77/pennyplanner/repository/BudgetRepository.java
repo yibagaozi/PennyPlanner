@@ -8,29 +8,82 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * Repository interface for Budget entity operations.
+ * Provides methods to create, read, update and delete budget records.
+ *
+ * @author JIANG Mengnan
+ * @version 2.0.0
+ * @since 1.2.0
+ */
 public interface BudgetRepository {
 
-    // 保存预算
+    /**
+     * Saves a budget to the repository
+     *
+     * @param budget the budget to save
+     * @return the saved budget with any generated fields
+     * @throws IOException if a data access error occurs
+     */
     Budget save(Budget budget) throws IOException;
 
-    // 根据日期删除预算
+    /**
+     * Deletes a budget for the specified date
+     *
+     * @param date the date of the budget to delete
+     * @return true if deletion was successful, false otherwise
+     * @throws IOException if a data access error occurs
+     */
     boolean deleteByDate(LocalDate date) throws IOException;
 
-    // 根据日期查找预算
+    /**
+     * Finds a budget for the specified date
+     *
+     * @param date the date to search for
+     * @return an Optional containing the budget if found
+     * @throws IOException if a data access error occurs
+     */
     Optional<Budget> findByDate(LocalDate date) throws IOException;
 
-    // 获取所有预算
+    /**
+     * Retrieves all budgets from the repository
+     *
+     * @return a map of budgets with date as the key
+     * @throws IOException if a data access error occurs
+     */
     Map<LocalDate, Budget> findAll() throws IOException;
 
-    // 更新预算
+    /**
+     * Updates an existing budget for the specified date
+     *
+     * @param date the date of the budget to update
+     * @param updatedBudget the new budget data
+     * @return an Optional containing the updated budget if successful
+     * @throws IOException if a data access error occurs
+     */
     Optional<Budget> update(LocalDate date, Budget updatedBudget) throws IOException;
 
-    // 检查指定日期的预算是否存在
+    /**
+     * Checks if a budget exists for the specified date
+     *
+     * @param date the date to check
+     * @return true if a budget exists, false otherwise
+     * @throws IOException if a data access error occurs
+     */
     boolean exists(LocalDate date) throws IOException;
 
-    // 获取预算数量
+    /**
+     * Counts the total number of budgets in the repository
+     *
+     * @return the count of budgets
+     * @throws IOException if a data access error occurs
+     */
     long count() throws IOException;
 
-    // 清空所有预算
+    /**
+     * Removes all budgets from the repository
+     *
+     * @throws IOException if a data access error occurs
+     */
     void clear() throws IOException;
 }

@@ -19,6 +19,16 @@ import java.io.File;
 
 import java.io.IOException;
 
+/**
+ * Controller for the user profile management screen in the PennyPlanner application.
+ * The controller integrates with the AuthService to authenticate password changes
+ * and persist user information updates.
+ *
+ * @author CHAI Jiayang
+ * @author WANG Bingsong
+ * @version 2.0.0
+ * @since 1.0.0
+ */
 @Controller
 @Slf4j
 public class UserController {
@@ -48,6 +58,10 @@ public class UserController {
     private final String avatarFolderPath = "data/avatars/";
     private String currentAvatarPath;
 
+    /**
+     * Initializes the controller after FXML elements are loaded.
+     * Sets up layout constraints and loads the current user's data.
+     */
     @FXML
     private void initialize() {
         // 禁用分割线的拖动
@@ -60,6 +74,10 @@ public class UserController {
             System.err.println("AuthService 未注入");}
     }
 
+    /**
+     * Loads the current user's profile data from the authentication service
+     * and populates the form fields with this information.
+     */
     private void loadUserData() {
         try {
             UserInfo currentUser = authService.getCurrentUser();
@@ -80,6 +98,9 @@ public class UserController {
         }
     }
 
+    /**
+     * Handles the avatar upload button click.
+     */
     @FXML
     private void handleUploadAvatar() {
         FileChooser fileChooser = new FileChooser();
@@ -128,6 +149,9 @@ public class UserController {
         }
     }
 
+    /**
+     * Handles the save button click.
+     */
     @FXML
     private void handleSave() {
         try {
@@ -169,6 +193,9 @@ public class UserController {
         }
     }
 
+    /**
+     * Handles the cancel button click.
+     */
     @FXML
     private void handleCancel() {
         // 重新加载用户数据
@@ -177,6 +204,13 @@ public class UserController {
         newPasswordField.clear();
     }
 
+    /**
+     * Displays an alert dialog with the specified type, title, and message
+     *
+     * @param alertType the type of alert to display
+     * @param title the title of the alert
+     * @param message the message content
+     */
     private void showAlert(Alert.AlertType alertType, String title, String message) {
         Alert alert = new Alert(alertType);
         alert.setTitle(title);
@@ -185,28 +219,72 @@ public class UserController {
         alert.showAndWait();
     }
 
+    /**
+     * Navigates to the home view
+     *
+     * @throws IOException if navigation fails
+     */
     @FXML
     private void turntoHome() throws IOException {
         MainApp.showHome();
     }
+
+    /**
+     * Navigates to the report view
+     *
+     * @throws IOException if navigation fails
+     */
     @FXML
     private void turntoReport() throws IOException {
         MainApp.showReport();
-    }@FXML
+    }
+
+    /**
+     * Navigates to the history view
+     *
+     * @throws IOException if navigation fails
+     */
+    @FXML
     private void turntoHistory() throws IOException {
         MainApp.showhistory();
-    }@FXML
+    }
+
+    /**
+     * Navigates to the management view
+     *
+     * @throws IOException if navigation fails
+     */
+    @FXML
     private void turntoManagement() throws IOException {
         MainApp.showmanagement();
-    }@FXML
+    }
+
+    /**
+     * Navigates to the user profile view
+     *
+     * @throws IOException if navigation fails
+     */
+    @FXML
     private void turntoUser() throws IOException {
         MainApp.showuser();
     }
+
+    /**
+     * Navigates to the login view
+     *
+     * @throws IOException if navigation fails
+     */
     @FXML
     private void turntoLogin() throws IOException {
         System.out.println("Login");
         MainApp.showLogin();
     }
+
+    /**
+     * Navigates to the financial assistant view
+     *
+     * @throws IOException if navigation fails
+     */
     @FXML
     private void turntoFinancialAssistant() throws IOException {
         MainApp.showFinancialAssistant();

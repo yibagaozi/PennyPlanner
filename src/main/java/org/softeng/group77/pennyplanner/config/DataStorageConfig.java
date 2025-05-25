@@ -10,12 +10,27 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * Configuration class responsible for setting up and initializing the data storage directories used by the PennyPlanner
+ * application.
+ *
+ * @author MA Ruize
+ * @version 2.0.0
+ */
 @Configuration
 public class DataStorageConfig {
 
+    /**
+     * Data storage path, defaults to "data" directory
+     */
     @Value("${app.data.path:data}")
     private String dataPath;
 
+    /**
+     * Initializes the data storage environment after the bean has been constructed.
+     *
+     * @throws IOException if there are problems creating directories or writing the .gitignore file
+     */
     @PostConstruct
     public void init() throws IOException {
         if (!StringUtils.hasText(dataPath)) {

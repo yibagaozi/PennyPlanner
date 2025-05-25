@@ -6,6 +6,14 @@ import org.softeng.group77.pennyplanner.service.AuthService;
 
 import java.util.UUID;
 
+/**
+ * Test helper class that maintains authentication context for integration tests.
+ * The context can be reset between tests to ensure isolation of test cases.
+ *
+ * @author JIANG Mengnan
+ * @version 2.0.0
+ * @since 2025-05-25
+ */
 public class TestContext {
 
     @Getter
@@ -34,9 +42,11 @@ public class TestContext {
     }
 
     /**
-     * 确保用户已登录，如果没有则创建并登录一个新用户
-     * @param authService 认证服务
-     * @return 登录的用户信息
+     * Ensures an authenticated user is available for testing.
+     *
+     * @param authService the authentication service to use
+     * @return the authenticated user information
+     * @throws Exception if user creation or authentication fails
      */
     public static synchronized UserInfo ensureAuthenticatedUser(AuthService authService) throws Exception {
         // 如果已经初始化但未登录状态，尝试登录
@@ -45,7 +55,7 @@ public class TestContext {
                 return authService.login(username, password);
             } catch (Exception e) {
                 // 如果登录失败，重置初始化状态
-                System.out.println("无法使用现有凭据登录，正在创建新用户: " + e.getMessage());
+                System.out.println("Create new user: " + e.getMessage());
                 initialized = false;
             }
         }
@@ -72,11 +82,11 @@ public class TestContext {
                 password = newPassword;
 
                 initialized = true;
-                System.out.println("测试用户已创建和登录: " + username);
+                System.out.println("User created: " + username);
 
                 return loginInfo;
             } catch (Exception e) {
-                System.out.println("创建测试用户失败: " + e.getMessage());
+                System.out.println("Create failed: " + e.getMessage());
                 throw e;
             }
         }
@@ -86,7 +96,8 @@ public class TestContext {
     }
 
     /**
-     * 重置测试上下文
+     * Resets the test context.
+     * Clears all stored user credentials and resets the initialization status.
      */
     public static void reset() {
         userId = null;
@@ -96,7 +107,10 @@ public class TestContext {
     }
 
     /**
-     * 检查用户是否已登录
+     * Checks if a user is currently authenticated.
+     *
+     * @param authService the authentication service to check
+     * @return true if a user is logged in, false otherwise
      */
     public static boolean isAuthenticated(AuthService authService) {
         return authService.isLoggedIn();

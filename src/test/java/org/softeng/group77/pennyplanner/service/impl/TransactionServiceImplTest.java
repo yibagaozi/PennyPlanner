@@ -29,6 +29,17 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for the TransactionServiceImpl class.
+ * These tests verify the transaction management functionality provided by the
+ * TransactionServiceImpl, including creating, updating, deleting, retrieving,
+ * and filtering transactions. The tests use a temporary JSON file for transaction
+ * storage and mock the authentication service to simulate an authenticated user.
+ *
+ * @author CHAI Yihang
+ * @version 2.0.0
+ * @since 1.1.0
+ */
 @ExtendWith(MockitoExtension.class)
 public class TransactionServiceImplTest {
 
@@ -49,6 +60,9 @@ public class TransactionServiceImplTest {
     private Path jsonFilePath;
     private UserInfo testUser;
 
+    /**
+     * Test implementation of JsonTransactionRepository that works with a temporary file.
+     */
     static class TestTransactionRepository extends JsonTransactionRepositoryImpl {
         public TestTransactionRepository(String filePath) {
             super(filePath);
@@ -59,7 +73,11 @@ public class TransactionServiceImplTest {
         }
     }
 
-
+    /**
+     * Sets up the test environment before each test method.
+     *
+     * @throws IOException if file operations fail
+     */
     @BeforeEach
     void setUp() throws IOException {
 
@@ -77,12 +95,23 @@ public class TransactionServiceImplTest {
         transactionService = new TransactionServiceImpl(transactionRepository, authService);
     }
 
+    /**
+     * Cleans up the test environment after each test method.
+     * Deletes the temporary files created during setup.
+     *
+     * @throws IOException if file deletion fails
+     */
     @AfterEach
     void tearDown() throws IOException {
         Files.deleteIfExists(jsonFilePath);
         Files.deleteIfExists(tempDir);
     }
 
+    /**
+     * Tests successful transaction creation.
+     *
+     * @throws Exception if transaction creation fails
+     */
     @Test
     void createTransaction_Success() throws Exception {
 
@@ -105,6 +134,9 @@ public class TransactionServiceImplTest {
         assertEquals(detail.getDescription(), savedTransactions.get(0).getDescription());
     }
 
+    /**
+     * Tests transaction creation validation failure.
+     */
     @Test
     void createTransaction_ValidationFailure() {
 
@@ -120,6 +152,9 @@ public class TransactionServiceImplTest {
         assertTrue(exception.getMessage().contains("Amount is required"));
     }
 
+    /**
+     * Tests transaction creation authentication failure.
+     */
     @Test
     void createTransaction_AuthenticationFailure() {
         when(authService.getCurrentUser()).thenReturn(null);
@@ -136,6 +171,11 @@ public class TransactionServiceImplTest {
 
     }
 
+    /**
+     * Tests successful transaction update.
+     *
+     * @throws Exception if transaction operations fail
+     */
     @Test
     void updateTransaction_Success() throws Exception {
 
@@ -164,6 +204,11 @@ public class TransactionServiceImplTest {
         assertEquals(new BigDecimal("200.00"), savedTransactions.get(0).getAmount());
     }
 
+    /**
+     * Tests successful transaction retrieval.
+     *
+     * @throws Exception if transaction operations fail
+     */
     @Test
     void getTransaction_Success() throws Exception {
 
@@ -177,6 +222,11 @@ public class TransactionServiceImplTest {
         assertEquals(transaction.getAmount(), result.getAmount());
     }
 
+    /**
+     * Tests successful transaction deletion.
+     *
+     * @throws Exception if transaction operations fail
+     */
     @Test
     void deleteTransaction_Success() throws Exception {
 
@@ -193,6 +243,11 @@ public class TransactionServiceImplTest {
         assertEquals(0, afterDelete.size());
     }
 
+    /**
+     * Tests retrieval of transactions for the current user.
+     *
+     * @throws Exception if transaction operations fail
+     */
     @Test
     void getUserTransactions_Success() throws Exception {
 
@@ -216,6 +271,11 @@ public class TransactionServiceImplTest {
         }
     }
 
+    /**
+     * Tests searching for transactions by keyword.
+     *
+     * @throws Exception if transaction operations fail
+     */
     @Test
     void searchUserTransactions_Success() throws Exception {
 
@@ -239,6 +299,11 @@ public class TransactionServiceImplTest {
         assertTrue(results.stream().anyMatch(t -> t.getDescription().equals("Shopping for clothes")));
     }
 
+    /**
+     * Tests filtering transactions by date range.
+     *
+     * @throws Exception if transaction operations fail
+     */
     @Test
     void filterTransactionByDate_Success() throws Exception {
 
@@ -263,6 +328,11 @@ public class TransactionServiceImplTest {
         assertEquals(LocalDateTime.of(2025, 4, 12, 15, 30), results.get(0).getTransactionDateTime());
     }
 
+    /**
+     * Tests filtering transactions by category.
+     *
+     * @throws Exception if transaction operations fail
+     */
     @Test
     void filterTransactionByCategory_Success() throws Exception {
 
@@ -297,6 +367,12 @@ public class TransactionServiceImplTest {
         return detail;
     }
 
+    /**
+     * Creates a test transaction detail object with specified properties.
+     *
+     * @param id the transaction ID (null for new transactions)
+     * @return a TransactionDetail object with test values
+     */
     private Transaction createTestTransaction() {
         Transaction transaction = new Transaction(TEST_USER_ID);
         transaction.setAmount(new BigDecimal("100.00"));
@@ -307,11 +383,23 @@ public class TransactionServiceImplTest {
         return transaction;
     }
 
+    /**
+     * Creates a test transaction object with default properties.
+     *
+     * @return a Transaction object with test values
+     */
     private Transaction createAndSaveTestTransaction() throws IOException {
         Transaction transaction = createTestTransaction();
         return transactionRepository.save(transaction);
     }
-    
+
+    /**
+     * Gets a financial summary for the current month up to a specified end time.
+     *
+     * @param endTime the end time for the summary period (optional)
+     * @return a map containing income, expense, and balance totals
+     * @throws IOException if data access fails
+     */
     public Map<String, Double> getDefaultSummary(@RequestParam(required = false) LocalDateTime endTime) throws IOException {
         String userId = authService.getCurrentUser().getId();
     
@@ -331,7 +419,16 @@ public class TransactionServiceImplTest {
     
         return calculateSummary(transactions);
     }//这个方法是如果用户没有输入开始结束日期就返回该月1号到当前时间的那三个数值
-    
+
+    /**
+     * Gets a financial summary for a specified date range.
+     *
+     * @param startDate the start date for the summary period
+     * @param endDate the end date for the summary period
+     * @return a map containing income, expense, and balance totals
+     * @throws IOException if data access fails
+     * @throws IllegalArgumentException if start date is after end date
+     */
     public Map<String, Double> getSummaryByDateRange(LocalDate startDate, LocalDate endDate) throws IOException {
         // 1. 验证日期范围
         if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
@@ -351,6 +448,12 @@ public class TransactionServiceImplTest {
         return calculateSummary(transactions);
     }//这个方法是输入了特定时间返回三个数据
 
+    /**
+     * Calculates financial summary data from a list of transactions.
+     *
+     * @param transactions the list of transactions to summarize
+     * @return a map containing income, expense, and balance totals
+     */
     private Map<String, Double> calculateSummary(List<Transaction> transactions) {
         // 使用 BigDecimal 进行精确计算，最后转换为 Double
         BigDecimal income = transactions.stream()

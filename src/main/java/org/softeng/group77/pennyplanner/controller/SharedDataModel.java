@@ -10,8 +10,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 
 /**
- * SharedDataModel 用于管理和提供交易数据的访问和操作，包括数据的刷新、添加、更新、删除等操作。
- * 该类确保交易数据始终保持最新状态，尤其是根据当前用户的身份信息动态加载相关交易数据。
+ * Shared data model that provides centralized access to transaction data across the application.
+ *
+ * @author CHAI Jiayang
+ * @author WANG Bingsong
+ * @version 2.0.0
+ * @since 1.1.0
  */
 @Component
 public class SharedDataModel {
@@ -37,12 +41,22 @@ public class SharedDataModel {
 ////        dataInitialized = false;  // 标记数据需要重新初始化
 //    }
 
+    /**
+     * Creates a new SharedDataModel with the specified transaction adapter and auth service.
+     *
+     * @param transactionAdapter adapter for transaction data persistence
+     * @param authService service for user authentication and identity management
+     */
     @Autowired
     public SharedDataModel(TransactionAdapter transactionAdapter, AuthService authService) {
         this.transactionAdapter = transactionAdapter;
         this.authService = authService;
     }
 
+    /**
+     * Initializes static references after Spring constructs the instance.
+     * This method is automatically called by Spring after dependency injection.
+     */
     @PostConstruct
     private void init() {
         // 将注入的实例赋值给静态变量
@@ -53,9 +67,9 @@ public class SharedDataModel {
     }
 
     /**
-     * 获取当前用户的交易数据。如果需要，数据将会被刷新。
-     * 
-     * @return 当前用户的交易数据列表
+     * Gets the observable list of transaction data for the current user.
+     *
+     * @return an observable list of transaction models
      */
     public static ObservableList<tableModel> getTransactionData() {
         //refreshTransactionData();
@@ -84,7 +98,7 @@ public class SharedDataModel {
 //    }
 
     /**
-     * 刷新当前用户的交易数据，确保数据是最新的。
+     * Refreshes transaction data from the persistence layer for the current user.
      */
     public static void refreshTransactionData() {
         if (transactionAdapterStatic != null && authServiceStatic.getCurrentUser() != null) {
@@ -109,10 +123,10 @@ public class SharedDataModel {
     }
 
     /**
-     * 添加一笔新的交易记录。
-     * 
-     * @param transaction 需要添加的交易记录
-     * @return 操作是否成功
+     * Adds a new transaction to the system.
+     *
+     * @param transaction the transaction model to add
+     * @return true if the operation was successful, false otherwise
      */
     public static boolean addTransaction(tableModel transaction) {
         boolean success = false;
@@ -132,10 +146,10 @@ public class SharedDataModel {
     }
 
     /**
-     * 更新一笔已存在的交易记录。
-     * 
-     * @param transaction 需要更新的交易记录
-     * @return 操作是否成功
+     * Updates an existing transaction in the system.
+     *
+     * @param transaction the updated transaction model
+     * @return true if the operation was successful, false otherwise
      */
     public static boolean updateTransaction(tableModel transaction) {
         boolean success = false;
@@ -148,12 +162,11 @@ public class SharedDataModel {
         return success;
     }
 
-
     /**
-     * 删除一笔交易记录。
-     * 
-     * @param transactionId 需要删除的交易记录的ID
-     * @return 操作是否成功
+     * Deletes a transaction from the system by its ID.
+     *
+     * @param transactionId the ID of the transaction to delete
+     * @return true if the operation was successful, false otherwise
      */
     public static boolean deleteTransaction(String transactionId) {
         boolean success = false;
@@ -167,8 +180,8 @@ public class SharedDataModel {
     }
 
     /**
-     * 清除 UI 数据，不清除后端数据。
-     * 仅清除界面上显示的交易数据，并标记数据为未初始化状态。
+     * Clears the UI data without affecting backend storage.
+     * It marks the data as needing reinitialization on next access.
      */
     public static void clearUIData() {
         transactionData.clear(); // 只清除UI数据集合

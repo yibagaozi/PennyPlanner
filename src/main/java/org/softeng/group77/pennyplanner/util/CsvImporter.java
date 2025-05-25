@@ -12,6 +12,17 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 
+/**
+ * Utility class for importing transaction data from CSV files.
+ * Validates and processes transaction records from properly formatted CSV files.
+ * <p>
+ * The expected CSV format is:
+ * <pre>date,description,amount,category,method</pre>
+ *
+ * @author CHAI Jiayang
+ * @version 2.0.0
+ * @since 1.2.0
+ */
 public class CsvImporter {
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -23,9 +34,11 @@ public class CsvImporter {
             "Credit Card", "Bank Transfer", "Auto-Payment", "Cash", "E-Payment"));
 
     /**
-     * 解析CSV文件并返回导入结果
-     * @param csvFile CSV文件
-     * @return 导入结果包括成功导入的记录和错误信息
+     * Parses a CSV file and imports valid transaction records.
+     *
+     * @param csvFile the CSV file to import
+     * @param transactionAdapter the adapter to save transactions to storage
+     * @return import result containing successful imports and error messages
      */
     public static ImportResult importTransactions(File csvFile, TransactionAdapter transactionAdapter) {
         List<tableModel> successfulImports = new ArrayList<>();
@@ -139,12 +152,19 @@ public class CsvImporter {
     }
 
     /**
-     * 导入结果类
+     * Container class for CSV import operation results.
+     * Provides access to successfully imported transactions and any error messages.
      */
     public static class ImportResult {
         private final List<tableModel> successfulImports;
         private final List<String> errorMessages;
 
+        /**
+         * Constructs an import result with successful imports and error messages
+         *
+         * @param successfulImports list of successfully imported transactions
+         * @param errorMessages list of error messages encountered during import
+         */
         public ImportResult(List<tableModel> successfulImports, List<String> errorMessages) {
             this.successfulImports = successfulImports;
             this.errorMessages = errorMessages;

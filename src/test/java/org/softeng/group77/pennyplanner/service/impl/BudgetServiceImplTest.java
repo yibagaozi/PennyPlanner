@@ -28,6 +28,16 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.lenient;
 
+/**
+ * Unit tests for the BudgetServiceImpl class.
+ * These tests verify the budget management functionality provided by the BudgetServiceImpl,
+ * including budget creation, retrieval, and validation. The tests use a temporary JSON file
+ * for budget storage and mock the authentication service to simulate an authenticated user.
+ *
+ * @author JIANG Mengnan
+ * @version 2.0.0
+ * @since 1.1.0
+ */
 @ExtendWith(MockitoExtension.class)
 public class BudgetServiceImplTest {
 
@@ -49,6 +59,9 @@ public class BudgetServiceImplTest {
     private Path jsonFilePath;
     private UserInfo testUser;
 
+    /**
+     * Test implementation of BudgetRepository that works with a temporary file.
+     */
     static class TestBudgetRepository extends BudgetRepositoryImpl {
         public TestBudgetRepository(String filePath) {
             super(filePath);
@@ -59,6 +72,11 @@ public class BudgetServiceImplTest {
         }
     }
 
+    /**
+     * Sets up the test environment before each test method.
+     *
+     * @throws IOException if file operations fail
+     */
     @BeforeEach
     void setUp() throws IOException {
 
@@ -78,6 +96,11 @@ public class BudgetServiceImplTest {
 
     }
 
+    /**
+     * Tests that a budget can be saved and then retrieved correctly.
+     *
+     * @throws Exception if budget operations fail
+     */
     @Test
     void testSaveAndGetBudget() throws Exception {
         // 保存预算
@@ -93,6 +116,12 @@ public class BudgetServiceImplTest {
         assertEquals(testDate, currentBudget.getDate(), "Budget date should be the current date");
     }
 
+    /**
+     * Tests that saving a budget for a date that already has a budget
+     * will overwrite the existing budget.
+     *
+     * @throws Exception if budget operations fail
+     */
     @Test
     void testSaveBudgetWhenDateIsSame() throws Exception {
         // 保存第一个预算
@@ -108,6 +137,10 @@ public class BudgetServiceImplTest {
         assertEquals(10000, currentBudget.getAmount(), "Budget amount should be 10000 after overwriting");
     }
 
+    /**
+     * Tests that attempting to save a budget with a negative amount
+     * throws an appropriate exception.
+     */
     @Test
     void testSaveBudgetWithNegativeAmount() {
         // 保存负金额预算，应该抛出 IllegalArgumentException
@@ -116,6 +149,10 @@ public class BudgetServiceImplTest {
         }, "Saving negative budget amount should throw IllegalArgumentException");
     }
 
+    /**
+     * Tests that attempting to save a budget with an invalid date
+     * throws an appropriate exception.
+     */
     @Test
     void testSaveBudgetWithInvalidDate() {
         // 保存一个无效日期的预算，应该抛出 IllegalArgumentException
@@ -125,7 +162,11 @@ public class BudgetServiceImplTest {
         }, "Saving budget with invalid date should throw IllegalArgumentException");
     }
 
-
+    /**
+     * Tests that a budget can be retrieved by a specific date.
+     *
+     * @throws Exception if budget operations fail
+     */
     @Test
     void testGetBudgetByDate() throws Exception {
         // 保存一个预算
@@ -140,6 +181,10 @@ public class BudgetServiceImplTest {
         assertEquals(testDate, retrievedBudget.getDate(), "Budget date should match the requested date");
     }
 
+    /**
+     * Tests that attempting to retrieve a budget for a date with no budget
+     * throws an appropriate exception.
+     */
     @Test
     void testGetBudgetByDateWhenNoBudgetSaved() {
 
@@ -148,6 +193,10 @@ public class BudgetServiceImplTest {
         }, "Budget cannot be null");
     }
 
+    /**
+     * Tests that attempting to retrieve the current budget when none exists
+     * throws an appropriate exception.
+     */
     @Test
     void testGetCurrentBudgetWhenNoBudgetSaved() {
 
@@ -156,6 +205,10 @@ public class BudgetServiceImplTest {
         }, "No current budget");
     }
 
+    /**
+     * Tests that attempting to save a budget with a null date
+     * throws an appropriate exception.
+     */
     @Test
     void testSaveBudgetWithNullDate() {
         assertThrows(BudgetProcessingException.class, () -> {
@@ -163,6 +216,11 @@ public class BudgetServiceImplTest {
         }, "Date cannot be null");
     }
 
+    /**
+     * Tests that a budget can be saved for a future date.
+     *
+     * @throws Exception if budget operations fail
+     */
     @Test
     void testSaveBudgetWithFutureDate() throws Exception {
         LocalDate futureDate = LocalDate.now().plusDays(1);
@@ -177,6 +235,11 @@ public class BudgetServiceImplTest {
         assertEquals(futureDate, currentBudget.getDate(), "Budget date should match the future date");
     }
 
+    /**
+     * Tests that a budget can be saved with a zero amount.
+     *
+     * @throws Exception if budget operations fail
+     */
     @Test
     void testSaveBudgetWithZeroAmount() throws Exception {
         // 保存金额为 0 的预算
@@ -190,6 +253,10 @@ public class BudgetServiceImplTest {
         assertEquals(0, currentBudget.getAmount(), "Budget amount should be 0");
     }
 
+    /**
+     * Tests that getCurrentBudget throws an exception when budgets only exist
+     * for months other than the current month.
+     */
     @Test
     void testGetCurrentBudgetForSameMonth() throws Exception {
         LocalDate nextMonth = LocalDate.now().plusMonths(1);
@@ -205,6 +272,10 @@ public class BudgetServiceImplTest {
 
     }
 
+    /**
+     * Tests that attempting to save a budget for a past date
+     * throws an appropriate exception.
+     */
     @Test
     void testSaveBudgetForPastDate() {
         // 尝试保存一个过去的日期，应该抛出 IllegalArgumentException

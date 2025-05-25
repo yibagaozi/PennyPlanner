@@ -11,6 +11,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Represents a transaction entity in the PennyPlanner application.
+ *
+ * @author MA Ruize
+ * @version 2.0.0
+ * @since 1.0.0
+ */
 @Getter
 public class Transaction {
 
