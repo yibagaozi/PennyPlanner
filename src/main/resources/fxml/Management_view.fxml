@@ -63,9 +63,9 @@
                       <ComboBox fx:id="categoryComboBox" layoutX="46.0" layoutY="238.0" prefWidth="150.0" />
                       <Button fx:id="classifyButton" layoutX="45.0" layoutY="275.0" styleClass="action-button" text="AI-Classification" />
                       <!-- 在描述字段的HBox后面添加新的HBox -->
-                      <HBox alignment="CENTER_LEFT" layoutX="22.0" layoutY="324.0" prefHeight="28.0" prefWidth="205.0" spacing="10.0">
+                      <HBox alignment="CENTER_LEFT" layoutX="8.0" layoutY="324.0" prefHeight="28.0" prefWidth="219.0" spacing="10.0">
                           <children>
-                              <Label fx:id="classificationStatusLabel" prefHeight="43.0" prefWidth="153.0" style="-fx-font-weight: bold;" text="Status" />
+                              <Label fx:id="classificationStatusLabel" prefHeight="17.0" prefWidth="187.0" style="-fx-font-weight: bold;" text="Status" />
                               <ProgressIndicator fx:id="classifyProgress" prefHeight="43.0" prefWidth="38.0" visible="false" />
 <!--                              <Button fx:id="classifyButton" text="AI智能分类" />-->
                           </children>
