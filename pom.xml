@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>org.softeng.group77</groupId>
 	<artifactId>PennyPlanner</artifactId>
-	<version>2.0.0-PreRelease</version>
+	<version>2.0.0</version>
 	<name>PennyPlanner</name>
 	<description>PennyPlanner</description>
 	<url/>
@@ -165,15 +165,6 @@
 						<option>javafx.controls,javafx.fxml</option>
 					</options>
 				</configuration>
-				<executions>
-					<execution>
-						<id>create-runtime</id>
-						<phase>package</phase>
-						<goals>
-							<goal>jlink</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 
 		</plugins>
