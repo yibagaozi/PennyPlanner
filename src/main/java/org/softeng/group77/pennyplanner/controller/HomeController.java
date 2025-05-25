@@ -31,8 +31,15 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * HomeController负责展示应用的主页，包括用户欢迎信息、支出趋势折线图、支出分布饼图等。
- * 该控制器通过ChartService和ChartViewService来渲染图表，并通过TransactionAdapter从数据库获取用户交易数据。
+ * Controller for the home dashboard view in the PennyPlanner application.
+ * This controller manages the main dashboard that displays:
+ * The controller uses ChartService and ChartViewService to render visual data
+ * representations and TransactionAdapter to retrieve transaction data.
+ *
+ * @author CHAI Jiayang
+ * @author WANG Bingsong
+ * @version 2.0.0
+ * @since 1.0.0
  */
 @Controller
 @Slf4j
@@ -81,18 +88,18 @@ public class HomeController {
     private MonthlyFinancialSummary currentMonthlySummary;
 
     /**
-     * 设置TransactionAdapter实例，用于获取用户交易数据。
-     * 
-     * @param adapter TransactionAdapter实例
+     * Sets the TransactionAdapter instance used to retrieve user transaction data.
+     *
+     * @param adapter the TransactionAdapter instance
      */
     public static void setTransactionAdapter(TransactionAdapter adapter) {
         transactionAdapter = adapter;
     }
 
     /**
-     * 设置AuthService实例，用于获取当前用户信息。
-     * 
-     * @param service AuthService实例
+     * Sets the AuthService instance used to retrieve current user information.
+     *
+     * @param service the AuthService instance
      */
     public static void setAuthService(AuthService service) {
         authService = service;
@@ -102,7 +109,10 @@ public class HomeController {
     private static ChartViewService staticChartViewService;
 
     /**
-     * 初始化方法，设置用户名并初始化图表。
+     * Initializes the controller after FXML elements are loaded.
+     * Sets up user information, charts, budget display, and layout constraints.
+     *
+     * @throws Exception if initialization fails
      */
     @FXML
     private void initialize() throws Exception {
@@ -158,12 +168,16 @@ public class HomeController {
         }));
     }
 
-    // 设置保存预算的按钮事件
+    /**
+     * Sets up the budget save button action event
+     */
     private void setupSaveBudgetButton() {
         saveBudgetButton.setOnAction(e -> saveBudget());
     }
 
-    // 保存预算
+    /**
+     * Saves the current budget value from the budget field
+     */
     @FXML
     private void saveBudget() {
         try {
@@ -188,7 +202,11 @@ public class HomeController {
         }
     }
 
-    // 加载预算信息
+    /**
+     * Loads current budget information from the budget service
+     *
+     * @throws Exception if budget loading fails
+     */
     private void loadBudgetInfo() throws Exception {
         try {
             if (budgetService != null) {
@@ -203,7 +221,9 @@ public class HomeController {
     }
     }
 
-    // 更新卡片信息
+    /**
+     * Updates the financial summary card displays with current data
+     */
     private void updateCardInfo() {
         // 获取当月的收入和支出数据
         MonthlyFinancialSummary summary = calculateMonthlyFinancials();
@@ -214,7 +234,11 @@ public class HomeController {
         expenseAmountLabel.setText(String.format("%.2f", Math.abs(summary.getTotalExpense())));
     }
 
-    // 计算当月财务摘要
+    /**
+     * Calculates the financial summary for the current month
+     *
+     * @return a MonthlyFinancialSummary with income, expense and balance data
+     */
     private MonthlyFinancialSummary calculateMonthlyFinancials() {
         double totalIncome = 0;
         double totalExpense = 0;
@@ -257,38 +281,79 @@ public class HomeController {
         return new MonthlyFinancialSummary(totalIncome, totalExpense, totalBalance);
     }
 
-
-
+    /**
+     * Navigates to the home view
+     *
+     * @throws IOException if navigation fails
+     */
     @FXML
     private void turntoHome() throws IOException {
         MainApp.showHome();
     }
+
+    /**
+     * Navigates to the report view
+     *
+     * @throws IOException if navigation fails
+     */
     @FXML
     private void turntoReport() throws IOException {
         MainApp.showReport();
-    }@FXML
+    }
+
+    /**
+     * Navigates to the history view
+     *
+     * @throws IOException if navigation fails
+     */
+    @FXML
     private void turntoHistory() throws IOException {
         MainApp.showhistory();
-    }@FXML
+    }
+
+    /**
+     * Navigates to the management view
+     *
+     * @throws IOException if navigation fails
+     */
+    @FXML
     private void turntoManagement() throws IOException {
         MainApp.showmanagement();
-    }@FXML
+    }
+
+    /**
+     * Navigates to the user profile view
+     *
+     * @throws IOException if navigation fails
+     */
+    @FXML
     private void turntoUser() throws IOException {
         MainApp.showuser();
     }
+
+    /**
+     * Navigates to the login view
+     *
+     * @throws IOException if navigation fails
+     */
     @FXML
     private void turntoLogin() throws IOException {
         System.out.println("Login");
         MainApp.showLogin();
     }
 
+    /**
+     * Navigates to the financial assistant view
+     *
+     * @throws IOException if navigation fails
+     */
     @FXML
     private void turntoFinancialAssistant() throws IOException {
         MainApp.showFinancialAssistant();
     }
 
     /**
-     * 初始化支出趋势折线图。
+     * Sets up the expense trend line chart
      */
     private void setupExpenseTrendChart() {
         // 清除现有内容
@@ -325,7 +390,7 @@ public class HomeController {
     }
 
     /**
-     * 初始化支出分布饼图。
+     * Sets up the expense distribution pie chart
      */
     private void setupExpenseDistributionChart() {
         // 清除现有内容
@@ -360,10 +425,10 @@ public class HomeController {
 
 
     /**
-     * 将tableModel对象转换为Transaction对象。
-     * 
-     * @param model tableModel对象
-     * @return 转换后的Transaction对象
+     * Converts a tableModel object to a Transaction object
+     *
+     * @param model the tableModel to convert
+     * @return the converted Transaction object
      */
     private Transaction convertToTransaction(tableModel model) {
         Transaction tx = new Transaction();
@@ -386,9 +451,9 @@ public class HomeController {
 
 
     /**
-     * 创建示例交易数据。
-     * 
-     * @return 示例交易数据列表
+     * Creates sample transaction data for testing or when no data is available
+     *
+     * @return a list of sample transactions
      */
     private List<Transaction> createSampleTransactions() {
         List<Transaction> samples = new ArrayList<>();
@@ -422,13 +487,13 @@ public class HomeController {
 
 
     /**
-     * 创建单个交易记录帮助方法。
-     * 
-     * @param description 交易描述
-     * @param amount 交易金额
-     * @param category 交易类别
-     * @param date 交易日期
-     * @return 创建的Transaction对象
+     * Creates a single transaction record
+     *
+     * @param description the transaction description
+     * @param amount the transaction amount
+     * @param category the transaction category
+     * @param date the transaction date
+     * @return the created Transaction object
      */
     private Transaction createTransaction(String description, double amount, String category, LocalDate date) {
         Transaction tx = new Transaction();
@@ -440,9 +505,9 @@ public class HomeController {
     }
 
     /**
-     * 获取默认的饼图数据。
-     * 
-     * @return 默认的饼图数据
+     * Gets default pie chart data for testing
+     *
+     * @return an ObservableList of default pie chart data
      */
     private ObservableList<PieChart.Data> getDefaultPieChartData() {
         return FXCollections.observableArrayList(
@@ -454,12 +519,21 @@ public class HomeController {
         );
     }
 
-    // 月度财务summary内部类
+    /**
+     * Class to store monthly financial summary data
+     */
     private static class MonthlyFinancialSummary {
         private final double totalIncome;
         private final double totalExpense;
         private final double totalBalance;
 
+        /**
+         * Creates a new monthly financial summary
+         *
+         * @param totalIncome the total income amount
+         * @param totalExpense the total expense amount
+         * @param totalBalance the total balance amount
+         */
         public MonthlyFinancialSummary(double totalIncome, double totalExpense, double totalBalance) {
             this.totalIncome = totalIncome;
             this.totalExpense = totalExpense;
@@ -479,7 +553,9 @@ public class HomeController {
         }
     }
 
-    // 更新预算进度条
+    /**
+     * Updates the budget progress bar based on current budget and expenses
+     */
     private void updateBudgetProgressBar() {
         if (budgetProgressBar == null) {
             log.warn("budgetProgressBar is null. Cannot update progress.");

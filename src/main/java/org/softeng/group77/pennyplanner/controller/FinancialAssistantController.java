@@ -19,6 +19,16 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
 
+/**
+ * Controller for the Financial Assistant chat interface in PennyPlanner.
+ * This controller manages an AI-powered chat interface that allows users to:
+ * The controller maintains conversation history between views and uses the
+ * TransactionAnalysisService to process user queries and generate responses.
+ *
+ * @author WANG Bingsong
+ * @version 2.0.0
+ * @since 2.0.0
+ */
 @Controller
 @Slf4j
 public class FinancialAssistantController {
@@ -49,21 +59,38 @@ public class FinancialAssistantController {
     private List<Map<String, String>> conversationHistory = new ArrayList<>();
     private static final String WELCOME_MESSAGE = "Hello! I'm PennyPlanner, your finance assistant. Please select a date range and let me help you analyze your finances and answer your questions.";
 
-    // 聊天消息的内部类，用于保存聊天记录
+    /**
+     * Internal class to store chat messages with their type
+     */
     private static class ChatMessage {
         String content;
         String type; // "user", "assistant", "system"
 
+        /**
+         * Creates a new chat message
+         *
+         * @param content the message content
+         * @param type the message type (user, assistant, or system)
+         */
         ChatMessage(String content, String type) {
             this.content = content;
             this.type = type;
         }
     }
 
+    /**
+     * Sets the previous view name for navigation purposes
+     *
+     * @param viewName the name of the previous view
+     */
     public static void setPreviousView(String viewName) {
         previousView = viewName;
     }
 
+    /**
+     * Initializes the controller after FXML elements are loaded.
+     * Sets up date pickers, event handlers, and restores previous chat history if available.
+     */
     @FXML
     private void initialize() {
         Locale.setDefault(Locale.ENGLISH);
@@ -111,7 +138,9 @@ public class FinancialAssistantController {
         });
     }
 
-    // 恢复聊天记录
+    /**
+     * Restores previously saved chat messages to the chat container
+     */
     private void restoreChatMessages() {
         chatContainer.getChildren().clear();
         for (ChatMessage message : savedChatMessages) {
@@ -129,6 +158,9 @@ public class FinancialAssistantController {
         }
     }
 
+    /**
+     * Sets up quick question buttons for common financial inquiries
+     */
     private void setupQuickQuestions() {
         String[] questions = {
                 "Give advice on possible upcoming spending spikes",
@@ -148,6 +180,10 @@ public class FinancialAssistantController {
         }
     }
 
+    /**
+     * Sends the current message from the input field to the AI service
+     * and displays the response in the chat container
+     */
     @FXML
     private void sendMessage() {
         String message = messageField.getText().trim();
@@ -210,11 +246,21 @@ public class FinancialAssistantController {
                 });
     }
 
+    /**
+     * Toggles the loading state - disables the send button and shows/hides the loading indicator
+     *
+     * @param isLoading true to show loading state, false to hide it
+     */
     private void toggleLoading(boolean isLoading) {
         sendButton.setDisable(isLoading);
         loadingIndicator.setVisible(isLoading);
     }
 
+    /**
+     * Adds a user message to the chat container
+     *
+     * @param message the message content to display
+     */
     private void addUserMessage(String message) {
         HBox messageBox = new HBox();
         messageBox.setAlignment(Pos.CENTER_RIGHT);
@@ -228,6 +274,11 @@ public class FinancialAssistantController {
         scrollToBottom();
     }
 
+    /**
+     * Adds an assistant message to the chat container
+     *
+     * @param message the message content to display
+     */
     private void addAssistantMessage(String message) {
         HBox messageBox = new HBox();
         messageBox.setAlignment(Pos.CENTER_LEFT);
@@ -241,6 +292,11 @@ public class FinancialAssistantController {
         scrollToBottom();
     }
 
+    /**
+     * Adds a system message to the chat container
+     *
+     * @param message the system message content to display
+     */
     private void addSystemMessage(String message) {
         HBox messageBox = new HBox();
         messageBox.setAlignment(Pos.CENTER);
@@ -254,6 +310,14 @@ public class FinancialAssistantController {
         scrollToBottom();
     }
 
+    /**
+     * Creates a message bubble with the specified styling
+     *
+     * @param message the message content
+     * @param bgColor the background color for the bubble
+     * @param textColor the text color for the message
+     * @return a styled VBox containing the message
+     */
     private VBox createBubble(String message, String bgColor, String textColor) {
         VBox bubble = new VBox();
         bubble.setStyle(
@@ -275,6 +339,9 @@ public class FinancialAssistantController {
         return bubble;
     }
 
+    /**
+     * Scrolls the chat container to the bottom to show the most recent message
+     */
     private void scrollToBottom() {
         Platform.runLater(() -> {
             if (chatContainer.getParent() instanceof ScrollPane) {
@@ -284,14 +351,20 @@ public class FinancialAssistantController {
         });
     }
 
-    // 清除聊天记录
+    /**
+     * Clears all chat history and conversation state
+     */
     public static void clearChat() {
         savedChatMessages.clear();
         savedConversationHistory.clear();
         hasInitialized = false;
     }
 
-    // 返回前一个页面
+    /**
+     * Navigates back to the previous view
+     *
+     * @throws IOException if navigation fails
+     */
     @FXML
     private void goBack() throws IOException {
         switch (previousView) {
@@ -316,26 +389,51 @@ public class FinancialAssistantController {
         }
     }
 
+    /**
+     * Navigates to the home view
+     *
+     * @throws IOException if navigation fails
+     */
     @FXML
     private void turntoHome() throws java.io.IOException {
         MainApp.showHome();
     }
 
+    /**
+     * Navigates to the report view
+     *
+     * @throws IOException if navigation fails
+     */
     @FXML
     private void turntoReport() throws java.io.IOException {
         MainApp.showReport();
     }
 
+    /**
+     * Navigates to the history view
+     *
+     * @throws IOException if navigation fails
+     */
     @FXML
     private void turntoHistory() throws java.io.IOException {
         MainApp.showhistory();
     }
 
+    /**
+     * Navigates to the management view
+     *
+     * @throws IOException if navigation fails
+     */
     @FXML
     private void turntoManagement() throws java.io.IOException {
         MainApp.showmanagement();
     }
 
+    /**
+     * Navigates to the user profile view
+     *
+     * @throws IOException if navigation fails
+     */
     @FXML
     private void turntoUser() throws java.io.IOException {
         MainApp.showuser();

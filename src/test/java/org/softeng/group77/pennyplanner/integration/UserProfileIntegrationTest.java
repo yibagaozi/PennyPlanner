@@ -12,12 +12,27 @@ import javax.naming.AuthenticationException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Integration tests for user profile management in the PennyPlanner application.
+ * The tests use the TestContext helper to ensure a consistent authenticated
+ * state and to track credentials between test operations.
+ *
+ * @author JIANG Mengnan
+ * @version 2.0.0
+ * @since 2.0.0
+ */
 @SpringBootTest
 public class UserProfileIntegrationTest {
 
     @Autowired
     private AuthService authService;
 
+    /**
+     * Sets up the test environment before each test method.
+     * Ensures a test user is authenticated for the profile tests.
+     *
+     * @throws Exception if authentication fails
+     */
     @BeforeEach
     public void setUp() throws Exception {
         // 确保用户已登录，必要时创建新用户
@@ -25,14 +40,16 @@ public class UserProfileIntegrationTest {
     }
 
     /**
-     * 测试用户信息更新流程
+     * Tests the complete user profile update workflow.
+     *
+     * @throws Exception if any profile operations fail
      */
     @Test
     public void testUserProfileUpdate() throws Exception {
-        System.out.println("======== 开始测试: 用户信息更新 ========");
+        System.out.println("======== Start test: User Profile Update ========");
 
         String userId = TestContext.getUserId();
-        System.out.println("使用用户ID: " + userId);
+        System.out.println("User ID: " + userId);
 
         // 1. 更新个人资料
         UserInfo updatedInfo = new UserInfo();
@@ -43,12 +60,12 @@ public class UserProfileIntegrationTest {
         UserInfo updatedUserInfo = authService.updateUserInfo(userId, updatedInfo);
 
         // 验证个人资料更新
-        assertNotNull(updatedUserInfo, "更新后的用户信息不应为空");
-        assertEquals("penny_updated", updatedUserInfo.getUsername(), "更新后的用户名不匹配");
-        assertEquals("updated@example.com", updatedUserInfo.getEmail(), "更新后的邮箱不匹配");
-        assertEquals("13900001111", updatedUserInfo.getPhone(), "更新后的手机号不匹配");
+        assertNotNull(updatedUserInfo, "Updated user information should not be null");
+        assertEquals("penny_updated", updatedUserInfo.getUsername(), "Updated username does not match");
+        assertEquals("updated@example.com", updatedUserInfo.getEmail(), "Updated email does not match");
+        assertEquals("13900001111", updatedUserInfo.getPhone(), "Updated phone number does not match");
 
-        System.out.println("个人资料更新成功: " + updatedUserInfo.getUsername());
+        System.out.println("Updated: " + updatedUserInfo.getUsername());
 
         // 更新全局上下文中的用户名
         TestContext.setUsername(updatedUserInfo.getUsername());
@@ -59,30 +76,30 @@ public class UserProfileIntegrationTest {
         UserInfo passwordChanged = authService.changePassword(userId, oldPassword, newPassword);
 
         // 验证密码更改
-        assertNotNull(passwordChanged, "密码更改后的用户信息不应为空");
+        assertNotNull(passwordChanged, "User profile not null");
 
-        System.out.println("密码更改成功");
+        System.out.println("Password changed");
 
         // 3. 使用旧密码登录(应失败)
         authService.logout();
         assertThrows(AuthenticationException.class, () -> {
             authService.login(TestContext.getUsername(), oldPassword);
-        }, "使用旧密码登录应该失败");
+        }, "Old password login should fail");
 
-        System.out.println("使用旧密码登录失败验证成功");
+        System.out.println("Old password login failed as expected");
 
         // 4. 使用新密码登录
         UserInfo reloginInfo = authService.login(TestContext.getUsername(), newPassword);
 
         // 验证使用新凭证登录
-        assertNotNull(reloginInfo, "使用新凭证登录后的信息不应为空");
-        assertEquals(userId, reloginInfo.getId(), "登录后的用户ID不匹配");
-        assertTrue(authService.isLoggedIn(), "用户应该处于登录状态");
+        assertNotNull(reloginInfo, "Relogin user information should not be null");
+        assertEquals(userId, reloginInfo.getId(), "Relogin user ID does not match");
+        assertTrue(authService.isLoggedIn(), "User should be logged in with new password");
 
         // 更新全局上下文中的密码
         TestContext.setPassword(newPassword);
 
-        System.out.println("使用新密码登录成功");
-        System.out.println("======== 用户信息更新测试完成 ========");
+        System.out.println("New password login success");
+        System.out.println("======== User Profile Update Test Success ========");
     }
 }

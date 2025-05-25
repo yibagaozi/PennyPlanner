@@ -14,12 +14,24 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Integration tests for the authentication system in the PennyPlanner application.
+ *
+ * @author JIANG Mengnan
+ * @version 2.0.0
+ * @since 2.0.0
+ */
 @SpringBootTest
 public class AuthenticationIntegrationTest {
 
     @Autowired
     private AuthService authService;
 
+
+    /**
+     * Sets up the test environment before each test method.
+     * Ensures no user is logged in and resets the test context.
+     */
     @BeforeEach
     public void setUp() {
         if (authService.isLoggedIn()) {
@@ -29,47 +41,57 @@ public class AuthenticationIntegrationTest {
         TestContext.reset();
     }
 
+    /**
+     * Tests the complete user registration and login flow.
+     * The test uses random user information to ensure test isolation.
+     *
+     * @throws Exception if any authentication operations fail
+     */
     @Test
     public void testUserRegistrationAndLogin() throws Exception {
-        System.out.println("======== 开始测试: 用户注册与登录 ========");
+        System.out.println("======== Start test: Login and Register ========");
 
-        // 生成随机用户信息
+        // Generate random user information
         String randomSuffix = UUID.randomUUID().toString().substring(0, 8);
         String username = "testuser" + randomSuffix;
         String password = "Password123";
         String email = "test" + randomSuffix + "@example.com";
         String phone = "13812345678";
 
-        // 1. 用户注册
+        // 1. User registration
         UserInfo userInfo = authService.register(username, password, email, phone);
 
-        // 验证注册成功
-        assertNotNull(userInfo, "用户信息不应为空");
-        assertNotNull(userInfo.getId(), "用户ID不应为空");
-        assertEquals(username, userInfo.getUsername(), "用户名不匹配");
-        assertEquals(email, userInfo.getEmail(), "邮箱不匹配");
-        assertEquals(phone, userInfo.getPhone(), "手机号不匹配");
+        // Verify successful registration
+        assertNotNull(userInfo, "User information should not be null");
+        assertNotNull(userInfo.getId(), "User ID should not be null");
+        assertEquals(username, userInfo.getUsername(), "Username does not match");
+        assertEquals(email, userInfo.getEmail(), "Email does not match");
+        assertEquals(phone, userInfo.getPhone(), "Phone number does not match");
 
-        System.out.println("用户注册成功: " + userInfo.getUsername() + " (ID: " + userInfo.getId() + ")");
+        System.out.println("Register success: " + userInfo.getUsername() + " (ID: " + userInfo.getId() + ")");
 
-        // 2. 用户登录
+        // 2. User login
         UserInfo loginInfo = authService.login(username, password);
 
-        // 验证登录成功
-        assertNotNull(loginInfo, "登录信息不应为空");
-        assertEquals(userInfo.getId(), loginInfo.getId(), "登录后的用户ID不匹配");
-        assertTrue(authService.isLoggedIn(), "用户应该处于登录状态");
+        // Verify successful login
+        assertNotNull(loginInfo, "Login information should not be null");
+        assertEquals(userInfo.getId(), loginInfo.getId(), "User ID after login does not match");
+        assertTrue(authService.isLoggedIn(), "User should be in logged-in state");
 
-        System.out.println("用户登录成功");
+        System.out.println("Log in success");
 
-        // 保存用户信息供后续测试使用
+        // Save user information for subsequent tests
         TestContext.setUserId(loginInfo.getId());
         TestContext.setUsername(loginInfo.getUsername());
         TestContext.setPassword(password);
 
-        System.out.println("======== 用户注册与登录测试完成 ========");
+        System.out.println("======== Register and Login finished ========");
     }
 
+    /**
+     * Cleans up the test environment after each test method.
+     * Ensures the user is logged out after each test.
+     */
     @AfterEach
     public void tearDown() {
         // 确保每个测试结束后用户处于登出状态

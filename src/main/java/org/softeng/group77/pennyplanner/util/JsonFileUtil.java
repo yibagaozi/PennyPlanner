@@ -17,6 +17,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+/**
+ * Utility class for reading and writing JSON files with thread safety.
+ * Handles JSON serialization and deserialization with proper file locking.
+ *
+ * @author MA Ruize
+ * @version 2.0.0
+ * @since 1.0.0
+ */
 @Slf4j
 public class JsonFileUtil {
 
@@ -24,6 +32,11 @@ public class JsonFileUtil {
 
     private static final ConcurrentHashMap<String, ReadWriteLock> fileLocks = new ConcurrentHashMap<>();
 
+    /**
+     * Creates and configures an ObjectMapper with proper settings
+     *
+     * @return configured ObjectMapper instance
+     */
     private static ObjectMapper createObjectMapper() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
@@ -32,10 +45,24 @@ public class JsonFileUtil {
         return mapper;
     }
 
+    /**
+     * Gets a lock for a specific file path
+     *
+     * @param filePath path to the file
+     * @return a lock for the file
+     */
     private static ReadWriteLock getFileLock(String filePath) {
         return fileLocks.computeIfAbsent(filePath, k -> new ReentrantReadWriteLock());
     }
 
+    /**
+     * Reads JSON data from a file and converts it to an object
+     *
+     * @param filePath path to the JSON file
+     * @param clazz class to convert the JSON data to
+     * @return object of type T or null if file doesn't exist
+     * @throws IOException if reading or parsing fails
+     */
     public static <T> T readFromJson(String filePath, Class<T> clazz) throws IOException {
         ReadWriteLock lock = getFileLock(filePath);
         lock.readLock().lock();
@@ -53,6 +80,14 @@ public class JsonFileUtil {
         }
     }
 
+    /**
+     * Reads JSON data from a file using a TypeReference
+     *
+     * @param filePath path to the JSON file
+     * @param typeReference type reference for complex types
+     * @return object of type T or null if file doesn't exist
+     * @throws IOException if reading or parsing fails
+     */
     public static <T> T readFromJson(String filePath, TypeReference<T> typeReference) throws IOException {
         ReadWriteLock lock = getFileLock(filePath);
         lock.readLock().lock();
@@ -70,6 +105,13 @@ public class JsonFileUtil {
         }
     }
 
+    /**
+     * Writes data to a JSON file safely using a temporary file
+     *
+     * @param filePath path where to save the JSON file
+     * @param data object to convert to JSON and save
+     * @throws IOException if writing fails
+     */
     public static void writeToJson(String filePath, Object data) throws IOException {
         ReadWriteLock lock = getFileLock(filePath);
         lock.writeLock().lock();
@@ -88,6 +130,14 @@ public class JsonFileUtil {
         }
     }
 
+    /**
+     * Updates JSON data by reading, modifying, and writing it back
+     *
+     * @param filePath path to the JSON file
+     * @param clazz class of the data
+     * @param updater function to update the data
+     * @throws IOException if reading or writing fails
+     */
     public static <T> void updateJson(String filePath, Class<T> clazz, JsonUpdater<T> updater) throws IOException {
         ReadWriteLock lock = getFileLock(filePath);
         lock.writeLock().lock();
@@ -105,6 +155,12 @@ public class JsonFileUtil {
         }
     }
 
+    /**
+     * Deletes a JSON file if it exists
+     *
+     * @param filePath path to the JSON file
+     * @return true if file was deleted, false otherwise
+     */
     public static boolean deleteJson(String filePath) {
         ReadWriteLock lock = getFileLock(filePath);
         lock.writeLock().lock();
@@ -116,7 +172,13 @@ public class JsonFileUtil {
             lock.writeLock().unlock();
         }
     }
-    
+
+    /**
+     * Makes sure the directory exists before writing to a file
+     *
+     * @param path path to the file
+     * @throws IOException if directory creation fails
+     */
     private static void ensureDirectoryExists(Path path) throws IOException {
         Path parent = path.getParent();
         if (parent != null) {
@@ -124,6 +186,12 @@ public class JsonFileUtil {
         }
     }
 
+    /**
+     * Checks if a file exists
+     *
+     * @param filePath path to the file
+     * @return true if file exists, false otherwise
+     */
     public static boolean exists(String filePath) {
         return Files.exists(Paths.get(filePath));
     }

@@ -27,6 +27,9 @@ import java.util.function.Predicate;
  * Controller class for handling transaction history view.
  * Manages display and filtering of transaction records in a TableView with
  * filtering capabilities by year, month and category.
+ * @author CHAI Jiayang
+ * @version 2.0.0
+ * @since 1.0.0
  */
 @Controller
 public class HistoryController {
