@@ -8,6 +8,16 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import org.softeng.group77.pennyplanner.model.Transaction;
 
+/**
+ * Data Transfer Object for transaction details with JavaFX property support.
+ * This class wraps Transaction model data for display in the UI and binds
+ * to JavaFX controls. It uses JavaFX properties to enable automatic UI updates
+ * when data changes.
+ *
+ * @author MA Ruize
+ * @version 2.0.0
+ * @since 1.0.0
+ */
 public class TransactionDetail {
 
     private final StringProperty id = new SimpleStringProperty();

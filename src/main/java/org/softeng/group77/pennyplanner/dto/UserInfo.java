@@ -10,6 +10,16 @@ import org.softeng.group77.pennyplanner.model.User;
 import java.time.LocalDateTime;
 import lombok.Data;
 
+/**
+ * Data Transfer Object for user information with JavaFX property support.
+ * This class wraps User model data for display in the UI and provides
+ * JavaFX properties for binding to UI controls, enabling automatic updates
+ * when user data changes.
+ *
+ * @author MA Ruize
+ * @version 2.0.0
+ * @since 1.0.0
+ */
 public class UserInfo {
 
     @Getter

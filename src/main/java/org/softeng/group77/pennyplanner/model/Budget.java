@@ -7,6 +7,13 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.time.LocalDate;
 
+/**
+ * Represents a budget entity in the PennyPlanner application.
+ *
+ * @author JIANG Mengnan
+ * @version 2.0.0
+ * @since 1.1.0
+ */
 @Getter
 @Setter
 @AllArgsConstructor  // 自动生成全参构造函数
