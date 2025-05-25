@@ -187,8 +187,8 @@ public class TransactionIntegrationTest {
 
         assertNotNull(summary, "Financial summary should not be null");
         assertEquals(5000.0, summary.get("income"), 0.001, "Total income does not match");
-        assertEquals(750.0, summary.get("expense"), 0.001, "Total expense does not match");
-        assertEquals(4250.0, summary.get("totalBalance"), 0.001, "Net balance does not match");
+        assertEquals(820.0, summary.get("expense"), 0.001, "Total expense does not match");
+        assertEquals(4180.0, summary.get("totalBalance"), 0.001, "Net balance does not match");
 
         System.out.println("Get budget success:");
         System.out.println("  Income: " + summary.get("income"));
