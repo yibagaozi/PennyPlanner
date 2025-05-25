@@ -13,6 +13,7 @@ import java.io.IOException;
  * Handles user login, registration, and profile management.
  *
  * @author MA Ruize
+ * @author CHAI Yihang
  * @version 2.0.0
  * @since 1.0.0
  */
