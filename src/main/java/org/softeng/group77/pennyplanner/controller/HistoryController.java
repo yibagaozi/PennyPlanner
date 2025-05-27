@@ -55,11 +55,21 @@ public class HistoryController {
     private TransactionAdapter transactionAdapter;
     private AuthService authService; // 添加AuthService
 
+    /**
+     * Sets the TransactionAdapter for this controller.
+     * This method is used by Spring to inject the TransactionAdapter dependency.
+     * @param transactionAdapter the TransactionAdapter to set
+     */
     @Autowired
     public void setTransactionAdapter(TransactionAdapter transactionAdapter) {
         this.transactionAdapter = transactionAdapter;
     }
 
+    /**
+     * Sets the AuthService for this controller.
+     * This method is used by Spring to inject the AuthService dependency.
+     * @param authService the AuthService to set
+     */
     @Autowired
     public void setAuthService(AuthService authService) {
         this.authService = authService;
@@ -70,6 +80,10 @@ public class HistoryController {
 
     private final ApplicationContext applicationContext;
 
+    /**
+     * Constructor for HistoryController.
+     * @param applicationContext Spring application context for dependency injection
+     */
     public HistoryController(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }
@@ -233,7 +247,10 @@ public class HistoryController {
         }
     }
 
-    // 统一筛选逻辑（核心修复）
+    /**
+     * Updates the filter based on selected year, month, and category.
+     * This method is called whenever the filter criteria change.
+     */
     private void updateFilter() {
         Predicate<tableModel> predicate = transaction -> {
             // 日期条件处理
@@ -262,7 +279,10 @@ public class HistoryController {
         filteredData.setPredicate(predicate);
     }
 
-
+    /**
+     * Refreshes the transaction data and re-applies the current filters.
+     * This method can be called to update the displayed data after any changes.
+     */
     @FXML
     public void refreshData() {
         SharedDataModel.refreshTransactionData();
@@ -272,7 +292,10 @@ public class HistoryController {
         transactionTable.refresh();
     }
 
-    // 为类别和支付方式列添加emoji和样式
+    /**
+     * Styles the transaction ID column with emojis.
+     * @param column the TableColumn to style
+     */
     private void styleColumnWithEmoji(TableColumn<tableModel, String> column) {
         column.setCellFactory(col -> new TableCell<>() {
             @Override
@@ -291,7 +314,10 @@ public class HistoryController {
         });
     }
 
-    // 根据类别返回对应的emoji
+    /**
+     * Return the emoji for the transaction category.
+     * @param category the transaction category
+     */
     private String getEmojiForCategory(String category) {
         if (category == null) return "";
 
@@ -307,7 +333,10 @@ public class HistoryController {
         }
     }
 
-    // 根据支付方式返回对应的emoji
+    /**
+     * Return the emoji for the payment method.
+     * @param method the payment method
+     */
     private String getEmojiForMethod(String method) {
         if (method == null) return "❓";
 
@@ -322,7 +351,7 @@ public class HistoryController {
     }
 
     /**
-     * 处理编辑按钮点击事件
+     * Handle the edit button event
      */
     @FXML
     public void handleEdit() {
@@ -403,7 +432,7 @@ public class HistoryController {
     }
 
     /**
-     * 处理删除按钮点击事件
+     * Handle the delete button event
      */
     @FXML
     public void handleDelete() {
@@ -474,29 +503,72 @@ public class HistoryController {
         }
     }
 
-    // 以下导航方法保持不变
+    /**
+     * Navigates to the home view
+     *
+     * @throws IOException if navigation fails
+     */
     @FXML
     private void turntoHome() throws IOException {
         MainApp.showHome();
     }
+
+    /**
+     * Navigates to the report view
+     *
+     * @throws IOException if navigation fails
+     */
     @FXML
     private void turntoReport() throws IOException {
         MainApp.showReport();
-    }@FXML
+    }
+
+    /**
+     * Navigates to the history view
+     *
+     * @throws IOException if navigation fails
+     */
+    @FXML
     private void turntoHistory() throws IOException {
         MainApp.showhistory();
-    }@FXML
+    }
+
+    /**
+     * Navigates to the management view
+     *
+     * @throws IOException if navigation fails
+     */
+    @FXML
     private void turntoManagement() throws IOException {
         MainApp.showmanagement();
-    }@FXML
+    }
+
+    /**
+     * Navigates to the user profile view
+     *
+     * @throws IOException if navigation fails
+     */
+    @FXML
     private void turntoUser() throws IOException {
         MainApp.showuser();
     }
+
+    /**
+     * Navigates to the login view
+     *
+     * @throws IOException if navigation fails
+     */
     @FXML
     private void turntoLogin() throws IOException {
         System.out.println("Login");
         MainApp.showLogin();
     }
+
+    /**
+     * Navigates to the financial assistant view
+     *
+     * @throws IOException if navigation fails
+     */
     @FXML
     private void turntoFinancialAssistant() throws IOException {
         MainApp.showFinancialAssistant();
